@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d0" for="edge" attr.name="predicate" attr.type="string"/>
+<graph edgedefault="undirected"><node id="http://shortbol.org/v2#LacI_inverter/LacITetR_int/LacI_lacinv_part/1"/>
+<node id="http://shortbol.org/v2#LacI_inverter/LacI_fc/1"/>
+<node id="http://shortbol.org/v2#LacI_inverter/LacITetR_int/1"/>
+<node id="http://sbols.org/v2#Participation"/>
+<node id="http://identifiers.org/biomodels.sbo/SBO:0000020"/>
+<node id="http://shortbol.org/v2#LacI/1"/>
+<node id="http://shortbol.org/v2#LacI_inverter/1"/>
+<node id="http://sbols.org/v2#FunctionalComponent"/>
+<node id="http://shortbol.org/v2#LacI_inverter/TetR_fc/1"/>
+<node id="http://sbols.org/v2#ModuleDefinition"/>
+<node id="http://sbols.org/v2#Interaction"/>
+<node id="http://identifiers.org/biomodels.sbo/SBO:0000169"/>
+<node id="http://shortbol.org/v2#LacI_inverter/LacITetR_int/TetR_lacinv_part/1"/>
+<node id="http://shortbol.org/v2#TetR/1"/>
+<node id="http://www.biopax.org/release/biopax-level3.owl#Protein"/>
+<node id="http://sbols.org/v2#ComponentDefinition"/>
+<node id="http://identifiers.org/biomodels.sbo/SBO:0000642"/>
+<edge source="http://shortbol.org/v2#LacI_inverter/LacITetR_int/LacI_lacinv_part/1" target="http://shortbol.org/v2#LacI_inverter/LacI_fc/1">
+  <data key="d0">http://sbols.org/v2#participant</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI_inverter/LacITetR_int/LacI_lacinv_part/1" target="http://shortbol.org/v2#LacI_inverter/LacITetR_int/1">
+  <data key="d0">http://sbols.org/v2#participation</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI_inverter/LacITetR_int/LacI_lacinv_part/1" target="http://sbols.org/v2#Participation">
+  <data key="d0">http://www.w3.org/1999/02/22-rdf-syntax-ns#type</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI_inverter/LacITetR_int/LacI_lacinv_part/1" target="http://identifiers.org/biomodels.sbo/SBO:0000020">
+  <data key="d0">http://sbols.org/v2#role</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI_inverter/LacI_fc/1" target="http://shortbol.org/v2#LacI/1">
+  <data key="d0">http://sbols.org/v2#definition</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI_inverter/LacI_fc/1" target="http://shortbol.org/v2#LacI_inverter/1">
+  <data key="d0">http://sbols.org/v2#functionalComponent</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI_inverter/LacI_fc/1" target="http://sbols.org/v2#FunctionalComponent">
+  <data key="d0">http://www.w3.org/1999/02/22-rdf-syntax-ns#type</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI_inverter/LacITetR_int/1" target="http://shortbol.org/v2#LacI_inverter/1">
+  <data key="d0">http://sbols.org/v2#interaction</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI_inverter/LacITetR_int/1" target="http://sbols.org/v2#Interaction">
+  <data key="d0">http://www.w3.org/1999/02/22-rdf-syntax-ns#type</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI_inverter/LacITetR_int/1" target="http://identifiers.org/biomodels.sbo/SBO:0000169">
+  <data key="d0">http://sbols.org/v2#type</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI_inverter/LacITetR_int/1" target="http://shortbol.org/v2#LacI_inverter/LacITetR_int/TetR_lacinv_part/1">
+  <data key="d0">http://sbols.org/v2#participation</data>
+</edge>
+<edge source="http://sbols.org/v2#Participation" target="http://shortbol.org/v2#LacI_inverter/LacITetR_int/TetR_lacinv_part/1">
+  <data key="d0">http://www.w3.org/1999/02/22-rdf-syntax-ns#type</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI/1" target="http://www.biopax.org/release/biopax-level3.owl#Protein">
+  <data key="d0">http://sbols.org/v2#type</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI/1" target="http://sbols.org/v2#ComponentDefinition">
+  <data key="d0">http://www.w3.org/1999/02/22-rdf-syntax-ns#type</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI_inverter/1" target="http://shortbol.org/v2#LacI_inverter/TetR_fc/1">
+  <data key="d0">http://sbols.org/v2#functionalComponent</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI_inverter/1" target="http://sbols.org/v2#ModuleDefinition">
+  <data key="d0">http://www.w3.org/1999/02/22-rdf-syntax-ns#type</data>
+</edge>
+<edge source="http://sbols.org/v2#FunctionalComponent" target="http://shortbol.org/v2#LacI_inverter/TetR_fc/1">
+  <data key="d0">http://www.w3.org/1999/02/22-rdf-syntax-ns#type</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI_inverter/TetR_fc/1" target="http://shortbol.org/v2#LacI_inverter/LacITetR_int/TetR_lacinv_part/1">
+  <data key="d0">http://sbols.org/v2#participant</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI_inverter/TetR_fc/1" target="http://shortbol.org/v2#TetR/1">
+  <data key="d0">http://sbols.org/v2#definition</data>
+</edge>
+<edge source="http://shortbol.org/v2#LacI_inverter/LacITetR_int/TetR_lacinv_part/1" target="http://identifiers.org/biomodels.sbo/SBO:0000642">
+  <data key="d0">http://sbols.org/v2#role</data>
+</edge>
+<edge source="http://shortbol.org/v2#TetR/1" target="http://www.biopax.org/release/biopax-level3.owl#Protein">
+  <data key="d0">http://sbols.org/v2#type</data>
+</edge>
+<edge source="http://shortbol.org/v2#TetR/1" target="http://sbols.org/v2#ComponentDefinition">
+  <data key="d0">http://www.w3.org/1999/02/22-rdf-syntax-ns#type</data>
+</edge>
+</graph></graphml>

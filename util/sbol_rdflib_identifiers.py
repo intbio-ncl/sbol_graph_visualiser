@@ -46,6 +46,7 @@ class Objects:
         self.collection = rdflib.term.URIRef(self.namespaces.sbol + "Collection")
         self.sequence_annotation = rdflib.term.URIRef(self.namespaces.sbol + "SequenceAnnotation")
         self.participation = rdflib.term.URIRef(self.namespaces.sbol + "Participation")
+        self.sequence_constraint = rdflib.term.URIRef(self.namespaces.sbol + "SequenceConstraint")
 
         self.top_levels = {rdflib.URIRef(self.namespaces.sbol + name) for name in
                             ['Sequence',
@@ -109,6 +110,7 @@ class Predicates:
         self.local = rdflib.term.URIRef(self.namespaces.sbol + 'local')
         self.remote = rdflib.term.URIRef(self.namespaces.sbol + 'remote')
 
+        self.module = rdflib.term.URIRef(self.namespaces.sbol + "module")
         self.ownership_predicates = {rdflib.URIRef(self.namespaces.sbol + predicate) for predicate in
                                 ['module',
                                 'mapsTo',
