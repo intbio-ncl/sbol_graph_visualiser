@@ -20,6 +20,64 @@ class CytoscapeVisualiser:
 
 
     # ---------------------- Set Preset (Set a sub-graph) ----------------------
+    def set_full_graph_preset(self):
+        '''
+        :type: preset
+        Sets the rendered graph as the default graph (Whole graph.)
+        :rtype: None
+        '''
+        # Shouldn't need to set positions when swapping to orig graph as they already have there positions bound.
+        # If a preset is added that introduces nodes that are not in the orig graph then 
+        # potentially the positions must be recalulated.
+        # Kept it like this as noticable performance drop.
+        self.preset = self._graph.graph
+
+    def set_interaction_preset(self):
+        ''' 
+        :type: preset
+        Sets the rendered graph as a graph displaying interactions between parts.
+        Nodes - ComponentDefinitions
+        Edges - Interactions
+        :rtype: None
+        '''
+        self._set_positions()
+        parts_graph = self._graph.produce_interaction_graph()
+        self.preset = parts_graph
+
+    def set_components_preset(self):
+        ''' 
+        Sets the rendered graph as a graph displaying 
+        CD's as subparts of other CD's.
+        Nodes - ComponentDefinitions
+        Edges - Components (Instances of CD's)
+        :rtype: None
+        '''
+        self._set_positions()
+        components_preset = self._graph.produce_components_preset()
+        self.preset = components_preset
+
+    def set_parts_preset(self):
+        self._set_positions()
+        parts_graph = self._graph.produce_parts_preset()
+        self.preset = parts_graph
+
+    def set_functional_preset(self):
+        ''' 
+        :type: preset
+        Sets the rendered graph as a graph displaying 
+        CD's as subparts of other CD's.
+        Nodes - ComponentDefinitions
+        Edges - Components (Instances of CD's)
+        :rtype: None
+        '''
+        self._set_positions()
+        functional_graph = self._graph.produce_functional_preset()
+        self.preset = functional_graph
+
+    def set_parent_preset(self):
+        self._set_positions()
+        parent_graph = self._graph.produce_parent_preset()
+        self.preset = parent_graph
 
     # ---------------------- Pick a layout ----------------------
 

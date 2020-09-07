@@ -6,11 +6,11 @@ from graph_visualisation.networkx.visual import NetworkXGraphBuilder
 from graph_visualisation.plotly.visual import PlotlyVisualiser
 from graph_visualisation.cytoscape.visual import CytoscapeVisualiser
 
-from graph_visualisation.dash.visual import DashBoard
+from graph_dashboards.dash.visual import DashBoard
 
 from graph_visualisation.networkx.run import nwx_runner
 from graph_visualisation.plotly.run import plotly_runner
-from graph_visualisation.dash.run import dash_runner
+from graph_dashboards.dash.run import dash_runner
 
 visual_mapper = {
                 "networkx" : {"builder" : NetworkXGraphWrapper,"visual" : {"networkx" : NetworkXGraphBuilder}, "run" : nwx_runner},
@@ -22,9 +22,6 @@ visual_mapper = {
 TODO::
 Graph
     User prune? Given some string or pattern prune graph of said values.
-    New graph type (I think) - https://dash.plotly.com/cytoscape
-Layouts
-    Tree
 
 Optional Extras
     Allow chaining of labels. Add to current label instead of overwriting.

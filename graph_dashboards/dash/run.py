@@ -72,6 +72,8 @@ def dash_runner(visualiser,name = ""):
     # Add Graph
     plotly_graph = dashboard.create_graph(plotly_update_outputs["graph_id"].component_id,figure,add=False)
     cyto_graph = dashboard.create_graph(cyto_update_outputs["graph_id"].component_id,None,add=False)
+    # Cyto is different to plotly, you dont add it to a graph it standalone in the component list.
+    #cyto_container = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,[cyto_graph],add=False)
 
     plotly_div = dashboard.create_div(graph_type_outputs["plotly_div"].component_id, [plotly_graph], add=False)
     cyto_div = dashboard.create_div(graph_type_outputs["cyto_div"].component_id, [cyto_graph], add=False,style=hidden_style)
