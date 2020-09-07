@@ -1,0 +1,42 @@
+html, body
+{
+    height: 100%;
+    margin : 0px;
+    background-color: rgb(229, 236, 246);
+}
+
+#sidebar{
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 16rem;
+    padding: 2rem 1rem;
+    background-color: #f8f9fa;
+    overflow-y: auto;
+}
+
+#content{
+    margin : 0px;
+    padding : 0px;
+    margin-left: 18rem;
+    height : 100vh;
+}
+
+#plotly_graph, #cyto_graph{
+    margin : 0px;
+    padding : 0px;
+    height:88vh;
+    width:90vw;
+    background-color: rgb(229, 236, 246);
+}
+
+#graph_type{
+    width:10%;
+    height:100%;
+}
+
+#toolbox{ 
+    display: flex; 
+}
+

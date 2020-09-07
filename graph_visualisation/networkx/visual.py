@@ -4,14 +4,14 @@ import copy
 import rdflib
 import networkx as nx
 import matplotlib.pyplot as plt
-from graph_wrapper import NetworkXGraphWrapper
+from graph_builder.networkx_wrapper import NetworkXGraphWrapper
 from networkx.drawing.nx_pydot import write_dot
 from operator import itemgetter
 from functools import partial
 from networkx import MultiGraph
 sys.path.insert(0,os.path.expanduser(os.path.join(os.getcwd(),"util")))
 from sbol_rdflib_identifiers import identifiers
-import color_util
+from color_util import SBOLTypeColors,SBOLPredicateColors,calculate_next_color,calculate_role_color
 from matplotlib.lines import Line2D
 try:
     import pygraphviz
@@ -28,8 +28,8 @@ TODO
 class NetworkXGraphBuilder:
     def __init__(self, graph = None):
         self._graph = NetworkXGraphWrapper(graph)
-        self.build_settings = {"layout":None, 
-                               "preset":self._graph.graph, 
+        self.build_settings = {"preset":self._graph.graph,
+                               "layout":None,  
                                "edge_attributes":None, 
                                "node_attributes":None,
                                "misc_calls" : [],
@@ -215,12 +215,12 @@ class NetworkXGraphBuilder:
         '''
         nodes = self.build_settings["preset"].nodes
         for node in nodes:
-            obj_type = self._graph.search((node,identifiers.predicates.rdf_type,None))
-            if obj_type == []:
-                color = color_util.SBOLTypeColors["default"].value
+            obj_type = self._graph.retrieve_node(node,identifiers.predicates.rdf_type)
+            if obj_type is None:
+                color = SBOLTypeColors["default"].value
             else:
-                obj_type = self._graph._get_name(obj_type[0][1])
-                color = color_util.SBOLTypeColors[obj_type].value
+                obj_type = self._graph._get_name(obj_type)
+                color = SBOLTypeColors[obj_type].value
             nodes[node]["color"] = color
 
         self.build_settings["misc"]["node_color"] = [nodes[u]['color'] for u in nodes]
@@ -232,19 +232,17 @@ class NetworkXGraphBuilder:
         type_color_map = {}
         role_color_map = {"no_role" : (0,0,0)}
         for node in nodes:
-            obj_type_triple = self._graph.search((node,identifiers.predicates.rdf_type,None))
-            if obj_type_triple == []:
-                type_color = color_util.SBOLTypeColors["default"].value
-                obj_type_triple = None
+            obj_type = self._graph.retrieve_node(node,identifiers.predicates.rdf_type)
+            if obj_type is None:
+                type_color = SBOLTypeColors["default"].value
             else:
-                obj_type = obj_type_triple[0][1]
                 obj_name = self._graph._get_name(obj_type)
                 if obj_name in type_color_map.keys():
                     type_color = type_color_map[obj_name]
                 else:
                     type_color = type_curr_color
                     type_color_map[obj_name] = type_curr_color
-                    type_curr_color = color_util.calculate_next_color(type_curr_color)
+                    type_curr_color = calculate_next_color(type_curr_color)
 
             role = self._graph.get_sbol_object_role(node,obj_type)
             if role is None:
@@ -252,7 +250,7 @@ class NetworkXGraphBuilder:
             elif role in role_color_map.keys():
                 role_color = role_color_map[role]
             else:
-                role_color = color_util.calculate_role_color(type_color_map[obj_name],role_color_map)
+                role_color = calculate_role_color(type_color_map[obj_name],role_color_map)
                 role_color_map[role] = role_color
 
             nodes[node]["type_color"] = type_color
@@ -283,9 +281,9 @@ class NetworkXGraphBuilder:
         for u,v in edges:
             edge = edges[u,v]
             if "triples" not in edge.keys():
-                color = color_util.SBOLPredicateColors["default"].value
+                color = SBOLPredicateColors["default"].value
             edge_type = self._graph._get_name(edge["triples"][0][1])
-            color = color_util.SBOLPredicateColors[edge_type].value
+            color = SBOLPredicateColors[edge_type].value
             edges[u,v]["edge_color"] = color
         self.build_settings["misc"]["edge_color"] = [edges[u,v]['edge_color'] for u,v in edges]
 
@@ -303,7 +301,7 @@ class NetworkXGraphBuilder:
             else:
                 color = curr_color
                 color_map[predicate_type] = curr_color
-                curr_color = color_util.calculate_next_color(curr_color)
+                curr_color = calculate_next_color(curr_color)
             
             edges[u,v]["edge_color"] = color
         self.build_settings["misc"]["edge_color"] = [edges[u,v]['edge_color'] for u,v in edges]
@@ -312,13 +310,13 @@ class NetworkXGraphBuilder:
     def set_node_size(self,size):
         self.build_settings["misc"]["node_size"] = int(size)
 
-    def set_node_edge_width(self,width):
+    def set_node_outline_width(self,width):
         self.build_settings["misc"]["width"] = int(width)
 
     def set_edge_width(self,width):
         self.build_settings["misc"]["linewidths"] = int(width)
     
-    def add_legend(self,mapping,title,location):
+    def _add_legend(self,mapping,title,location):
         def make_proxy(clr, **kwargs):
             return Line2D([0, 1], [0, 1], color=clr, **kwargs)
         types = list(mapping.keys())
@@ -339,6 +337,7 @@ class NetworkXGraphBuilder:
         if self.build_settings["layout"] is None:
             raise ValueError("No Graph Layout provided.")
         else:
+            print(self.build_settings["layout"])
             position = self.build_settings["layout"]()
             y_off = 0.05
             pos_higher = {}
@@ -365,13 +364,13 @@ class NetworkXGraphBuilder:
 
         # generate proxies with the above function
         if "edge_color_mapping" in self.build_settings["meta_data"].keys():
-            self.add_legend(self.build_settings["meta_data"]["edge_color_mapping"],"Edge Types","upper left")
+            self._add_legend(self.build_settings["meta_data"]["edge_color_mapping"],"Edge Types","upper left")
 
         if "node_type_color_mapping" in self.build_settings["meta_data"].keys():
-            self.add_legend(self.build_settings["meta_data"]["node_type_color_mapping"],"Node Types","upper right")
+            self._add_legend(self.build_settings["meta_data"]["node_type_color_mapping"],"Node Types","upper right")
         
         if "node_role_color_mapping" in self.build_settings["meta_data"].keys():
-            self.add_legend(self.build_settings["meta_data"]["node_role_color_mapping"],"Node Roles","lower right")
+            self._add_legend(self.build_settings["meta_data"]["node_role_color_mapping"],"Node Roles","lower right")
         plt.show()
 
     def save_visualisation(self):
@@ -379,17 +378,4 @@ class NetworkXGraphBuilder:
 
     def show_graph(self):
         plt.show()
-
-if __name__ == "__main__":
-    graph = NetworkXGraphWrapper(sys.argv[1])
-    graph.prune_graph()
-    graph.write_graphml("graphml.xml")
-    exit(0)
-    visual_builder = NetworkXGraphBuilder(graph)
-    visual_builder.set_tree_layout()
-    visual_builder.set_interaction_preset()
-    visual_builder.add_adaptive_node_color()
-    visual_builder.add_adaptive_edge_color()
-    visual_builder.add_node_labels()
-    visual_builder.build()
 
