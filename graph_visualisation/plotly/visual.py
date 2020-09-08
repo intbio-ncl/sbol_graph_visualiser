@@ -7,9 +7,10 @@ sys.path.insert(0,os.path.expanduser(os.path.join(os.getcwd(),"util")))
 from rdflib import URIRef,Literal
 from sbol_rdflib_identifiers import identifiers
 from color_util import SBOLTypeColors,SBOLPredicateColors,calculate_next_color,calculate_role_color
+from graph_visualisation.abstract_visualiser import AbstractVisualiser
 
 
-class PlotlyVisualiser:
+class PlotlyVisualiser(AbstractVisualiser):
     def __init__(self, graph = None):
         if isinstance(graph,NetworkXGraphWrapper):
             self._graph = graph
@@ -32,194 +33,17 @@ class PlotlyVisualiser:
                                     }
         self.misc_edge_settings = {"legends" : [],
                                   "line" : {"width" : 1.0}}
-        self.edge_pos = []
-        self.node_pos = []
 
-    def _set_positions(self):
-        self.edge_pos = []
-        self.node_pos = []
-        if self.pos == []:
-            raise ValueError("Unable to set position as no layout has been defined.")
-        for edge in self.preset.edges():
-            x0, y0 = self.pos[edge[0]]
-            x1, y1 = self.pos[edge[1]]
-            self.edge_pos.append([[x0,y0],[x1,y1]])
-        for node in self.preset.nodes():
-            x, y = self.pos[node]
-            self.node_pos.append([x,y])
+    def copy_settings(self):
+        current_settings = [
+            self.layout,
+            self.node_text_preset,
+            self.edge_text_preset,
+            self.node_color_preset,
+            self.edge_color_preset,
+        ]
+        return current_settings
 
-
-    # ---------------------- Set Preset (Set a sub-graph) ----------------------
-    def set_full_graph_preset(self):
-        '''
-        :type: preset
-        Sets the rendered graph as the default graph (Whole graph.)
-        :rtype: None
-        '''
-        # Shouldn't need to set positions when swapping to orig graph as they already have there positions bound.
-        # If a preset is added that introduces nodes that are not in the orig graph then 
-        # potentially the positions must be recalulated.
-        # Kept it like this as noticable performance drop.
-        self.preset = self._graph.graph
-
-    def set_interaction_preset(self):
-        ''' 
-        :type: preset
-        Sets the rendered graph as a graph displaying interactions between parts.
-        Nodes - ComponentDefinitions
-        Edges - Interactions
-        :rtype: None
-        '''
-        self._set_positions()
-        parts_graph = self._graph.produce_interaction_graph()
-        self.preset = parts_graph
-
-    def set_components_preset(self):
-        ''' 
-        Sets the rendered graph as a graph displaying 
-        CD's as subparts of other CD's.
-        Nodes - ComponentDefinitions
-        Edges - Components (Instances of CD's)
-        :rtype: None
-        '''
-        self._set_positions()
-        components_preset = self._graph.produce_components_preset()
-        self.preset = components_preset
-
-    def set_parts_preset(self):
-        self._set_positions()
-        parts_graph = self._graph.produce_parts_preset()
-        self.preset = parts_graph
-
-    def set_functional_preset(self):
-        ''' 
-        :type: preset
-        Sets the rendered graph as a graph displaying 
-        CD's as subparts of other CD's.
-        Nodes - ComponentDefinitions
-        Edges - Components (Instances of CD's)
-        :rtype: None
-        '''
-        self._set_positions()
-        functional_graph = self._graph.produce_functional_preset()
-        self.preset = functional_graph
-
-    def set_parent_preset(self):
-        self._set_positions()
-        parent_graph = self._graph.produce_parent_preset()
-        self.preset = parent_graph
-
-    # ---------------------- Pick a layout ----------------------
-    def set_spring_layout(self):
-        ''' 
-        Draw the specified graph with a spring layout. 
-        :rtype: None
-        '''
-        if self.layout == self.set_spring_layout:
-            self.pos = nx.spring_layout(self.preset, iterations=200)
-            self._set_positions()
-        else:
-            self.layout = self.set_spring_layout
-
-    def set_circular_layout(self):
-        ''' 
-        Draw the specified graph with a circular layout. 
-        :rtype: None
-        '''
-        if self.layout == self.set_circular_layout:
-            self.pos = nx.circular_layout(self.preset)
-            self._set_positions()
-        else:
-            self.layout = self.set_circular_layout
-
-    def set_kamada_kawai_layout(self):
-        ''' 
-        Draw the graph G with a Kamada-Kawai force-directed layout.
-        :rtype: None
-        '''
-        if self.layout == self.set_kamada_kawai_layout:
-            self.pos = nx.kamada_kawai_layout(self.preset)
-            self._set_positions()
-        else:
-            self.layout = self.set_kamada_kawai_layout
-
-    def set_planar_layout(self):
-        ''' 
-        Draw a planar graph with planar layout.
-        :rtype: None
-        '''
-        if self.layout == self.set_planar_layout:
-            self.pos = nx.planar_layout(self.preset)
-            self._set_positions()
-        else:
-            self.layout = self.set_planar_layout
-
-    def set_shell_layout(self):
-        ''' 	
-        Draw graph with shell layout.
-        :rtype: None
-        '''
-        if self.layout == self.set_shell_layout:
-            self.pos = nx.shell_layout(self.preset)
-            self._set_positions()
-        else:
-            self.layout = self.set_shell_layout
-
-    def set_spiral_layout(self):
-        ''' 	
-        Position nodes in a spiral layout.
-        :rtype: None
-        '''
-        if self.layout == self.set_spiral_layout:
-            self.pos = nx.spiral_layout(self.preset)
-            self._set_positions()
-        else:
-            self.layout = self.set_spiral_layout
-            
-    def set_spectral_layout(self):
-        ''' 	
-        Position nodes using the eigenvectors of the graph Laplacian.
-        :rtype: None
-        '''
-        if self.layout == self.set_spectral_layout:
-            self.pos = nx.spectral_layout(self.preset)
-            self._set_positions()
-        else:
-            self.layout = self.set_spectral_layout
-            
-    def set_random_layout(self):
-        ''' 	
-        Position nodes uniformly at random in the unit square.
-        :rtype: None
-        '''
-        if self.layout == self.set_random_layout:
-            self.pos = nx.random_layout(self.preset)
-            self._set_positions()
-        else:
-            self.layout = self.set_random_layout
-            
-    def set_graphviz_layout(self):
-        ''' 	
-        Create node positions using Graphviz.
-        :rtype: None
-        '''
-        if self.layout == self.set_graphviz_layout:
-            self.pos = nx.nx_agraph.graphviz_layout(self.preset)
-            self._set_positions()
-        else:
-            self.layout = self.set_graphviz_layout
-            
-    def set_pydot_layout(self):
-        ''' 	
-        Create node positions using pydot.
-        :rtype: None
-        '''
-        if self.layout == self.set_pydot_layout:
-            self.pos = nx.nx_pydot.pydot_layout(self.preset)
-            self._set_positions()
-        else:
-            self.layout = self.set_pydot_layout
-            
     # ---------------------- Pick the node content ----------------------
 
     def add_node_no_labels(self):
@@ -508,16 +332,19 @@ class PlotlyVisualiser:
         data = []
         edge_color = self.edge_color_preset()  
         edges_list = []
-        for index, e in enumerate(self.edge_pos):
+        for index,edge in enumerate(self.preset.edges()):
             line = self._get_specific_node_settings(index,self.misc_edge_settings["line"])
             line["color"] = edge_color[index]
             if len(self.misc_edge_settings["legends"]) > index:
                 legend = self.misc_edge_settings["legends"][index]
             else:
                 legend = {}
+
+            x0, y0 = self.pos[edge[0]]
+            x1, y1 = self.pos[edge[1]]
             edges_list.append(dict(type='scatter',
-                        x=[e[0][0],e[1][0]],
-                        y=[e[0][1],e[1][1]],
+                        x=[x0,x1],
+                        y=[y0,y1],
                         mode='lines',
                         hoverinfo='none',
                         line=line,
@@ -530,7 +357,7 @@ class PlotlyVisualiser:
         if self.node_color_preset is not None:
             node_color = self.node_color_preset()
         node_list = []
-        for index,e in enumerate(self.node_pos):
+        for index,node in enumerate(self.preset.nodes()):
             # Some settings are generic (Same for all nodes), some are unique
             # When a list appears in the settings its unique so use node pos index to find its value.
             specialised_node_settings = self._get_specific_node_settings(index,self.misc_node_settings["marker"])
@@ -541,8 +368,8 @@ class PlotlyVisualiser:
                 legend = {}
             marker = dict(color = node_color[index],**specialised_node_settings)
             node_list.append(dict(type='scatter',
-                                    x=[e[0]],
-                                    y=[e[1]],
+                                    x=[self.pos[node][0]],
+                                    y=[self.pos[node][1]],
                                     mode=self.node_marker_type,
                                     hoverinfo='text',
                                     text=node_text[index],
@@ -633,7 +460,3 @@ class PlotlyVisualiser:
                 )
             }
             
-if __name__ == "__main__":
-    g = PlotlyVisualiser(sys.argv[1])
-    g.add_adaptive_node_color()
-    g.add_adaptive_node_color()

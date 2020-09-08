@@ -27,7 +27,7 @@ plotly_update_outputs = {"graph_id" : Output("plotly_graph","figure"),
                         "error_content" : Output("plotly_error_alert","children")}
 
 cyto_update_inputs = OrderedDict()
-cyto_update_outputs = {"graph_id" : Output("cyto_graph","figure"),
+cyto_update_outputs = {"graph_id" : Output("cyto_graph","children"),
                         "error_id" : Output("cyto_error_alert", "is_open"),
                         "error_content" : Output("cyto_error_alert","children")}
 
@@ -71,12 +71,10 @@ def dash_runner(visualiser,name = ""):
 
     # Add Graph
     plotly_graph = dashboard.create_graph(plotly_update_outputs["graph_id"].component_id,figure,add=False)
-    cyto_graph = dashboard.create_graph(cyto_update_outputs["graph_id"].component_id,None,add=False)
+    cyto_graph = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,[],add=False)
     # Cyto is different to plotly, you dont add it to a graph it standalone in the component list.
-    #cyto_container = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,[cyto_graph],add=False)
-
     plotly_div = dashboard.create_div(graph_type_outputs["plotly_div"].component_id, [plotly_graph], add=False)
-    cyto_div = dashboard.create_div(graph_type_outputs["cyto_div"].component_id, [cyto_graph], add=False,style=hidden_style)
+    cyto_div = dashboard.create_div(graph_type_outputs["cyto_div"].component_id, cyto_graph, add=False,style=hidden_style)
 
     graph_container = dashboard.create_div(load_outputs["graph_container_id"].component_id, plotly_div+cyto_div, add=False)
 
@@ -111,8 +109,10 @@ def dash_runner(visualiser,name = ""):
 
 
 def update_plotly_graph(dashboard,*args):
+    if not isinstance(dashboard.visualiser,PlotlyVisualiser):
+        raise dash.exceptions.PreventUpdate()
     args = args[0]
-    old_settings = copy_settings(dashboard)
+    old_settings = dashboard.visualiser.copy_settings()
     for index,setter_str in enumerate(args):
         if setter_str is not None:
             try:
@@ -142,8 +142,10 @@ def update_plotly_graph(dashboard,*args):
     
 
 def update_cyto_graph(dashboard,*args):
+    if not isinstance(dashboard.visualiser,CytoscapeVisualiser):
+        raise dash.exceptions.PreventUpdate()
     args = args[0]
-    old_settings = copy_settings(dashboard)
+    old_settings = dashboard.visualiser.copy_settings()
     for index,setter_str in enumerate(args):
         if setter_str is not None:
             try:
@@ -166,8 +168,8 @@ def update_cyto_graph(dashboard,*args):
 
     try:
         figure = dashboard.visualiser.build(show=False)
-        figure.update_layout(transition_duration=500)
-        return figure,False,"No Error"
+        #figure.update_layout(transition_duration=500)
+        return [figure],False,["No Error"]
     except Exception as ex:
         return reverse_graph(dashboard, old_settings,ex)
 
@@ -207,17 +209,17 @@ def change_graph_type(dashboard,graph_type):
 
     if graph_type == "plotly":
         plotly_options_style = {}
-        plotly_div_children = dashboard.create_graph(graph_type_outputs["plotly_options_id"].component_id,figure,add=False) 
+        plotly_div_children = dashboard.create_graph(plotly_update_outputs["graph_id"].component_id,figure,add=False) 
         plotly_div_style = {}
         cyto_options_style = {'display': 'none'}
-        cyto_div_children = empty_figure 
+        cyto_div_children = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,[empty_figure],add=False) 
         cyto_div_style = {'display': 'none'}
     else :
         plotly_options_style = {'display': 'none'}
-        plotly_div_children = dashboard.create_graph(graph_type_outputs["plotly_options_id"].component_id,empty_figure,add=False) 
+        plotly_div_children = dashboard.create_graph(plotly_update_outputs["graph_id"].component_id,empty_figure,add=False) 
         plotly_div_style = {'display': 'none'}
         cyto_options_style = {}
-        cyto_div_children = figure
+        cyto_div_children = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,[figure],add=False)
         cyto_div_style = {}
 
     return plotly_options_style,plotly_div_children,plotly_div_style,cyto_options_style,cyto_div_children,cyto_div_style
@@ -228,7 +230,6 @@ def reverse_graph(dashboard,old_settings,error_str = ""):
         if setting is not None:
             setting()
     figure = dashboard.visualiser.build(show=False)
-    figure.update_layout(transition_duration=500)
     error_string = "Error: " + str(error_str)
     return figure,True,error_string
 
@@ -284,15 +285,6 @@ def _create_form_elements(visualiser,dashboard,style = {},id_prefix = ""):
     
     return elements + misc_div, identifiers
 
-def copy_settings(dashboard):
-    current_settings = [
-        dashboard.visualiser.layout,
-        dashboard.visualiser.node_text_preset,
-        dashboard.visualiser.edge_text_preset,
-        dashboard.visualiser.node_color_preset,
-        dashboard.visualiser.edge_color_preset,
-    ]
-    return current_settings
 
 def _beautify_name(name):
     name_parts = name.split("_")
@@ -315,7 +307,8 @@ def _generate_options(visualiser):
                            "edge_text_preset",
                            "node_color_preset",
                            "edge_color_preset",
-                           "layout"]
+                           "layout",
+                           "copy_settings"]
 
     options = {"preset" : {},
                "layout" : {}}
