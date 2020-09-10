@@ -12,18 +12,7 @@ from graph_visualisation.abstract_visualiser import AbstractVisualiser
 
 class PlotlyVisualiser(AbstractVisualiser):
     def __init__(self, graph = None):
-        if isinstance(graph,NetworkXGraphWrapper):
-            self._graph = graph
-        else:
-            self._graph = NetworkXGraphWrapper(graph)
-
-        self.preset = self._graph.graph
-        self.layout = self.set_spring_layout
-        self.pos = []
-        self.node_text_preset = self.add_node_no_labels
-        self.edge_text_preset = None
-        self.node_color_preset = self.add_standard_node_color
-        self.edge_color_preset = self.add_standard_edge_color
+        super().__init__(graph)
         self.node_marker_type = "markers"
         self.edge_marker_type = "markers"
         self.misc_node_settings = {
@@ -44,80 +33,6 @@ class PlotlyVisualiser(AbstractVisualiser):
         ]
         return current_settings
 
-    # ---------------------- Pick the node content ----------------------
-
-    def add_node_no_labels(self):
-        if self.node_text_preset == self.add_node_no_labels:
-            return [None] * len(self.preset.nodes())
-        else:
-            self.node_text_preset = self.add_node_no_labels
-
-    def add_node_adjacency_labels(self):
-        if self.node_text_preset == self.add_node_adjacency_labels:
-            node_text = []
-            for node, adjacencies in enumerate(self.preset.adjacency()):
-                node_text.append('# of connections: '+str(len(adjacencies[1])))
-            return node_text
-        else:
-            self.node_text_preset = self.add_node_adjacency_labels
-
-    def add_node_name_labels(self):
-        if self.node_text_preset == self.add_node_name_labels:
-            node_text = []
-            names = nx.get_node_attributes(self.preset,"display_name")
-            for v in names.values():
-                node_text.append(v)
-            return node_text
-        else:
-            self.node_text_preset = self.add_node_name_labels
-    
-    def add_node_type_labels(self):
-        if self.node_text_preset == self.add_node_type_labels:
-            node_text = []
-            for node in self.preset.nodes:
-                edges = [[e for e in edge[2]["triples"]] for edge in self._graph.edges(node,data=True)]
-                found = False
-                for edge in edges:
-                    edge = edge[0]
-                    if edge[1] == identifiers.predicates.rdf_type:
-                        node_text.append(self._graph._get_name(str(edge[2])))
-                        found = True
-                        break
-                if not found:
-                    # I think this should only be literals and external identifiers.
-                    if isinstance(edge[2],Literal):
-                        node_text.append("Literal")
-                    elif isinstance(edge[2],URIRef):
-                        node_text.append("Identifier")
-                    else:
-                        node_text.append("?")
-            return node_text
-        else:
-            self.node_text_preset = self.add_node_type_labels
-        
-    def add_node_parent_labels(self):
-        if self.node_text_preset == self.add_node_parent_labels:
-            node_text = []
-            # A parent is essentially a triple child - parent - edge
-            # If a node doesnt have a parent don't add it as it will already be present.
-            for node in self.preset.nodes:
-                edges = [[e for e in edge[2]["triples"]] for edge in self.preset.edges(node,data=True)]
-                node_type = self._graph.triplepack_search((node,identifiers.predicates.rdf_type,None),edges)
-                if node_type is None:
-                    node_text.append("N/A")
-                    continue
-                if node_type in identifiers.objects.top_levels:
-                    node_text.append("Top Level")
-                    continue
-                node_type = node_type[2]
-                parent = self._graph._get_parent(node,edges,self.preset.edges)
-                if parent is None:
-                    node_text.append("No Parent")
-                else:
-                    node_text.append(self._graph._get_name(str(parent)))
-            return node_text
-        else:
-            self.node_text_preset = self.add_node_parent_labels
 
     # ---------------------- Pick the edge content ----------------------
 
@@ -146,18 +61,17 @@ class PlotlyVisualiser(AbstractVisualiser):
             return edge_names
         else:
             self.edge_text_preset = self.add_edge_name_labels
-
+            
     # ---------------------- Pick the node color ----------------------
 
     def add_standard_node_color(self):
         if self.node_color_preset == self.add_standard_node_color:
+            color_list = super().add_standard_node_color()
             self.misc_node_settings["legends"].clear()
-            nodes = self.preset.nodes()
-            standard_color = "#888"
             hide_legend = {"showlegend" : False}
-            self.misc_node_settings["marker"]["line"]["color"] = ["#800000" for e in nodes]
-            self.misc_node_settings["legends"] = self.misc_node_settings["legends"] + [hide_legend for e in nodes]
-            return [standard_color for e in nodes]
+            self.misc_node_settings["marker"]["line"]["color"] = ["#800000" for e in self.preset.nodes()]
+            self.misc_node_settings["legends"] = self.misc_node_settings["legends"] + [hide_legend for e in self.preset.nodes()]
+            return color_list
         else:
             self.node_color_preset = self.add_standard_node_color
 
@@ -238,13 +152,12 @@ class PlotlyVisualiser(AbstractVisualiser):
 
     def add_standard_edge_color(self):
         if self.edge_color_preset == self.add_standard_edge_color:
+            color_list = super().add_standard_edge_color()
             self.misc_edge_settings["legends"].clear()
-            edges = self.preset.edges
-            standard_color = "#888"
             hide_legend = {"showlegend" : False}
-            self.misc_edge_settings["legends"] = self.misc_edge_settings["legends"] + [hide_legend for e in edges]
-            self.misc_edge_settings["line"]["color"] = [standard_color for e in edges]
-            return [standard_color for e in edges]
+            self.misc_edge_settings["legends"] = self.misc_edge_settings["legends"] + [hide_legend for e in self.preset.edges]
+            self.misc_edge_settings["line"]["color"] = color_list
+            return color_list
         else:
             self.edge_color_preset = self.add_standard_edge_color
 
