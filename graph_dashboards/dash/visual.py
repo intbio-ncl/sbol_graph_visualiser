@@ -8,7 +8,7 @@ import dash_bio as dashbio
 
 class DashBoard:
     def __init__(self,graph_visualiser):
-        app = dash.Dash(__name__)
+        app = dash.Dash(__name__,suppress_callback_exceptions=True)
         self.app = app
         self.visualiser = graph_visualiser
         self.style = {}
@@ -24,6 +24,7 @@ class DashBoard:
             else:
                 self.app.callback(v["outputs"],v["inputs"],v["states"])(k)
                 
+
         self.app.run_server(debug=True)
 
     def add_callback(self,function,inputs,outputs,states=None):
@@ -93,6 +94,13 @@ class DashBoard:
         else:
             return [div]
     
+    def create_button(self,identifier,name,add=True,**kwargs):
+        button = html.Button(id=identifier,children=name)
+        if add:
+            return self._create_element(button)
+        else:
+            return [button]
+            
     def create_input(self,identifier,name,value,add=True,**kwargs):
         label = html.Label(name)
         input_l = dcc.Input(id=identifier,value=value, **kwargs)
@@ -124,7 +132,7 @@ class DashBoard:
         else:
             return [label,checklist]
 
-    def create_slider(self,identifier,name,min_val, max_val, default_val = None,marks = None, add=True,**kwargs):
+    def create_slider(self,identifier,name,min_val, max_val, default_val = None,step=None,marks = None, add=True,**kwargs):
         label = html.Label(name)
         if default_val is None:
             default_val = max_val/2
@@ -135,8 +143,8 @@ class DashBoard:
             marks[default_val] = str(default_val)
             marks[max_val*0.75] = str(max_val*0.75)
             marks[max_val] = str(max_val)
-
-        step = max_val/10
+        if step is None:
+            step = max_val/10
         slider = dcc.Slider(id=identifier,min=min_val,max=max_val,value=default_val,marks=marks,step=step,**kwargs)
         if add:
             return self._create_element(label,slider)

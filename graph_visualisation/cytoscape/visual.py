@@ -3,7 +3,7 @@ import dash
 import dash_cytoscape as cyto
 cyto.load_extra_layouts()
 import dash_html_components as html
-
+import math
 sys.path.insert(0,os.path.expanduser(os.path.join(os.getcwd(),"util")))
 from color_util import SBOLTypeColors,SBOLPredicateColors,calculate_next_color,calculate_role_color
 from sbol_rdflib_identifiers import identifiers
@@ -14,7 +14,8 @@ import networkx as nx
 class CytoscapeVisualiser(AbstractVisualiser):
     def __init__(self, graph = None):
         super().__init__(graph)
-        self._node_size = 30
+        self.elements = []
+        self._node_size = 15
         self._edge_width = 1
         self._node_edge_size = 3
         self._node_edge_colors = []
@@ -46,15 +47,22 @@ class CytoscapeVisualiser(AbstractVisualiser):
 
     def set_grid_layout(self):
         if self.layout == self.set_grid_layout:
-            return {"name" : "grid"}
+            row_num = cols_num = (math.ceil(math.sqrt(len(self._graph.nodes)))) 
+
+            return {"name" : "grid",
+                    "rows" : row_num,
+                    "cols" : cols_num}
         else:
             self.layout = self.set_grid_layout
 
-    def set_circle_layout(self):
-        if self.layout == self.set_circle_layout:
-            return {"name" : "circle"}
+    def set_semi_circular_layout(self):
+        if self.layout == self.set_semi_circular_layout:
+            return {"name" : "circle",
+                    'radius': 250,
+                    'startAngle': math.pi * 1/6,
+                    'sweep': math.pi * 2/3}
         else:
-            self.layout = self.set_circle_layout
+            self.layout = self.set_semi_circular_layout
 
     def set_concentric_layout(self):
         if self.layout == self.set_concentric_layout:
@@ -76,7 +84,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
 
     def set_cose_bilkent_layout(self):
         if self.layout == self.set_cose_bilkent_layout:
-            return {"name" : "cose_bilkent"}
+            return {"name" : "cose-bilkent"}
         else:
             self.layout = self.set_cose_bilkent_layout
 
@@ -321,34 +329,19 @@ class CytoscapeVisualiser(AbstractVisualiser):
                 temp_edge_selectors.append(color_key)
             cyto_edges.append(cyto_edge)
 
-        elements = elements + cyto_nodes + cyto_edges
+        self.elements = elements + cyto_nodes + cyto_edges
         figure = cyto.Cytoscape(
-            id='cytoscape-two-nodes',
+            id='cytoscape_graph',
             layout=layout,
             style={'width': '100%', 'height': '1000px'},
-            elements=elements,
+            elements=self.elements,
             stylesheet = stylesheet
         )
-        if show:
-            figure.show()
-        else:
-            return figure
-
-
-
-
-
-
-
-
-
-
-
-
+        return figure
 
     def _create_empty_figure(self):
         return cyto.Cytoscape(
-            id='cytoscape-two-nodes',
+            id='cytoscape_graph',
             layout={'name': 'preset'},
             style={'width': '100%', 'height': '400px'},
             elements=[

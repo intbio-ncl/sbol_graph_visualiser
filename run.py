@@ -18,24 +18,6 @@ visual_mapper = {
                 "dash"     : {"builder" : NetworkXGraphWrapper,"visual" : {"plotly" : PlotlyVisualiser, "cytoscape" : CytoscapeVisualiser}, "run" : dash_runner}
                 }
 
-'''
-TODO::
-Graph
-    User prune? Given some string or pattern prune graph of said values.
-
-Optional Extras
-    Allow chaining of labels. Add to current label instead of overwriting.
-    WILDCARD - Dash has a specific bioinformatics lib, Perhaps sequence View (Tab),Alignment(Tab) - https://dash.plotly.com/dash-bio
-
-Dash
-    Has a section about secondary graphing, when you hover over a node certain things happen to a secondary graph.
-    I wonder if I could use this for the "Zooming" https://dash.plotly.com/interactive-graphing
-
-Performance-
-    Are the callbacks slow?? - https://dash.plotly.com/advanced-callbacks
-                             - https://dash.plotly.com/clientside-callbacks
-                             - https://dash.plotly.com/callback-gotchas
-''' 
 
 def process_input(filename,visualiser,graph_type):
     graph_builder = visual_mapper[visualiser]["builder"](filename,prune=True)

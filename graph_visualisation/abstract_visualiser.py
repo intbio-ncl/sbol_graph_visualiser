@@ -164,30 +164,7 @@ class AbstractVisualiser:
     
         else:
             self.layout = self.set_random_layout
-            
-    def set_graphviz_layout(self):
-        ''' 	
-        Create node positions using Graphviz.
-        :rtype: None
-        '''
-        if self.layout == self.set_graphviz_layout:
-            self.pos = nx.nx_agraph.graphviz_layout(self.preset)
     
-        else:
-            self.layout = self.set_graphviz_layout
-            
-    def set_pydot_layout(self):
-        ''' 	
-        Create node positions using pydot.
-        :rtype: None
-        '''
-        if self.layout == self.set_pydot_layout:
-            self.pos = nx.nx_pydot.pydot_layout(self.preset)
-    
-        else:
-            self.layout = self.set_pydot_layout
-
-
     # ---------------------- Pick the node content ----------------------
 
     def add_node_no_labels(self):

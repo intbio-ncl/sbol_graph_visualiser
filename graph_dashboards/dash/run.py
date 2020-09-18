@@ -19,7 +19,8 @@ hidden_style = background_color.copy()
 hidden_style["display"] = "none"
 
 not_modifier_identifiers = {"sidebar_id" : "sidebar",
-                            "toolbox_id" : "toolbox"}
+                            "toolbox_id" : "toolbox",
+                            "cyto_utility_id" : "cyto_utility"}
 
 plotly_update_inputs = OrderedDict()
 plotly_update_outputs = {"graph_id" : Output("plotly_graph","figure"),
@@ -48,6 +49,9 @@ graph_type_outputs = {"plotly_options_id" : Output("plotly_options","style"),
 graph_types = {"plotly" : PlotlyVisualiser,
                "cytoscape" : CytoscapeVisualiser}
 
+zoom_inputs = {"cyto_zoom_slider_id" : Input("cyto_zoom_slider","value")}
+cyto_graph_id = "cytoscape_graph"
+
 def dash_runner(visualiser,name = ""):
     figure_layout_elements = {"autosize": True}
     figure = visualiser.build(layout_elements = figure_layout_elements, show = False)
@@ -71,10 +75,12 @@ def dash_runner(visualiser,name = ""):
 
     # Add Graph
     plotly_graph = dashboard.create_graph(plotly_update_outputs["graph_id"].component_id,figure,add=False)
+
     cyto_graph = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,[],add=False)
     # Cyto is different to plotly, you dont add it to a graph it standalone in the component list.
     plotly_div = dashboard.create_div(graph_type_outputs["plotly_div"].component_id, [plotly_graph], add=False)
-    cyto_div = dashboard.create_div(graph_type_outputs["cyto_div"].component_id, cyto_graph, add=False,style=hidden_style)
+    cyto_utility = _generate_cyto_util_components(dashboard)
+    cyto_div = dashboard.create_div(graph_type_outputs["cyto_div"].component_id, cyto_graph + cyto_utility, add=False,style=hidden_style)
 
     graph_container = dashboard.create_div(load_outputs["graph_container_id"].component_id, plotly_div+cyto_div, add=False)
 
@@ -100,11 +106,14 @@ def dash_runner(visualiser,name = ""):
         return load_graph(dashboard,contents,filename)
     def change_graph_type_inner(graph_type):
         return change_graph_type(dashboard,graph_type)
+    def update_zoom_inner(value):
+        return update_zoom(value)
 
     dashboard.add_callback(update_plotly_graph_inner,list(plotly_update_inputs.values()),list(plotly_update_outputs.values()))
     dashboard.add_callback(update_cyto_graph_inner,list(cyto_update_inputs.values()),list(cyto_update_outputs.values()))
     dashboard.add_callback(load_graph_inner,list(load_inputs.values()),list(load_outputs.values()),list(load_states.values()))
     dashboard.add_callback(change_graph_type_inner,list(graph_type_inputs.values()),list(graph_type_outputs.values()))
+    dashboard.add_callback(update_zoom_inner,list(zoom_inputs.values()),Output(cyto_graph_id,"zoom"))
     dashboard.run()
 
 
@@ -168,8 +177,8 @@ def update_cyto_graph(dashboard,*args):
 
     try:
         figure = dashboard.visualiser.build(show=False)
-        #figure.update_layout(transition_duration=500)
-        return [figure],False,["No Error"]
+        cyto_utility = _generate_cyto_util_components(dashboard)
+        return cyto_utility + [figure],False,["No Error"]
     except Exception as ex:
         return reverse_graph(dashboard, old_settings,ex)
 
@@ -215,15 +224,19 @@ def change_graph_type(dashboard,graph_type):
         cyto_div_children = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,[empty_figure],add=False) 
         cyto_div_style = {'display': 'none'}
     else :
+        cyto_utility = _generate_cyto_util_components(dashboard)
         plotly_options_style = {'display': 'none'}
         plotly_div_children = dashboard.create_graph(plotly_update_outputs["graph_id"].component_id,empty_figure,add=False) 
         plotly_div_style = {'display': 'none'}
         cyto_options_style = {}
-        cyto_div_children = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,[figure],add=False)
+        cyto_div_children = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,cyto_utility+[figure],add=False)
         cyto_div_style = {}
 
     return plotly_options_style,plotly_div_children,plotly_div_style,cyto_options_style,cyto_div_children,cyto_div_style
 
+
+def update_zoom(value):
+    return value
 
 def reverse_graph(dashboard,old_settings,error_str = ""):
     for setting in old_settings:
@@ -362,3 +375,12 @@ def _generate_options(visualiser):
 
     return options
 
+
+def _generate_cyto_util_components(dashboard):
+    # Slider for zoom
+    zoom_slider = dashboard.create_slider(zoom_inputs["cyto_zoom_slider_id"].component_id,"Zoom Slider",0.1,3,1.5,step=0.1,add=False)
+    # Reset for centering.
+    utilities = zoom_slider
+    util_div = dashboard.create_div(not_modifier_identifiers["cyto_utility_id"],utilities,add=False)
+
+    return util_div

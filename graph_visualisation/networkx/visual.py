@@ -13,18 +13,8 @@ sys.path.insert(0,os.path.expanduser(os.path.join(os.getcwd(),"util")))
 from sbol_rdflib_identifiers import identifiers
 from color_util import SBOLTypeColors,SBOLPredicateColors,calculate_next_color,calculate_role_color
 from matplotlib.lines import Line2D
-try:
-    import pygraphviz
-    import pydot
-except ImportError:
-    pass
 
-'''
-TODO
-    2. Test
-    5. Tree layout (Moving towards graphviz etc.)
-    6. Edge Node Colors...
-'''
+
 class NetworkXGraphBuilder:
     def __init__(self, graph = None):
         self._graph = NetworkXGraphWrapper(graph)
@@ -137,29 +127,6 @@ class NetworkXGraphBuilder:
         :rtype: None
         '''
         self.build_settings["layout"] = partial(nx.random_layout, self.build_settings["preset"])
-
-    def set_graphviz_layout(self):
-        ''' 	
-        Create node positions using Graphviz.
-        :rtype: None
-        '''
-        self.build_settings["layout"] = partial(nx.nx_agraph.graphviz_layout, self.build_settings["preset"])
-
-    def set_pydot_layout(self):
-        ''' 	
-        Create node positions using pydot.
-        :rtype: None
-        '''
-        self.build_settings["layout"] = partial(nx.nx_pydot.pydot_layout, self.build_settings["preset"])
-
-    def set_tree_layout(self):
-        #https://stackoverflow.com/questions/11479624/is-there-a-way-to-guarantee-hierarchical-output-from-networkx
-        from networkx.drawing.nx_agraph import write_dot, graphviz_layout
-
-        # write dot file to use with graphviz
-        # run "dot -Tpng test.dot >test.png"
-        write_dot(self.build_settings["preset"],'test.dot')
-        self.build_settings["layout"] = partial(graphviz_layout, self.build_settings["preset"],prog='dot')
 
     def set_ego_layout(self):        
         # find node with largest degree
