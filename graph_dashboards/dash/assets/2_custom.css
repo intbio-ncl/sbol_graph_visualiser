@@ -27,7 +27,7 @@ html, body
     margin : 0px;
     padding : 0px;
     height:88vh;
-    width:90vw;
+    width:92vw;
     background-color: rgb(229, 236, 246);
 }
 
@@ -39,4 +39,20 @@ html, body
 #toolbox{ 
     display: flex; 
 }
+
+#zoom_div{
+    display:inline-block;
+    width:20%;
+}
+
+#remove_node_div{
+    display:inline-block;
+}
+
+
+#cyto_utility{
+    display:inline-block;
+    width:100%;
+}
+
 

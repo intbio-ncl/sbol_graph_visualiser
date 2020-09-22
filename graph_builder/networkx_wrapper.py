@@ -31,7 +31,7 @@ whitelist_sbol_objects = [
 rec = re.compile('#|\/|:') 
 
 class NetworkXGraphWrapper:
-    def __init__(self, graph = None, graph_type = "graph", prune=False):
+    def __init__(self, graph = None, graph_type = "directed", prune=False):
         if graph_type == "graph":
             graph_type = rdflib_to_networkx_graph
         elif graph_type == "directed":
@@ -108,28 +108,6 @@ class NetworkXGraphWrapper:
     
     def get_connected_nodes(self,node):
         return nx.node_connected_component(self.graph, node)
-
-    def write_graphml(self,fn):
-        if isinstance(self.graph,nx.classes.multidigraph.MultiDiGraph):
-            new_graph = nx.classes.multidigraph.MultiDiGraph()
-        elif isinstance(self.graph,nx.classes.graph.Graph):
-            new_graph = nx.classes.graph.Graph()
-
-        for u,v in self.graph.edges:
-            orig_edge = self.graph.edges[u,v]
-            new_edge = {}
-            if "triples" in orig_edge.keys():
-                new_edge["predicate"] = str(orig_edge["triples"][0][1])
-            else:
-                new_edge["predicate"] = "Unknown"
-            
-            if isinstance(u,rdflib.URIRef):
-                u = str(u)
-            if isinstance(v,rdflib.URIRef):
-                v = str(v)
-            new_graph.add_edges_from([(u,v,new_edge)])
-                
-        nx.write_graphml(new_graph, fn)
 
     def search(self,pattern):
         '''
@@ -296,14 +274,30 @@ class NetworkXGraphWrapper:
         :return: Interaction SubGraph 
         :rtype: nx.classes.graph.Graph
         '''
+        part_mapping = {identifiers.external.participant_inhibitor : "in",
+                        identifiers.external.participant_inhibited : "out",
+                        identifiers.external.participant_stimulator : "in",
+                        identifiers.external.participant_stimulated : "out",
+                        identifiers.external.participant_modifier : "in",
+                        identifiers.external.participant_modified : "out",
+                        identifiers.external.participant_product : "out",
+                        identifiers.external.participant_reactant : "out",
+                        identifiers.external.participant_participation_promoter : "in",
+                        identifiers.external.participant_template : "in"}
         interaction_edges = []
         interactions = self.search((None,identifiers.predicates.interaction,None))
         for interaction in interactions:
             done_list = []
             participants = self.search((interaction[1],identifiers.predicates.participation,None))
             for participant1 in participants:
+                participant1_type = self.retrieve_node(participant1[1],identifiers.predicates.role)
+                try:
+                    particiant_1_mapping = part_mapping[participant1_type]
+                except KeyError:
+                    particiant_1_mapping = "in"
+
                 for participant2 in participants:
-                    if participant1 == participant2 or (participant1[2] in done_list and participant2[2] in done_list):
+                    if participant1 == participant2 or participant1[2] in done_list or participant2[2] in done_list:
                         continue
                     fc1 = self.retrieve_node(participant1[1],identifiers.predicates.participant)
                     fc2 = self.retrieve_node(participant2[1],identifiers.predicates.participant)
@@ -321,12 +315,33 @@ class NetworkXGraphWrapper:
                         raise ValueError(f'{fc2} is a component with no definition')
 
                     interaction_type = self.retrieve_node(interaction[1],identifiers.predicates.type)
+                    participant2_type = self.retrieve_node(participant2[1],identifiers.predicates.role)
+
+                    try:
+                        particiant_2_mapping = part_mapping[participant2_type]
+                    except KeyError:
+                        particiant_2_mapping = "out"
                     interaction_type_name = identifiers.external.get_interaction_type_name(interaction_type)
+                    if particiant_1_mapping == "in" and particiant_2_mapping == "out":
+                        in_part = cd1
+                        out_part = cd2
+                    elif particiant_2_mapping == "in" and particiant_1_mapping == "out":
+                        in_part = cd2
+                        out_part = cd1
+                    else:
+                        in_part = cd1
+                        out_part = cd2
+                        edge = {'triples': [(out_part,interaction_type_name,in_part)], 
+                        'weight': 1, 
+                        'display_name': interaction_type_name}
+                        interaction_edges.append((out_part,in_part,edge))
+
+
                     edge = {'triples': [(cd1,interaction_type_name,cd2)], 
                                         'weight': 1, 
                                         'display_name': interaction_type_name}
                                         
-                    interaction_edges.append((cd1,cd2,edge))
+                    interaction_edges.append((in_part,out_part,edge))
                     done_list.append(participant1[2])
 
         interaction_graph = self._sub_graph(interaction_edges)
@@ -391,22 +406,20 @@ class NetworkXGraphWrapper:
             if node_type is None:
                 continue
             node_type = node_type[2]
-            parent = None
+            child = None
             predicate = None
             for edge in edges:
                 edge = edge[0]
-                
-                if edge[1] in identifiers.predicates.ownership_predicates and edge[2] == node:
-                    parent = edge[0]
+                if edge[1] in identifiers.predicates.ownership_predicates and edge[0] == node:
+                    child = edge[2]
                     predicate = edge[1]
-                    break
-                elif edge[1] == identifiers.predicates.component and edge[2] == node:
+                elif edge[1] == identifiers.predicates.component and edge[0] == node:
                     parent_edges = [[e for e in edge[2]["triples"]] for edge in self.graph.edges(edge[0],data=True)]
                     potential_parent_type = inner_search((edge[0],identifiers.predicates.rdf_type,None),parent_edges)
+                    print(potential_parent_type)
                     if identifiers.objects.component_definition == potential_parent_type[2]:
-                        parent = potential_parent_type[0]
+                        child = potential_parent_type[2]
                         predicate = edge[1]
-                        break
                     else:
                         # A sequenceAnnotation will be handled in its own iteration.
                         continue
@@ -414,13 +427,12 @@ class NetworkXGraphWrapper:
                     #All the other triples that aren't parential.
                     continue
 
-            
-            if parent is not None and predicate is not None:
-                new_edge = {'triples': [(parent,predicate,node)], 
-                        'weight': 1, 
-                        'display_name': self._get_name(str(predicate))}
+                if child is not None and predicate is not None:
+                    new_edge = {'triples': [(node,predicate,child)], 
+                            'weight': 1, 
+                            'display_name': self._get_name(str(predicate))}
 
-                parent_edges_graph.append((parent,node,new_edge))
+                    parent_edges_graph.append((node,child,new_edge))
 
         parent_graph = self._sub_graph(parent_edges_graph)
         return parent_graph

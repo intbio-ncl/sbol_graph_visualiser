@@ -18,6 +18,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
         self._node_size = 15
         self._edge_width = 1
         self._node_edge_size = 3
+        self.edge_shape = "straight"
         self._node_edge_colors = []
 
 
@@ -72,13 +73,29 @@ class CytoscapeVisualiser(AbstractVisualiser):
 
     def set_breadthfirst_layout(self):
         if self.layout == self.set_breadthfirst_layout:
-            return {"name" : "breadthfirst"}
+            return {"name" : "breadthfirst",
+                    'directed': True,}
         else:
             self.layout = self.set_breadthfirst_layout
 
     def set_cose_layout(self):
         if self.layout == self.set_cose_layout:
-            return {"name" : "cose"}
+            return {"name" : "cose",
+            'idealEdgeLength': 100,
+            'nodeOverlap': 20,
+            'refresh': 20,
+            'fit': True,
+            'padding': 30,
+            'randomize': False,
+            'componentSpacing': 100,
+            'nodeRepulsion': 400000,
+            'edgeElasticity': 100,
+            'nestingFactor': 5,
+            'gravity': 80,
+            'numIter': 1000,
+            'initialTemp': 200,
+            'coolingFactor': 0.95,
+            'minTemp': 1.0}
         else:
             self.layout = self.set_cose_layout
 
@@ -232,8 +249,27 @@ class CytoscapeVisualiser(AbstractVisualiser):
             return edge_colors
         else:
             self.edge_color_preset = self.add_adaptive_edge_color
-    # ---------------------- Set sizes ----------------------
+    # ---------------------- Set edge shape ----------------------
+    def set_straight_edge_shape(self):
+        self.edge_shape = "straight"
 
+    def set_bezier_edge_shape(self):
+        self.edge_shape = "bezier"
+
+    def set_taxi_edge_shape(self):
+        self.edge_shape = "taxi"
+
+    def set_unbundled_bezier_edge_shape(self):
+        self.edge_shape = "unbundled-bezier"
+        
+    def set_loop_edge_shape(self):
+        self.edge_shape = "loop"
+
+    def set_haystack_edge_shape(self):
+        self.edge_shape = "haystack"
+
+    def set_segments_edge_shape(self):
+        self.edge_shape = "segments"
     # ---------------------- Misc Settings ---------------------
     def node_size(self,size = None):
         if size is None:
@@ -249,6 +285,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
         if width is None:
             return self._edge_width
         self._edge_width = float(width)
+    
 
     def build(self,layout_elements = {},show=True):
         elements = []
@@ -282,8 +319,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
 
             cyto_node = {
                 'data': {'id': node, 'label': node_text[index]},
-                'locked': False,
-                "classes" : color_key + " " + node_edge_color_key
+                "classes" : "top-center " + color_key + " " + node_edge_color_key,
             }
             if self.pos != [] and self.pos is not None:
                 cyto_node["position"] = {'x': 2000 * self.pos[node][0], 'y': 2000 * self.pos[node][1]}
@@ -311,7 +347,9 @@ class CytoscapeVisualiser(AbstractVisualiser):
 
         stylesheet.append({'selector': 'edge','style': {'content': 'data(label)',
                                                 'height' : self._edge_width,
-                                                "width" : self._edge_width}})
+                                                "width" : self._edge_width,
+                                                "mid-target-arrow-color": "grey",
+                                                "mid-target-arrow-shape": "triangle"}})
         if self.edge_color_preset is not None:
             edge_color = self.edge_color_preset()  
         
@@ -320,25 +358,38 @@ class CytoscapeVisualiser(AbstractVisualiser):
             color_key =  list(edge_color[index].keys())[0]
             cyto_edge = {
                 'data': {'source': u, 'target': v, 'label': edge_text[index]},
-                "classes" : color_key,
+                "classes" : "center-right " + color_key,
                 "size" : self._edge_width
             }
 
             if color_key not in temp_edge_selectors:
-                stylesheet.append({"selector" : "." + color_key,"style" : {"line-color" : edge_color[index][color_key]}})
+                stylesheet.append({"selector" : "." + color_key,"style" : {"line-color" : edge_color[index][color_key],
+                                                                            'curve-style': self.edge_shape,
+                                                                            "mid-target-arrow-color": edge_color[index][color_key],
+                                                                            "mid-target-arrow-shape": "triangle"}})
                 temp_edge_selectors.append(color_key)
             cyto_edges.append(cyto_edge)
+
+        stylesheet.append({
+        'selector': ':selected',
+        "style": {
+            "background-color" : "white",
+            "border-width": 2,
+            "border-color": "black",
+            "label": "data(label)",
+            'z-index': 9999
+        }})
 
         self.elements = elements + cyto_nodes + cyto_edges
         figure = cyto.Cytoscape(
             id='cytoscape_graph',
             layout=layout,
-            style={'width': '100%', 'height': '1000px'},
+            style={'width': '100%', 'height': '1200px'},
             elements=self.elements,
             stylesheet = stylesheet
         )
         return figure
-
+    
     def _create_empty_figure(self):
         return cyto.Cytoscape(
             id='cytoscape_graph',

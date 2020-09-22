@@ -1,0 +1,1222 @@
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" xmlns:sbol="http://sbols.org/v2#">
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/1">
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pair4/1">
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_mCherry_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pair4"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pLlac_c/1"/>
+        <sbol:displayId>Pu_pair4</sbol:displayId>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:version>1</sbol:version>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pair3/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pair3"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_lacI_c/1"/>
+        <sbol:displayId>Pu_pair3</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:version>1</sbol:version>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pLlac_c/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_lacI_c/1">
+        <sbol:version>1</sbol:version>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#lacI/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>Pu_lacI_c</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_lacI_c"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pBAD_c/1">
+        <sbol:displayId>Pu_pBAD_c</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pBAD_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#Pu/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pTeT_c/1">
+        <sbol:displayId>Pu_pTeT_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pTeT_c"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pTeT/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pair2/1">
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pair2"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_lacI_c/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>Pu_pair2</sbol:displayId>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pBAD_c/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pair1/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pair1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_lacI_c/1"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pTeT_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:displayId>Pu_pair1</sbol:displayId>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+    <sbol:displayId>NOR_gate_promoter_variable_2_Pu</sbol:displayId>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_mCherry_c/1">
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_mCherry_c"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#mCherry/1"/>
+        <sbol:displayId>Pu_mCherry_c</sbol:displayId>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pLlac_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pLlac/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_Pu/Pu_pLlac_c"/>
+        <sbol:displayId>Pu_pLlac_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+      </sbol:Component>
+    </sbol:component>
+  </sbol:ComponentDefinition>
+  <sbol:Sequence rdf:about="http://shortbol.org/v2#ctx_sequence/1">
+    <sbol:displayId>ctx_sequence</sbol:displayId>
+    <sbol:elements>aacagaaaatgataaaaaaggactaatagtatattttgatttttgatttttgatttttgatttttgatttttgatttttgatttttgatttcaaataatacaaatttatttacttatttaattgttttgatcaattatttttctg</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:version>1</sbol:version>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#ctx_sequence"/>
+  </sbol:Sequence>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/1">
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pair4/1">
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_mCherry_c/1"/>
+        <sbol:displayId>pRhlR_pair4</sbol:displayId>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pLlac_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pair4"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_mCherry_c/1">
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_mCherry_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#mCherry/1"/>
+        <sbol:displayId>pRhlR_mCherry_c</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pair1/1">
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:version>1</sbol:version>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pTeT_c/1"/>
+        <sbol:displayId>pRhlR_pair1</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pair1"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_lacI_c/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pBAD_c/1">
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pBAD_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pBAD/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>pRhlR_pBAD_c</sbol:displayId>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pair3/1">
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pLlac_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pair3"/>
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_lacI_c/1"/>
+        <sbol:displayId>pRhlR_pair3</sbol:displayId>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pair2/1">
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pair2"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_lacI_c/1"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pBAD_c/1"/>
+        <sbol:displayId>pRhlR_pair2</sbol:displayId>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pTeT_c/1">
+        <sbol:displayId>pRhlR_pTeT_c</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pTeT_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pRhlR/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:version>1</sbol:version>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_lacI_c/1">
+        <sbol:displayId>pRhlR_lacI_c</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_lacI_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#lacI/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pLlac_c/1">
+        <sbol:version>1</sbol:version>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pLlac/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR/pRhlR_pLlac_c"/>
+        <sbol:displayId>pRhlR_pLlac_c</sbol:displayId>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_pRhlR"/>
+    <sbol:displayId>NOR_gate_promoter_variable_1_pRhlR</sbol:displayId>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#YFP/1">
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+    <sbol:version>1</sbol:version>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#YFP"/>
+    <sbol:sequence rdf:resource="http://shortbol.org/v2#YFP_sequence/1"/>
+    <sbol:displayId>YFP</sbol:displayId>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#NOR_gate/1">
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate/mCherry_c/1">
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>mCherry_c</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate/mCherry_c"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#mCherry/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate/pair4/1">
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate/pLlac_c/1"/>
+        <sbol:displayId>pair4</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate/pair4"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate/mCherry_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate/pair2/1">
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate/lacI_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>pair2</sbol:displayId>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate/pBAD_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate/pair2"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate/pair1/1">
+        <sbol:displayId>pair1</sbol:displayId>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate/pTeT_c/1"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate/lacI_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate/pair1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate/pLlac_c/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>pLlac_c</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate/pLlac_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pLlac/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate/pBAD_c/1">
+        <sbol:displayId>pBAD_c</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate/pBAD_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pBAD/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate/lacI_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#lacI/1"/>
+        <sbol:displayId>lacI_c</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate/lacI_c"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:displayId>NOR_gate</sbol:displayId>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate/pTeT_c/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>pTeT_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pTeT/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate/pTeT_c"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate/pair3/1">
+        <sbol:displayId>pair3</sbol:displayId>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate/lacI_c/1"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate/pLlac_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate/pair3"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:version>1</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate"/>
+  </sbol:ComponentDefinition>
+  <sbol:Sequence rdf:about="http://shortbol.org/v2#pRhlR_sequence/1">
+    <sbol:displayId>pRhlR_sequence</sbol:displayId>
+    <sbol:elements>tcctgcatgaattggtaggcttacgcaagaaaatggtttgttatagtcgaa</sbol:elements>
+    <sbol:version>1</sbol:version>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#pRhlR_sequence"/>
+  </sbol:Sequence>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#lacI/1">
+    <sbol:sequence rdf:resource="http://shortbol.org/v2#lacI_sequence/1"/>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#lacI"/>
+    <sbol:version>1</sbol:version>
+    <sbol:displayId>lacI</sbol:displayId>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/1">
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pLlac_c/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pLlac_c"/>
+        <sbol:version>1</sbol:version>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pLlac/1"/>
+        <sbol:displayId>luxR_pLlac_c</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR"/>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pair4/1">
+        <sbol:displayId>luxR_pair4</sbol:displayId>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_mCherry_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pair4"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:version>1</sbol:version>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pLlac_c/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pair3/1">
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pLlac_c/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>luxR_pair3</sbol:displayId>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_lacI_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pair3"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_mCherry_c/1">
+        <sbol:displayId>luxR_mCherry_c</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#mCherry/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_mCherry_c"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pair2/1">
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_lacI_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pair2"/>
+        <sbol:displayId>luxR_pair2</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pBAD_c/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:version>1</sbol:version>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pBAD_c/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pBAD_c"/>
+        <sbol:displayId>luxR_pBAD_c</sbol:displayId>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pBAD/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_lacI_c/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>luxR_lacI_c</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_lacI_c"/>
+        <sbol:version>1</sbol:version>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#luxR/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:displayId>NOR_gate_repressor_variable_1_luxR</sbol:displayId>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pair1/1">
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pTeT_c/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_lacI_c/1"/>
+        <sbol:displayId>luxR_pair1</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pair1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pTeT_c/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>luxR_pTeT_c</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_luxR/luxR_pTeT_c"/>
+        <sbol:version>1</sbol:version>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pTeT/1"/>
+      </sbol:Component>
+    </sbol:component>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#pRhlR/1">
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#pRhlR"/>
+    <sbol:version>1</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:displayId>pRhlR</sbol:displayId>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+    <sbol:sequence rdf:resource="http://shortbol.org/v2#pRhlR_sequence/1"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#GFP/1">
+    <sbol:version>1</sbol:version>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#GFP"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+    <sbol:sequence rdf:resource="http://shortbol.org/v2#GFP_sequence/1"/>
+    <sbol:displayId>GFP</sbol:displayId>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#mCherry/1">
+    <sbol:displayId>mCherry</sbol:displayId>
+    <sbol:sequence rdf:resource="http://shortbol.org/v2#mCherry_sequence/1"/>
+    <sbol:version>1</sbol:version>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#mCherry"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/1">
+    <sbol:displayId>NOR_gate_repressor_variable_1_CinR</sbol:displayId>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pair3/1">
+        <sbol:displayId>CinR_pair3</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pLlac_c/1"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_lacI_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pair3"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:version>1</sbol:version>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pLlac_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pLlac/1"/>
+        <sbol:displayId>CinR_pLlac_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pLlac_c"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pair1/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pair1"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pTeT_c/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_lacI_c/1"/>
+        <sbol:displayId>CinR_pair1</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pair4/1">
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pair4"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pLlac_c/1"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_mCherry_c/1"/>
+        <sbol:displayId>CinR_pair4</sbol:displayId>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pBAD_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pBAD/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>CinR_pBAD_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pBAD_c"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_lacI_c/1">
+        <sbol:displayId>CinR_lacI_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_lacI_c"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#CinR/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_mCherry_c/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>CinR_mCherry_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_mCherry_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#mCherry/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pair2/1">
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pBAD_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_lacI_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pair2"/>
+        <sbol:displayId>CinR_pair2</sbol:displayId>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pTeT_c/1">
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_repressor_variable_1_CinR/CinR_pTeT_c"/>
+        <sbol:displayId>CinR_pTeT_c</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pTeT/1"/>
+      </sbol:Component>
+    </sbol:component>
+  </sbol:ComponentDefinition>
+  <sbol:Sequence rdf:about="http://shortbol.org/v2#YFP_sequence/1">
+    <sbol:displayId>YFP_sequence</sbol:displayId>
+    <sbol:elements>taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatggtgagcaagggcgaggagctgttcaccggggtggtgcccatcctggtcgagctggacggcgacgtaaacggccacaagttcagcgtgtccggcgagggcgagggcgatgccacctacggcaagctgaccctgaagttcatctgcaccaccggcaagctgcccgtgccctggcccaccctcgtgaccaccttcggctacggcctgcaatgcttcgcccgctaccccgaccacatgaagctgcacgacttcttcaagtccgccatgcccgaaggctacgtccaggagcgcaccatcttcttcaaggacgacggcaactacaagacccgcgccgaggtgaagttcgagggcgacaccctggtgaaccgcatcgagctgaagggcatcgacttcaaggaggacggcaacatcctggggcacaagctggagtacaactacaacagccacaacgtctatatcatggccgacaagcagaagaacggcatcaaggtgaacttcaagatccgccacaacatcgaggacggcagcgtgcagctcgccgaccactaccagcagaacacccccatcggcgacggccccgtgctgctgcccgacaaccactacctgagctaccagtccgccctgagcaaagaccccaacgagaagcgcgatcacatggtcctgctggagttcgtgaccgccgccgggatcactctcggcatggacgagctgtacaagaggcctgctgcaaacgacgaaaactacgctttagtagcttaataatactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata</sbol:elements>
+    <sbol:version>1</sbol:version>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#YFP_sequence"/>
+  </sbol:Sequence>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/1">
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pair1/1">
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pTeT_c/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pair1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_lacI_c/1"/>
+        <sbol:displayId>GFP_pair1</sbol:displayId>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_lacI_c/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_lacI_c"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>GFP_lacI_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#lacI/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:displayId>NOR_gate_output_variable_1_GFP</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pair4/1">
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_mCherry_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pLlac_c/1"/>
+        <sbol:displayId>GFP_pair4</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pair4"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pair3/1">
+        <sbol:displayId>GFP_pair3</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pair3"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pLlac_c/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_lacI_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_mCherry_c/1">
+        <sbol:displayId>GFP_mCherry_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_mCherry_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#GFP/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pair2/1">
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pBAD_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pair2"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_lacI_c/1"/>
+        <sbol:displayId>GFP_pair2</sbol:displayId>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pLlac_c/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pLlac_c"/>
+        <sbol:displayId>GFP_pLlac_c</sbol:displayId>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pLlac/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pBAD_c/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pBAD_c"/>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>GFP_pBAD_c</sbol:displayId>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pBAD/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pTeT_c/1">
+        <sbol:displayId>GFP_pTeT_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pTeT/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_GFP/GFP_pTeT_c"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#Pv/1">
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:displayId>Pv</sbol:displayId>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#Pv"/>
+    <sbol:sequence rdf:resource="http://shortbol.org/v2#Pv_sequence/1"/>
+    <sbol:version>1</sbol:version>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/1">
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pair3/1">
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>plux_pair3</sbol:displayId>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_lacI_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pair3"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pLlac_c/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pair2/1">
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pair2"/>
+        <sbol:displayId>plux_pair2</sbol:displayId>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_lacI_c/1"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pBAD_c/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_mCherry_c/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_mCherry_c"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>plux_mCherry_c</sbol:displayId>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#mCherry/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pLlac_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pLlac/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pLlac_c"/>
+        <sbol:displayId>plux_pLlac_c</sbol:displayId>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_lacI_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#lacI/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_lacI_c"/>
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>plux_lacI_c</sbol:displayId>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:displayId>NOR_gate_promoter_variable_1_plux</sbol:displayId>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pair4/1">
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_mCherry_c/1"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pLlac_c/1"/>
+        <sbol:displayId>plux_pair4</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pair4"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pair1/1">
+        <sbol:displayId>plux_pair1</sbol:displayId>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pTeT_c/1"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_lacI_c/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pair1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:version>1</sbol:version>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pTeT_c/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pTeT_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#plux/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>plux_pTeT_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pBAD_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pBAD/1"/>
+        <sbol:displayId>plux_pBAD_c</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux/plux_pBAD_c"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_1_plux"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/1">
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_mCherry_c/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_mCherry_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#mCherry/1"/>
+        <sbol:displayId>Pv_mCherry_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_lacI_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#lacI/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_lacI_c"/>
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>Pv_lacI_c</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv"/>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pair2/1">
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pBAD_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pair2"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_lacI_c/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>Pv_pair2</sbol:displayId>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pair4/1">
+        <sbol:displayId>Pv_pair4</sbol:displayId>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_mCherry_c/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pair4"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pLlac_c/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pair3/1">
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pair3"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pLlac_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:displayId>Pv_pair3</sbol:displayId>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_lacI_c/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pair1/1">
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>Pv_pair1</sbol:displayId>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pTeT_c/1"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_lacI_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pair1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pTeT_c/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pTeT_c"/>
+        <sbol:displayId>Pv_pTeT_c</sbol:displayId>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pTeT/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pLlac_c/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pLlac_c"/>
+        <sbol:displayId>Pv_pLlac_c</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#Pv/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pBAD_c/1">
+        <sbol:version>1</sbol:version>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pBAD/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_Pv/Pv_pBAD_c"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>Pv_pBAD_c</sbol:displayId>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+    <sbol:version>1</sbol:version>
+    <sbol:displayId>NOR_gate_promoter_variable_3_Pv</sbol:displayId>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#pBAD/1">
+    <sbol:version>1</sbol:version>
+    <sbol:sequence rdf:resource="http://shortbol.org/v2#pBAD_sequence/1"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+    <sbol:displayId>pBAD</sbol:displayId>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#pBAD"/>
+  </sbol:ComponentDefinition>
+  <sbol:Sequence rdf:about="http://shortbol.org/v2#mCherry_sequence/1">
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#mCherry_sequence"/>
+    <sbol:elements>atggtgagcaagggcgaggaggataacatggccatcatcaaggagttcatgcgcttcaaggtgcacatggagggctccgtgaacggccacgagttcgagatcgagggcgagggcgagggccgcccctacgagggcacccagaccgccaagctgaaggtgaccaagggtggccccctgcccttcgcctgggacatcctgtcccctcagttcatgtacggctccaaggcctacgtgaagcaccccgccgacatccccgactacttgaagctgtccttccccgagggcttcaagtgggagcgcgtgatgaacttcgaggacggcggcgtggtgaccgtgacccaggactcctccctgcaggacggcgagttcatctacaaggtgaagctgcgcggcaccaacttcccctccgacggccccgtaatgcagaagaagaccatgggctgggaggcctcctccgagcggatgtaccccgaggacggcgccctgaagggcgagatcaagcagaggctgaagctgaaggacggcggccactacgacgctgaggtcaagaccacctacaaggccaagaagcccgtgcagctgcccggcgcctacaacgtcaacatcaagttggacatcacctcccacaacgaggactacaccatcgtggaacagtacgaacgcgccgagggccgccactccaccggcggcatggacgagctgtacaag</sbol:elements>
+    <sbol:version>1</sbol:version>
+    <sbol:displayId>mCherry_sequence</sbol:displayId>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://shortbol.org/v2#luxR_sequence/1">
+    <sbol:version>1</sbol:version>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#luxR_sequence"/>
+    <sbol:displayId>luxR_sequence</sbol:displayId>
+    <sbol:elements>aaagaggagaaatactagatgaaaaacataaatgccgacgacacatacagaataattaataaaattaaagcttgtagaagcaataatgatattaatcaatgcttatctgatatgactaaaatggtacattgtgaatattatttactcgcgatcatttatcctcattctatggttaaatctgatatttcaatcctagataattaccctaaaaaatggaggcaatattatgatgacgctaatttaataaaatatgatcctatagtagattattctaactccaatcattcaccaattaattggaatatatttgaaaacaatgctgtaaataaaaaatctccaaatgtaattaaagaagcgaaaacatcaggtcttatcactgggtttagtttccctattcatacggctaacaatggcttcggaatgcttagttttgcacattcagaaaaagacaactatatagatagtttatttttacatgcgtgtatgaacataccattaattgttccttctctagttgataattatcgaaaaataaatatagcaaataataaatcaaacaacgatttaaccaaaagagaaaaagaatgtttagcgtgggcatgcgaaggaaaaagctcttgggatatttcaaaaatattaggttgcagtgagcgtactgtcactttccatttaaccaatgcgcaaatgaaactcaatacaacaaaccgctgccaaagtatttctaaagcaattttaacaggagcaattgattgcccatactttaaaaattaataacactgatagtgctagtgtagatcactactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata</sbol:elements>
+  </sbol:Sequence>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#pLlac/1">
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+    <sbol:displayId>pLlac</sbol:displayId>
+    <sbol:sequence rdf:resource="http://shortbol.org/v2#pLlac_sequence/1"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:version>1</sbol:version>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#pLlac"/>
+  </sbol:ComponentDefinition>
+  <sbol:Sequence rdf:about="http://shortbol.org/v2#pTeT_sequence/1">
+    <sbol:displayId>pTeT_sequence</sbol:displayId>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#pTeT_sequence"/>
+    <sbol:version>1</sbol:version>
+    <sbol:elements>ttgacagcttatcatcgataagctttaat</sbol:elements>
+  </sbol:Sequence>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#Pu/1">
+    <sbol:displayId>Pu</sbol:displayId>
+    <sbol:sequence rdf:resource="http://shortbol.org/v2#Pu_sequence/1"/>
+    <sbol:version>1</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#Pu"/>
+  </sbol:ComponentDefinition>
+  <sbol:Sequence rdf:about="http://shortbol.org/v2#GFP_sequence/1">
+    <sbol:displayId>GFP_sequence</sbol:displayId>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:elements>tcacacaggaaagtactagatgcgtaaaggagaagaacttttcactggagttgtcccaattcttgttgaattagatggtgatgttaatgggcacaaattttctgtcagtggagagggtgaaggtgatgcaacatacggaaaacttacccttaaatttatttgcactactggaaaactacctgttccatggccaacacttgtcactactttcggttatggtgttcaatgctttgcgagatacccagatcatatgaaacagcatgactttttcaagagtgccatgcccgaaggttatgtacaggaaagaactatatttttcaaagatgacgggaactacaagacacgtgctgaagtcaagtttgaaggtgatacccttgttaatagaatcgagttaaaaggtattgattttaaagaagatggaaacattcttggacacaaattggaatacaactataactcacacaatgtatacatcatggcagacaaacaaaagaatggaatcaaagttaacttcaaaattagacacaacattgaagatggaagcgttcaactagcagaccattatcaacaaaatactccaattggcgatggccctgtccttttaccagacaaccattacctgtccacacaatctgccctttcgaaagatcccaacgaaaagagagaccacatggtccttcttgagtttgtaacagctgctgggattacacatggcatggatgaactatacaaataataatactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata</sbol:elements>
+    <sbol:version>1</sbol:version>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#GFP_sequence"/>
+  </sbol:Sequence>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/1">
+    <sbol:version>1</sbol:version>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pLlac_c/1">
+        <sbol:displayId>ctx_pLlac_c</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pLlac_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#ctx/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pair4/1">
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pLlac_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pair4"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_mCherry_c/1"/>
+        <sbol:displayId>ctx_pair4</sbol:displayId>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_mCherry_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#mCherry/1"/>
+        <sbol:displayId>ctx_mCherry_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_mCherry_c"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pair2/1">
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_lacI_c/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pBAD_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pair2"/>
+        <sbol:displayId>ctx_pair2</sbol:displayId>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:displayId>NOR_gate_promoter_variable_3_ctx</sbol:displayId>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pTeT_c/1">
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pTeT_c"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pTeT/1"/>
+        <sbol:displayId>ctx_pTeT_c</sbol:displayId>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pBAD_c/1">
+        <sbol:displayId>ctx_pBAD_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pBAD/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pBAD_c"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pair3/1">
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:displayId>ctx_pair3</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pLlac_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pair3"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_lacI_c/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pair1/1">
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_lacI_c/1"/>
+        <sbol:displayId>ctx_pair1</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pair1"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_pTeT_c/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_lacI_c/1">
+        <sbol:displayId>ctx_lacI_c</sbol:displayId>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#lacI/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_3_ctx/ctx_lacI_c"/>
+      </sbol:Component>
+    </sbol:component>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#pTeT/1">
+    <sbol:version>1</sbol:version>
+    <sbol:displayId>pTeT</sbol:displayId>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#pTeT"/>
+    <sbol:sequence rdf:resource="http://shortbol.org/v2#pTeT_sequence/1"/>
+  </sbol:ComponentDefinition>
+  <sbol:Sequence rdf:about="http://shortbol.org/v2#pLL_sequence/1">
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#pLL_sequence"/>
+    <sbol:version>1</sbol:version>
+    <sbol:displayId>pLL_sequence</sbol:displayId>
+    <sbol:elements>gtggagatgaacaaaaaacacacagccattgtaagacagcctgaacaaatcccccctgttgcgtctgctgaaaatattcacaaaataaagcg</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://shortbol.org/v2#Pv_sequence/1">
+    <sbol:elements>ctgaccattacgctctccttgaatgttgtctggtagttctacaaatgaatccagatagcataacttttatatattgtgcaatctcacatgc</sbol:elements>
+    <sbol:version>1</sbol:version>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#Pv_sequence"/>
+    <sbol:displayId>Pv_sequence</sbol:displayId>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/1">
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pTeT_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pTeT/1"/>
+        <sbol:displayId>pLL_pTeT_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pTeT_c"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:version>1</sbol:version>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pLlac_c/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pLlac_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pLlac/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>pLL_pLlac_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pair3/1">
+        <sbol:displayId>pLL_pair3</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pLlac_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pair3"/>
+        <sbol:version>1</sbol:version>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_lacI_c/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:displayId>NOR_gate_promoter_variable_2_pLL</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_mCherry_c/1">
+        <sbol:displayId>pLL_mCherry_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#mCherry/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_mCherry_c"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pBAD_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pLL/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>pLL_pBAD_c</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pBAD_c"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pair1/1">
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pTeT_c/1"/>
+        <sbol:displayId>pLL_pair1</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pair1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_lacI_c/1"/>
+        <sbol:version>1</sbol:version>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_lacI_c/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_lacI_c"/>
+        <sbol:version>1</sbol:version>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#lacI/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>pLL_lacI_c</sbol:displayId>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pair4/1">
+        <sbol:version>1</sbol:version>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_mCherry_c/1"/>
+        <sbol:displayId>pLL_pair4</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pair4"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pLlac_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pair2/1">
+        <sbol:displayId>pLL_pair2</sbol:displayId>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_lacI_c/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pBAD_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_promoter_variable_2_pLL/pLL_pair2"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#ctx/1">
+    <sbol:displayId>ctx</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#ctx"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:sequence rdf:resource="http://shortbol.org/v2#ctx_sequence/1"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/1">
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_lacI_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#lacI/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_lacI_c"/>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>YFP_lacI_c</sbol:displayId>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP"/>
+    <sbol:version>1</sbol:version>
+    <sbol:displayId>NOR_gate_output_variable_1_YFP</sbol:displayId>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pair4/1">
+        <sbol:displayId>YFP_pair4</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_mCherry_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pLlac_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pair4"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pair2/1">
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pBAD_c/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pair2"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_lacI_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>YFP_pair2</sbol:displayId>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pair3/1">
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pair3"/>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pLlac_c/1"/>
+        <sbol:displayId>YFP_pair3</sbol:displayId>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_lacI_c/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pair1/1">
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>YFP_pair1</sbol:displayId>
+        <sbol:object rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_lacI_c/1"/>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pair1"/>
+        <sbol:subject rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pTeT_c/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pTeT_c/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pTeT_c"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pTeT/1"/>
+        <sbol:displayId>YFP_pTeT_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pLlac_c/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pLlac_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pLlac/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>YFP_pLlac_c</sbol:displayId>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_mCherry_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#YFP/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_mCherry_c"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>YFP_mCherry_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pBAD_c/1">
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>YFP_pBAD_c</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pBAD/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#NOR_gate_output_variable_1_YFP/YFP_pBAD_c"/>
+      </sbol:Component>
+    </sbol:component>
+  </sbol:ComponentDefinition>
+  <sbol:Sequence rdf:about="http://shortbol.org/v2#pBAD_sequence/1">
+    <sbol:displayId>pBAD_sequence</sbol:displayId>
+    <sbol:elements>atgccatagcatttttatcc</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:version>1</sbol:version>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#pBAD_sequence"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://shortbol.org/v2#lacI_sequence/1">
+    <sbol:version>1</sbol:version>
+    <sbol:displayId>lacI_sequence</sbol:displayId>
+    <sbol:elements>aaagaggagaaaatggtgaatgtgaaaccagtaacgttatacgatgtcgcagagtatgccggtgtctcttatcagaccgtttcccgcgtggtgaaccaggccagccacgtttctgcgaaaacgcgggaaaaagtggaagcggcgatggcggagctgaattacattcccaaccgcgtggcacaacaactggcgggcaaacagtcgttgctgattggcgttgccacctccagtctggccctgcacgcgccgtcgcaaattgtcgcggcgattaaatctcgcgccgatcaactgggtgccagcgtggtggtgtcgatggtagaacgaagcggcgtcgaagcctgtaaagcggcggtgcacaatcttctcgcgcaacgcgtcagtgggctgatcattaactatccgctggatgaccaggatgccattgctgtggaagctgcctgcactaatgttccggcgttatttcttgatgtctctgaccagacacccatcaacagtattattttctcccatgaagacggtacgcgactgggcgtggagcatctggtcgcattgggtcaccagcaaatcgcgctgttagcgggcccattaagttctgtctcggcgcgtctgcgtctggctggctggcataaatatctcactcgcaatcaaattcagccgatagcggaacgggaaggcgactggagtgccatgtccggttttcaacaaaccatgcaaatgctgaatgagggcatcgttcccactgcgatgctggttgccaacgatcagatggcgctgggcgcaatgcgcgccattaccgagtccgggctgcgcgttggtgcggatatctcggtagtgggatacgacgataccgaagacagctcatgttatatcccgccgttaaccaccatcaaacaggattttcgcctgctggggcaaaccagcgtggaccgcttgctgcaactctctcagggccaggcggtgaagggcaatcagctgttgcccgtctcactggtgaaaagaaaaaccaccctggcgcccaatacgcaaaccgcctctccccgcgcgttggccgattcattaatgcagctggcacgacaggtttcccgactggaaagcgggcaggctgcaaacgacgaaaactacgctttagtagcttaataactctgatagtgctagtgtagatctcccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#lacI_sequence"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://shortbol.org/v2#plux_sequence/1">
+    <sbol:version>1</sbol:version>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:elements>acctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaatacctctggcggtgata</sbol:elements>
+    <sbol:displayId>plux_sequence</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#plux_sequence"/>
+  </sbol:Sequence>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#luxR/1">
+    <sbol:displayId>luxR</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#luxR"/>
+    <sbol:version>1</sbol:version>
+    <sbol:sequence rdf:resource="http://shortbol.org/v2#luxR_sequence/1"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#plux/1">
+    <sbol:displayId>plux</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#plux"/>
+    <sbol:sequence rdf:resource="http://shortbol.org/v2#plux_sequence/1"/>
+    <sbol:version>1</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#CinR/1">
+    <sbol:displayId>CinR</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#CinR"/>
+    <sbol:sequence rdf:resource="http://shortbol.org/v2#CinR_sequence/1"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+    <sbol:version>1</sbol:version>
+  </sbol:ComponentDefinition>
+  <sbol:Sequence rdf:about="http://shortbol.org/v2#pLlac_sequence/1">
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#pLlac_sequence"/>
+    <sbol:elements>aattgtgagcggataacaattgacattgtgagcggataacaagatactgagcaca</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:displayId>pLlac_sequence</sbol:displayId>
+    <sbol:version>1</sbol:version>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://shortbol.org/v2#CinR_sequence/1">
+    <sbol:version>1</sbol:version>
+    <sbol:displayId>CinR_sequence</sbol:displayId>
+    <sbol:elements>aaagaggagaaatactagatgattgagaatacctatagcgaaaagttcgagtccgcgttcgaacagatcaaggcggcggccaacgtggatgccgccatccgtattctccaggcggaatataacctcgatttcgtcacctaccatctcgcccagacgatcgcgagcaagatcgattcgcccttcgtgcgcaccacctatccggatgcctgggtttcccgctacctcctcaacagctatgtgaaggtcgatccgatcgtcaagcagggcttcgaacgccagctgcccttcgactggagcgaggtcgaaccgacgccggaggcctatgccatgctggtcgacgcccagaaacacggcatcggtggcaatggctactccatccccgtcgccgacaaggcgcagcgccgcgccctgctgtcgctgaatgcccgtataccggccgacgaatggaccgagctcgtgcgccgctgccgcaacgagtggatcgagatcgcccatctgatccaccgcaaggccgtctatgagctgcatggcgaaaacgatccggtgccggcattgtcgccgcgcgagatcgagtgtctgcactggaccgccctcggcaaggattacaaggatatttcggtcatcctgggcatatcagagcataccacacgcgattacctgaagaccgcccgcttcaagctcggctgcgccacgatctcggccgccgcgtcgcgggctgttcaattgcgcatcatcaatccctaataatactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#CinR_sequence"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://shortbol.org/v2#Pu_sequence/1">
+    <sbol:displayId>Pu_sequence</sbol:displayId>
+    <sbol:elements>cccgggaaagcgcgatgaaccttttttatcgctgccttgatcaaatcgacaggtggttatgcgcgattgatgatttgctcaaatacagccagcgtgctgtagattttctctcataccccccctttcttttttacaaagaaaatcaataatttagatgaaataaggggatcggtataagcaatggcatggcggttgctagctatacgagacttaaaataaaaatagtggtgacccttcaatgttgtattttctcaactctgttcagattggttgctttcgccatgtatatcctcaaagcgggccagccgtagccgttacgc</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#Pu_sequence"/>
+    <sbol:version>1</sbol:version>
+  </sbol:Sequence>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#pLL/1">
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#pLL"/>
+    <sbol:version>1</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+    <sbol:sequence rdf:resource="http://shortbol.org/v2#pLL_sequence/1"/>
+    <sbol:displayId>pLL</sbol:displayId>
+  </sbol:ComponentDefinition>
+</rdf:RDF>

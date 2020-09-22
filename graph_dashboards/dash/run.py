@@ -18,6 +18,8 @@ background_color = {"backgroundColor" : options_color}
 hidden_style = background_color.copy()
 hidden_style["display"] = "none"
 
+cyto_graph_id = "cytoscape_graph"
+
 not_modifier_identifiers = {"sidebar_id" : "sidebar",
                             "toolbox_id" : "toolbox",
                             "cyto_utility_id" : "cyto_utility"}
@@ -48,9 +50,15 @@ graph_type_outputs = {"plotly_options_id" : Output("plotly_options","style"),
 
 graph_types = {"plotly" : PlotlyVisualiser,
                "cytoscape" : CytoscapeVisualiser}
-
+               
 zoom_inputs = {"cyto_zoom_slider_id" : Input("cyto_zoom_slider","value")}
-cyto_graph_id = "cytoscape_graph"
+
+remove_node_inputs = {"remove_node_id" : Input('remove_node_button', 'n_clicks')}
+remove_node_outputs = {"cyto_elements_id" : Output(cyto_graph_id, 'elements')}
+remove_node_state = {"cyto_elements_id" : State(cyto_graph_id, 'elements'),
+                     "cyto_selected_node_id" : State(cyto_graph_id, 'selectedNodeData')}
+
+
 
 def dash_runner(visualiser,name = ""):
     figure_layout_elements = {"autosize": True}
@@ -108,12 +116,15 @@ def dash_runner(visualiser,name = ""):
         return change_graph_type(dashboard,graph_type)
     def update_zoom_inner(value):
         return update_zoom(value)
+    def remove_node_inner(_,node_id,data):
+        return remove_selected_nodes(_,node_id,data)
 
     dashboard.add_callback(update_plotly_graph_inner,list(plotly_update_inputs.values()),list(plotly_update_outputs.values()))
     dashboard.add_callback(update_cyto_graph_inner,list(cyto_update_inputs.values()),list(cyto_update_outputs.values()))
     dashboard.add_callback(load_graph_inner,list(load_inputs.values()),list(load_outputs.values()),list(load_states.values()))
     dashboard.add_callback(change_graph_type_inner,list(graph_type_inputs.values()),list(graph_type_outputs.values()))
     dashboard.add_callback(update_zoom_inner,list(zoom_inputs.values()),Output(cyto_graph_id,"zoom"))
+    dashboard.add_callback(remove_node_inner,list(remove_node_inputs.values()),list(remove_node_outputs.values()),list(remove_node_state.values()))
     dashboard.run()
 
 
@@ -237,6 +248,13 @@ def change_graph_type(dashboard,graph_type):
 
 def update_zoom(value):
     return value
+
+def remove_selected_nodes(_, elements, data):
+    if elements and data:
+        ids_to_remove = {ele_data['id'] for ele_data in data}
+        new_elements = [ele for ele in elements if ele['data']['id'] not in ids_to_remove]
+        return [new_elements]
+    return [elements]
 
 def reverse_graph(dashboard,old_settings,error_str = ""):
     for setting in old_settings:
@@ -379,8 +397,11 @@ def _generate_options(visualiser):
 def _generate_cyto_util_components(dashboard):
     # Slider for zoom
     zoom_slider = dashboard.create_slider(zoom_inputs["cyto_zoom_slider_id"].component_id,"Zoom Slider",0.1,3,1.5,step=0.1,add=False)
-    # Reset for centering.
-    utilities = zoom_slider
+    zoom_slider_div = dashboard.create_div("zoom_div",zoom_slider,add=False)
+
+    remove_node_button = dashboard.create_button(remove_node_inputs["remove_node_id"].component_id,"Remove Selected Node",add=False)
+    remove_node_div = dashboard.create_div("remove_node_div",remove_node_button,add=False)
+    utilities = zoom_slider_div + remove_node_div
     util_div = dashboard.create_div(not_modifier_identifiers["cyto_utility_id"],utilities,add=False)
 
     return util_div

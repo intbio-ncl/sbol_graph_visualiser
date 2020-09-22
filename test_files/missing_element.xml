@@ -1,0 +1,304 @@
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" xmlns:sbol="http://sbols.org/v2#">
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#pTetR/1">
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+    <sbol:version>1</sbol:version>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#pTetR"/>
+    <sbol:displayId>pTetR</sbol:displayId>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#caspr/1">
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#caspr"/>
+    <sbol:displayId>caspr</sbol:displayId>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Dna"/>
+    <sbol:version>1</sbol:version>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#LacI_inv/1">
+    <sbol:version>1</sbol:version>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#LacI_inv"/>
+    <sbol:displayId>LacI_inv</sbol:displayId>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#Protein"/>
+  </sbol:ComponentDefinition>
+  <sbol:ModuleDefinition rdf:about="http://shortbol.org/v2#TetR_inverter/1">
+    <sbol:displayId>TetR_inverter</sbol:displayId>
+    <sbol:functionalComponent>
+      <sbol:FunctionalComponent rdf:about="http://shortbol.org/v2#TetR_inverter/caspr_fc/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#TetR_inverter/caspr_fc"/>
+        <sbol:displayId>caspr_fc</sbol:displayId>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#caspr/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:direction rdf:resource="http://sbols.org/v2#inout"/>
+        <sbol:version>1</sbol:version>
+      </sbol:FunctionalComponent>
+    </sbol:functionalComponent>
+    <sbol:functionalComponent>
+      <sbol:FunctionalComponent rdf:about="http://shortbol.org/v2#TetR_inverter/lacI_fc/1">
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>lacI_fc</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#lacI/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#TetR_inverter/lacI_fc"/>
+        <sbol:direction rdf:resource="http://sbols.org/v2#inout"/>
+      </sbol:FunctionalComponent>
+    </sbol:functionalComponent>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#TetR_inverter"/>
+    <sbol:interaction>
+      <sbol:Interaction rdf:about="http://shortbol.org/v2#TetR_inverter/lacI_fc_i_inhibition_with_DSM_fc/1">
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#TetR_inverter/lacI_fc_i_inhibition_with_DSM_fc"/>
+        <sbol:displayId>lacI_fc_i_inhibition_with_DSM_fc</sbol:displayId>
+        <sbol:participation>
+          <sbol:Participation rdf:about="http://shortbol.org/v2#TetR_inverter/lacI_fc_i_inhibition_with_DSM_fc/lacI_fc_i_inhibition_with_DSM_fc_lacI_fc_i_inhibitor/1">
+            <sbol:displayId>lacI_fc_i_inhibition_with_DSM_fc_lacI_fc_i_inhibitor</sbol:displayId>
+            <sbol:participant rdf:resource="http://shortbol.org/v2#TetR_inverter/lacI_fc/1"/>
+            <sbol:role rdf:resource="http://identifiers.org/biomodels.sbo/SBO:0000020"/>
+            <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#TetR_inverter/lacI_fc_i_inhibition_with_DSM_fc/lacI_fc_i_inhibition_with_DSM_fc_lacI_fc_i_inhibitor"/>
+            <sbol:version>1</sbol:version>
+          </sbol:Participation>
+        </sbol:participation>
+        <sbol:type rdf:resource="http://identifiers.org/biomodels.sbo/SBO:0000169"/>
+        <sbol:participation>
+          <sbol:Participation rdf:about="http://shortbol.org/v2#TetR_inverter/lacI_fc_i_inhibition_with_DSM_fc/lacI_fc_i_inhibition_with_DSM_fc_DSM_fc_i_inhibited/1">
+            <sbol:role rdf:resource="http://identifiers.org/biomodels.sbo/SBO:0000642"/>
+            <sbol:version>1</sbol:version>
+            <sbol:displayId>lacI_fc_i_inhibition_with_DSM_fc_DSM_fc_i_inhibited</sbol:displayId>
+            <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#TetR_inverter/lacI_fc_i_inhibition_with_DSM_fc/lacI_fc_i_inhibition_with_DSM_fc_DSM_fc_i_inhibited"/>
+            <sbol:participant rdf:resource="http://shortbol.org/v2#TetR_inverter/DSM_fc/1"/>
+          </sbol:Participation>
+        </sbol:participation>
+      </sbol:Interaction>
+    </sbol:interaction>
+    <sbol:version>1</sbol:version>
+    <sbol:functionalComponent>
+      <sbol:FunctionalComponent rdf:about="http://shortbol.org/v2#TetR_inverter/DSM_fc/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>DSM_fc</sbol:displayId>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#DSM/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#TetR_inverter/DSM_fc"/>
+        <sbol:direction rdf:resource="http://sbols.org/v2#inout"/>
+      </sbol:FunctionalComponent>
+    </sbol:functionalComponent>
+  </sbol:ModuleDefinition>
+  <sbol:ModuleDefinition rdf:about="http://shortbol.org/v2#LacI_inverter/1">
+    <sbol:displayId>LacI_inverter</sbol:displayId>
+    <sbol:functionalComponent>
+      <sbol:FunctionalComponent rdf:about="http://shortbol.org/v2#LacI_inverter/caspr_fc_2/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#caspr/1"/>
+        <sbol:direction rdf:resource="http://sbols.org/v2#inout"/>
+        <sbol:displayId>caspr_fc_2</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#LacI_inverter/caspr_fc_2"/>
+        <sbol:version>1</sbol:version>
+      </sbol:FunctionalComponent>
+    </sbol:functionalComponent>
+    <sbol:module>
+      <sbol:Module rdf:about="http://shortbol.org/v2#LacI_inverter/toggleSwitch/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#LacI_inverter/toggleSwitch"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#TetR_inverter/1"/>
+        <sbol:mapsTo>
+          <sbol:MapsTo rdf:about="http://shortbol.org/v2#LacI_inverter/toggleSwitch/LacI_inv_fc_mapsTo_DSM_fc/1">
+            <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#LacI_inverter/toggleSwitch/LacI_inv_fc_mapsTo_DSM_fc"/>
+            <sbol:refinement rdf:resource="http://sbols.org/v2#useLocal"/>
+            <sbol:version>1</sbol:version>
+            <sbol:remote rdf:resource="http://shortbol.org/v2#TetR_inverter/DSM_fc/1"/>
+            <sbol:displayId>LacI_inv_fc_mapsTo_DSM_fc</sbol:displayId>
+            <sbol:local rdf:resource="http://shortbol.org/v2#LacI_inverter/LacI_inv_fc/1"/>
+          </sbol:MapsTo>
+        </sbol:mapsTo>
+        <sbol:mapsTo>
+          <sbol:MapsTo rdf:about="http://shortbol.org/v2#LacI_inverter/toggleSwitch/lacI_fc_2_mapsTo_lacI_fc/1">
+            <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#LacI_inverter/toggleSwitch/lacI_fc_2_mapsTo_lacI_fc"/>
+            <sbol:local rdf:resource="http://shortbol.org/v2#LacI_inverter/lacI_fc_2/1"/>
+            <sbol:refinement rdf:resource="http://sbols.org/v2#useLocal"/>
+            <sbol:remote rdf:resource="http://shortbol.org/v2#TetR_inverter/lacI_fc/1"/>
+            <sbol:version>1</sbol:version>
+            <sbol:displayId>lacI_fc_2_mapsTo_lacI_fc</sbol:displayId>
+          </sbol:MapsTo>
+        </sbol:mapsTo>
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>toggleSwitch</sbol:displayId>
+      </sbol:Module>
+    </sbol:module>
+    <sbol:version>1</sbol:version>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#LacI_inverter"/>
+    <sbol:interaction>
+      <sbol:Interaction rdf:about="http://shortbol.org/v2#LacI_inverter/lacI_fc_2_i_inhibition_with_LacI_inv_fc/1">
+        <sbol:participation>
+          <sbol:Participation rdf:about="http://shortbol.org/v2#LacI_inverter/lacI_fc_2_i_inhibition_with_LacI_inv_fc/lacI_fc_2_i_inhibition_with_LacI_inv_fc_LacI_inv_fc_i_inhibited/1">
+            <sbol:displayId>lacI_fc_2_i_inhibition_with_LacI_inv_fc_LacI_inv_fc_i_inhibited</sbol:displayId>
+            <sbol:participant rdf:resource="http://shortbol.org/v2#LacI_inverter/LacI_inv_fc/1"/>
+            <sbol:version>1</sbol:version>
+            <sbol:role rdf:resource="http://identifiers.org/biomodels.sbo/SBO:0000642"/>
+            <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#LacI_inverter/lacI_fc_2_i_inhibition_with_LacI_inv_fc/lacI_fc_2_i_inhibition_with_LacI_inv_fc_LacI_inv_fc_i_inhibited"/>
+          </sbol:Participation>
+        </sbol:participation>
+        <sbol:type rdf:resource="http://identifiers.org/biomodels.sbo/SBO:0000169"/>
+        <sbol:participation>
+          <sbol:Participation rdf:about="http://shortbol.org/v2#LacI_inverter/lacI_fc_2_i_inhibition_with_LacI_inv_fc/lacI_fc_2_i_inhibition_with_LacI_inv_fc_lacI_fc_2_i_inhibitor/1">
+            <sbol:participant rdf:resource="http://shortbol.org/v2#LacI_inverter/lacI_fc_2/1"/>
+            <sbol:displayId>lacI_fc_2_i_inhibition_with_LacI_inv_fc_lacI_fc_2_i_inhibitor</sbol:displayId>
+            <sbol:version>1</sbol:version>
+            <sbol:role rdf:resource="http://identifiers.org/biomodels.sbo/SBO:0000020"/>
+            <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#LacI_inverter/lacI_fc_2_i_inhibition_with_LacI_inv_fc/lacI_fc_2_i_inhibition_with_LacI_inv_fc_lacI_fc_2_i_inhibitor"/>
+          </sbol:Participation>
+        </sbol:participation>
+        <sbol:displayId>lacI_fc_2_i_inhibition_with_LacI_inv_fc</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#LacI_inverter/lacI_fc_2_i_inhibition_with_LacI_inv_fc"/>
+        <sbol:version>1</sbol:version>
+      </sbol:Interaction>
+    </sbol:interaction>
+    <sbol:functionalComponent>
+      <sbol:FunctionalComponent rdf:about="http://shortbol.org/v2#LacI_inverter/lacI_fc_2/1">
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#LacI_inverter/lacI_fc_2"/>
+        <sbol:version>1</sbol:version>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#lacI/1"/>
+        <sbol:direction rdf:resource="http://sbols.org/v2#inout"/>
+        <sbol:displayId>lacI_fc_2</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+      </sbol:FunctionalComponent>
+    </sbol:functionalComponent>
+    <sbol:functionalComponent>
+      <sbol:FunctionalComponent rdf:about="http://shortbol.org/v2#LacI_inverter/LacI_inv_fc/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>LacI_inv_fc</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#LacI_inverter/LacI_inv_fc"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#LacI_inv/1"/>
+        <sbol:direction rdf:resource="http://sbols.org/v2#inout"/>
+      </sbol:FunctionalComponent>
+    </sbol:functionalComponent>
+  </sbol:ModuleDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#DSM_2261_term/1">
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:version>1</sbol:version>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#DSM_2261_term"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000141"/>
+    <sbol:displayId>DSM_2261_term</sbol:displayId>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#DSM_2261_RBS/1">
+    <sbol:version>1</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000139"/>
+    <sbol:displayId>DSM_2261_RBS</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#DSM_2261_RBS"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#DSM_2261_CDS/1">
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#DSM_2261_CDS"/>
+    <sbol:displayId>DSM_2261_CDS</sbol:displayId>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000316"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:version>1</sbol:version>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#DSM/1">
+    <sbol:displayId>DSM</sbol:displayId>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#DSM/DSM_DSM_2261_prom_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#DSM_2261_prom/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:displayId>DSM_DSM_2261_prom_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#DSM/DSM_DSM_2261_prom_c"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#DSM/DSM_DSM_2261_CDS_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#DSM_2261_CDS/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>DSM_DSM_2261_CDS_c</sbol:displayId>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#DSM/DSM_DSM_2261_CDS_c"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#DSM"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#DSM/DSM_DSM_2261_RBS_c/1">
+        <sbol:displayId>DSM_DSM_2261_RBS_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#DSM_2261_RBS/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#DSM/DSM_DSM_2261_RBS_c"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:version>1</sbol:version>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#DSM/DSM_DSM_2261_term_c/1">
+        <sbol:displayId>DSM_DSM_2261_term_c</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#DSM/DSM_DSM_2261_term_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#DSM_2261_term/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#DSM_2261_prom/1">
+    <sbol:displayId>DSM_2261_prom</sbol:displayId>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+    <sbol:version>1</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#DSM_2261_prom"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#lacI_CDS/1">
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:version>1</sbol:version>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#lacI_CDS"/>
+    <sbol:displayId>lacI_CDS</sbol:displayId>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000316"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#lacI_term/1">
+    <sbol:displayId>lacI_term</sbol:displayId>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:version>1</sbol:version>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#lacI_term"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000141"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#lacI_RBS/1">
+    <sbol:displayId>lacI_RBS</sbol:displayId>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#lacI_RBS"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000139"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:version>1</sbol:version>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://shortbol.org/v2#lacI/1">
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#lacI/lacI_lacI_CDS_c/1">
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>lacI_lacI_CDS_c</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#lacI_CDS/1"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#lacI/lacI_lacI_CDS_c"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:displayId>lacI</sbol:displayId>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#lacI/lacI_lacI_RBS_c/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#lacI/lacI_lacI_RBS_c"/>
+        <sbol:displayId>lacI_lacI_RBS_c</sbol:displayId>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#lacI_RBS/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#lacI/lacI_lacI_term_c/1">
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#lacI/lacI_lacI_term_c"/>
+        <sbol:definition rdf:resource="http://shortbol.org/v2#lacI_term/1"/>
+        <sbol:version>1</sbol:version>
+        <sbol:displayId>lacI_lacI_term_c</sbol:displayId>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:version>1</sbol:version>
+    <sbol:component>
+      <sbol:Component rdf:about="http://shortbol.org/v2#lacI/lacI_pTetR_c/1">
+        <sbol:definition rdf:resource="http://shortbol.org/v2#pTetR/1"/>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:version>1</sbol:version>
+        <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#lacI/lacI_pTetR_c"/>
+        <sbol:displayId>lacI_pTetR_c</sbol:displayId>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:persistentIdentity rdf:resource="http://shortbol.org/v2#lacI"/>
+  </sbol:ComponentDefinition>
+</rdf:RDF>
