@@ -24,11 +24,17 @@ not_modifier_identifiers = {"sidebar_id" : "sidebar",
                             "toolbox_id" : "toolbox",
                             "cyto_utility_id" : "cyto_utility"}
 
+
+plotly_preset_inputs = OrderedDict()
+plotly_preset_outputs = OrderedDict()
 plotly_update_inputs = OrderedDict()
 plotly_update_outputs = {"graph_id" : Output("plotly_graph","figure"),
                         "error_id" : Output("plotly_error_alert", "is_open"),
                         "error_content" : Output("plotly_error_alert","children")}
 
+
+cyto_preset_inputs = OrderedDict()
+cyto_preset_outputs = OrderedDict()
 cyto_update_inputs = OrderedDict()
 cyto_update_outputs = {"graph_id" : Output("cyto_graph","children"),
                         "error_id" : Output("cyto_error_alert", "is_open"),
@@ -66,11 +72,20 @@ def dash_runner(visualiser,name = ""):
     dashboard = DashBoard(visualiser)
 
     # Add Options
-    plotly_form_elements,plotly_identifiers = _create_form_elements(PlotlyVisualiser(),dashboard,style=background_color,id_prefix=plotly_id_prefix)
-    cyto_form_elements,cyto_identifiers = _create_form_elements(CytoscapeVisualiser(),dashboard,style=background_color,id_prefix=cyto_id_prefix)
-
+    plotly_form_elements,plotly_identifiers,plotly_maps = _create_form_elements(PlotlyVisualiser(),dashboard,style=background_color,id_prefix=plotly_id_prefix)
+    cyto_form_elements,cyto_identifiers,cyto_maps = _create_form_elements(CytoscapeVisualiser(),dashboard,style=background_color,id_prefix=cyto_id_prefix)
+    del plotly_maps["plotly_preset"]
+    del cyto_maps["cyto_preset"]
+    plotly_preset_identifiers,plotly_identifiers,plotly_preset_output,plotly_preset_state = _generate_inputs_outputs(plotly_identifiers)
+    cyto_preset_identifiers,cyto_identifiers,cyto_preset_output,cyto_preset_state = _generate_inputs_outputs(cyto_identifiers)
+    
     plotly_update_inputs.update(plotly_identifiers)
+    plotly_preset_inputs.update(plotly_preset_identifiers)
+    plotly_preset_outputs.update(plotly_preset_output)
+
     cyto_update_inputs.update(cyto_identifiers)
+    cyto_preset_inputs.update(cyto_preset_identifiers)
+    cyto_preset_outputs.update(cyto_preset_output)
     
     plotly_form_div = dashboard.create_div(graph_type_outputs["plotly_options_id"].component_id,plotly_form_elements,add=False,style=background_color)
     cytoscape_form_div = dashboard.create_div(graph_type_outputs["cyto_options_id"].component_id,cyto_form_elements,add=False,style=hidden_style)
@@ -106,6 +121,8 @@ def dash_runner(visualiser,name = ""):
     dashboard.create_div("content",final_elements)
 
     # Bind the callbacks
+    def update_plotly_preset_inner(preset_name,*states):
+        return update_plotly_preset(dashboard,preset_name,plotly_maps,states)
     def update_plotly_graph_inner(*args):
         return update_plotly_graph(dashboard,args)
     def update_cyto_graph_inner(*args):
@@ -119,6 +136,7 @@ def dash_runner(visualiser,name = ""):
     def remove_node_inner(_,node_id,data):
         return remove_selected_nodes(_,node_id,data)
 
+    dashboard.add_callback(update_plotly_preset_inner,list(plotly_preset_inputs.values()),list(plotly_preset_outputs.values()),list(plotly_preset_state.values()))
     dashboard.add_callback(update_plotly_graph_inner,list(plotly_update_inputs.values()),list(plotly_update_outputs.values()))
     dashboard.add_callback(update_cyto_graph_inner,list(cyto_update_inputs.values()),list(cyto_update_outputs.values()))
     dashboard.add_callback(load_graph_inner,list(load_inputs.values()),list(load_outputs.values()),list(load_states.values()))
@@ -127,6 +145,36 @@ def dash_runner(visualiser,name = ""):
     dashboard.add_callback(remove_node_inner,list(remove_node_inputs.values()),list(remove_node_outputs.values()),list(remove_node_state.values()))
     dashboard.run()
 
+
+
+def update_plotly_preset(dashboard,preset_name,mappings,*states):
+    if preset_name is None:
+        raise dash.exceptions.PreventUpdate()
+
+    try:
+        setter = getattr(dashboard.visualiser,preset_name,None)
+    except TypeError:
+        # This shouldn't happen.
+        raise dash.exceptions.PreventUpdate()
+    states = states[0]
+    modified_vals = setter()
+    modified_vals = [m.__name__ for m in modified_vals]
+    final_outputs = []
+    # We need to return: value of each option on the sidebar.
+    # Need the current values.
+    for index,state in enumerate(states):
+        is_modified = False
+        states_possible_vals = list(mappings.items())[index][1]
+        for mod in modified_vals:
+            if mod in states_possible_vals:
+                print(mod)
+                final_outputs.append(mod)
+                is_modified = True
+                break 
+        if not is_modified:
+            final_outputs.append(state)
+
+    return final_outputs
 
 def update_plotly_graph(dashboard,*args):
     if not isinstance(dashboard.visualiser,PlotlyVisualiser):
@@ -271,12 +319,13 @@ def _create_form_elements(visualiser,dashboard,style = {},id_prefix = ""):
     elements = []
     identifiers = {}
     misc_div = []
+    variable_input_list_map = OrderedDict()
     for k,v in options.items():
-        removal_words = ["Add","Set","Misc"]
         display_name = _beautify_name(k)
         identifier = id_prefix + "_" + k
         element = []
         miscs = []
+
         # The misc section is a special option set as they are all independant options.
         if "Misc" in display_name:
             # Create a heading (DisplayName)
@@ -289,15 +338,16 @@ def _create_form_elements(visualiser,dashboard,style = {},id_prefix = ""):
                 miscs = miscs + dashboard.create_toggle_switch(misc_identifer,name,add=False)
                 miscs = miscs + dashboard.create_line_break(add=False)
                 identifiers[k1] = Input(misc_identifer,"value")
+                variable_input_list_map[k1] = [True,False]
             
             misc_div = dashboard.create_div(id_prefix + "_misc_container",miscs,add=False,style=style)
             continue
-
         elif isinstance(v,(int,float)):
             min_v = v/2
             max_v = v*2
             element = dashboard.create_slider(identifier ,display_name,min_v,max_v,default_val=v,add=False)
             identifiers[k] =  Input(identifier,"value")
+            variable_input_list_map[identifier] = [min_v,max_v]
 
         elif isinstance(v,dict):
             removal_words = removal_words + [word for word in display_name.split(" ")]
@@ -307,6 +357,7 @@ def _create_form_elements(visualiser,dashboard,style = {},id_prefix = ""):
                 label = "".join("" if i in removal_words else i + " " for i in label.split())
                 inputs.append({"label" : label, "value" : k1})
 
+            variable_input_list_map[identifier] = [l["value"] for l in inputs]
             element = dashboard.create_radio_item(identifier,display_name,inputs,add=False)
             identifiers[k] = Input(identifier,"value")
 
@@ -314,7 +365,7 @@ def _create_form_elements(visualiser,dashboard,style = {},id_prefix = ""):
         elements = elements + dashboard.create_div(identifier + "_container",element,add=False,style=style)
         elements = elements + breaker 
     
-    return elements + misc_div, identifiers
+    return elements + misc_div, identifiers,variable_input_list_map
 
 
 def _beautify_name(name):
@@ -342,6 +393,7 @@ def _generate_options(visualiser):
                            "copy_settings"]
 
     options = {"preset" : {},
+               "view" : {},
                "layout" : {}}
 
     for func_str in dir(visualiser):
@@ -371,6 +423,9 @@ def _generate_options(visualiser):
             # When no params radiobox.
             if func_str.split("_")[-1] == "preset":
                 option_name = "preset"
+
+            elif func_str.split("_")[-1] == "view":
+                option_name = "view"
 
             elif func_str.split("_")[-1] == "layout":
                 option_name = "layout"
@@ -405,3 +460,11 @@ def _generate_cyto_util_components(dashboard):
     util_div = dashboard.create_div(not_modifier_identifiers["cyto_utility_id"],utilities,add=False)
 
     return util_div
+
+def _generate_inputs_outputs(identifiers):
+    preset_identifiers = {"preset" : identifiers["preset"]}
+    del identifiers["preset"]
+
+    outputs = {k:Output(v.component_id,v.component_property) for k,v in identifiers.items()}
+    states = {k:State(v.component_id,v.component_property) for k,v in identifiers.items()}
+    return preset_identifiers,identifiers,outputs,states

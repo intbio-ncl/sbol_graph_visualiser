@@ -416,7 +416,6 @@ class NetworkXGraphWrapper:
                 elif edge[1] == identifiers.predicates.component and edge[0] == node:
                     parent_edges = [[e for e in edge[2]["triples"]] for edge in self.graph.edges(edge[0],data=True)]
                     potential_parent_type = inner_search((edge[0],identifiers.predicates.rdf_type,None),parent_edges)
-                    print(potential_parent_type)
                     if identifiers.objects.component_definition == potential_parent_type[2]:
                         child = potential_parent_type[2]
                         predicate = edge[1]

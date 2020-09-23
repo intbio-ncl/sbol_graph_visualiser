@@ -16,7 +16,7 @@ class AbstractVisualiser:
         else:
             self._graph = NetworkXGraphWrapper(graph)
 
-        self.preset = self._graph.graph
+        self.graph_view = self._graph.graph
         self.layout = self.set_spring_layout
         self.pos = []
 
@@ -25,16 +25,51 @@ class AbstractVisualiser:
         self.node_color_preset = self.add_standard_node_color
         self.edge_color_preset = self.add_standard_edge_color
 
-    # ---------------------- Set Preset (Set a sub-graph) ----------------------
-    def set_full_graph_preset(self):
+
+    # ---------------------- Set Preset (Sets one or more other settings to focus on a specific thing in the graph) ----------------------
+    def set_interaction_preset(self):
+        pass
+
+    def set_parts_preset(self):
+        pass
+
+    def set_parent_preset(self):
+        pass
+
+    def set_dbtl_preset(self):
+        pass
+
+    def set_adjacency_preset(self):
+        '''
+        Sets other settings to best show how nodes are interconnected.
+        Sets:
+            . Full Graph
+            . Layout ?? - Maybe circular.
+            . Standard Edge Color 
+            . Adjacency Node Color
+            . No Edge Labels.
+            . Adjacency Node Labels
+        '''
+        sub_functions = [
+            self.set_full_graph_view,
+            self.set_circular_layout,
+            self.add_node_adjacency_labels,
+            self.add_standard_edge_color,
+        ]
+        for func in sub_functions:
+            func()
+        return sub_functions
+
+    # ---------------------- Set Graph (Set a different graph view) ----------------------
+    def set_full_graph_view(self):
         '''
         :type: preset
         Sets the rendered graph as the default graph (Whole graph.)
         :rtype: None
         '''
-        self.preset = self._graph.graph
+        self.graph_view = self._graph.graph
 
-    def set_interaction_preset(self):
+    def set_interaction_view(self):
         ''' 
         :type: preset
         Sets the rendered graph as a graph displaying interactions between parts.
@@ -43,9 +78,9 @@ class AbstractVisualiser:
         :rtype: None
         '''
         parts_graph = self._graph.produce_interaction_graph()
-        self.preset = parts_graph
+        self.graph_view = parts_graph
 
-    def set_components_preset(self):
+    def set_components_view(self):
         ''' 
         Sets the rendered graph as a graph displaying 
         CD's as subparts of other CD's.
@@ -54,13 +89,13 @@ class AbstractVisualiser:
         :rtype: None
         '''
         components_preset = self._graph.produce_components_preset()
-        self.preset = components_preset
+        self.graph_view = components_preset
 
-    def set_parts_preset(self):
+    def set_parts_view(self):
         parts_graph = self._graph.produce_parts_preset()
-        self.preset = parts_graph
+        self.graph_view = parts_graph
 
-    def set_functional_preset(self):
+    def set_functional_view(self):
         ''' 
         :type: preset
         Sets the rendered graph as a graph displaying 
@@ -70,11 +105,11 @@ class AbstractVisualiser:
         :rtype: None
         '''
         functional_graph = self._graph.produce_functional_preset()
-        self.preset = functional_graph
+        self.graph_view = functional_graph
 
-    def set_parent_preset(self):
+    def set_parent_view(self):
         parent_graph = self._graph.produce_parent_preset()
-        self.preset = parent_graph
+        self.graph_view = parent_graph
 
     # ---------------------- Pick a layout ----------------------
     def set_spring_layout(self):
@@ -83,7 +118,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_spring_layout:
-            self.pos = nx.spring_layout(self.preset, iterations=200)
+            self.pos = nx.spring_layout(self.graph_view, iterations=200)
     
         else:
             self.layout = self.set_spring_layout
@@ -94,7 +129,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_circular_layout:
-            self.pos = nx.circular_layout(self.preset)
+            self.pos = nx.circular_layout(self.graph_view)
     
         else:
             self.layout = self.set_circular_layout
@@ -105,7 +140,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_kamada_kawai_layout:
-            self.pos = nx.kamada_kawai_layout(self.preset)
+            self.pos = nx.kamada_kawai_layout(self.graph_view)
     
         else:
             self.layout = self.set_kamada_kawai_layout
@@ -116,7 +151,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_planar_layout:
-            self.pos = nx.planar_layout(self.preset)
+            self.pos = nx.planar_layout(self.graph_view)
     
         else:
             self.layout = self.set_planar_layout
@@ -127,7 +162,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_shell_layout:
-            self.pos = nx.shell_layout(self.preset)
+            self.pos = nx.shell_layout(self.graph_view)
     
         else:
             self.layout = self.set_shell_layout
@@ -138,7 +173,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_spiral_layout:
-            self.pos = nx.spiral_layout(self.preset)
+            self.pos = nx.spiral_layout(self.graph_view)
     
         else:
             self.layout = self.set_spiral_layout
@@ -149,7 +184,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_spectral_layout:
-            self.pos = nx.spectral_layout(self.preset)
+            self.pos = nx.spectral_layout(self.graph_view)
     
         else:
             self.layout = self.set_spectral_layout
@@ -160,7 +195,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_random_layout:
-            self.pos = nx.random_layout(self.preset)
+            self.pos = nx.random_layout(self.graph_view)
     
         else:
             self.layout = self.set_random_layout
@@ -169,14 +204,14 @@ class AbstractVisualiser:
 
     def add_node_no_labels(self):
         if self.node_text_preset == self.add_node_no_labels:
-            return [None] * len(self.preset.nodes())
+            return [None] * len(self.graph_view.nodes())
         else:
             self.node_text_preset = self.add_node_no_labels
 
     def add_node_adjacency_labels(self):
         if self.node_text_preset == self.add_node_adjacency_labels:
             node_text = []
-            for node, adjacencies in enumerate(self.preset.adjacency()):
+            for node, adjacencies in enumerate(self.graph_view.adjacency()):
                 node_text.append('# of connections: '+str(len(adjacencies[1])))
             return node_text
         else:
@@ -185,7 +220,7 @@ class AbstractVisualiser:
     def add_node_name_labels(self):
         if self.node_text_preset == self.add_node_name_labels:
             node_text = []
-            names = nx.get_node_attributes(self.preset,"display_name")
+            names = nx.get_node_attributes(self.graph_view,"display_name")
             for v in names.values():
                 node_text.append(v)
             return node_text
@@ -195,7 +230,7 @@ class AbstractVisualiser:
     def add_node_type_labels(self):
         if self.node_text_preset == self.add_node_type_labels:
             node_text = []
-            for node in self.preset.nodes:
+            for node in self.graph_view.nodes:
                 edges = [[e for e in edge[2]["triples"]] for edge in self._graph.edges(node,data=True)]
                 found = False
                 for edge in edges:
@@ -221,8 +256,8 @@ class AbstractVisualiser:
             node_text = []
             # A parent is essentially a triple child - parent - edge
             # If a node doesnt have a parent don't add it as it will already be present.
-            for node in self.preset.nodes:
-                edges = [[e for e in edge[2]["triples"]] for edge in self.preset.edges(node,data=True)]
+            for node in self.graph_view.nodes:
+                edges = [[e for e in edge[2]["triples"]] for edge in self.graph_view.edges(node,data=True)]
                 node_type = self._graph.triplepack_search((node,identifiers.predicates.rdf_type,None),edges)
                 if node_type is None:
                     node_text.append("N/A")
@@ -231,7 +266,7 @@ class AbstractVisualiser:
                     node_text.append("Top Level")
                     continue
                 node_type = node_type[2]
-                parent = self._graph._get_parent(node,edges,self.preset.edges)
+                parent = self._graph._get_parent(node,edges,self.graph_view.edges)
                 if parent is None:
                     node_text.append("No Parent")
                 else:
@@ -244,13 +279,13 @@ class AbstractVisualiser:
     # ---------------------- Pick the node color ----------------------
 
     def add_standard_node_color(self):
-        nodes = self.preset.nodes()
+        nodes = self.graph_view.nodes()
         standard_color = "#888"
         return [standard_color for e in nodes]
 
 
     # ---------------------- Pick the edge color ----------------------
     def add_standard_edge_color(self):
-        edges = self.preset.edges
+        edges = self.graph_view.edges
         standard_color = "#888"
         return [standard_color for e in edges]

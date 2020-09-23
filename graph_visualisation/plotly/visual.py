@@ -45,7 +45,7 @@ class PlotlyVisualiser(AbstractVisualiser):
     def add_edge_name_labels(self):
         if self.edge_text_preset == self.add_edge_name_labels:
             edge_names = []
-            for index,edge in enumerate(self.preset.edges(data=True)):
+            for index,edge in enumerate(self.graph_view.edges(data=True)):
                 edge_colour = self.misc_edge_settings["line"]["color"][index]
                 marker = dict(color = edge_colour,opacity = 0)
                 x0, y0 = self.pos[edge[0]]
@@ -69,8 +69,8 @@ class PlotlyVisualiser(AbstractVisualiser):
             color_list = super().add_standard_node_color()
             self.misc_node_settings["legends"].clear()
             hide_legend = {"showlegend" : False}
-            self.misc_node_settings["marker"]["line"]["color"] = ["#800000" for e in self.preset.nodes()]
-            self.misc_node_settings["legends"] = self.misc_node_settings["legends"] + [hide_legend for e in self.preset.nodes()]
+            self.misc_node_settings["marker"]["line"]["color"] = ["#800000" for e in self.graph_view.nodes()]
+            self.misc_node_settings["legends"] = self.misc_node_settings["legends"] + [hide_legend for e in self.graph_view.nodes()]
             return color_list
         else:
             self.node_color_preset = self.add_standard_node_color
@@ -82,7 +82,7 @@ class PlotlyVisualiser(AbstractVisualiser):
             adj_colors = []
             adj_curr_color = (255,0,0)
             adj_color_map = {}
-            for node, adjacencies in enumerate(self.preset.adjacency()):
+            for node, adjacencies in enumerate(self.graph_view.adjacency()):
                 node_adj = len(adjacencies[1])
                 if node_adj in adj_color_map.keys():
                     adj_colors.append(adj_color_map[node_adj])
@@ -107,7 +107,7 @@ class PlotlyVisualiser(AbstractVisualiser):
 
             self.misc_node_settings["legends"].clear()
             legends = []
-            nodes = self.preset.nodes()
+            nodes = self.graph_view.nodes()
             type_curr_color = (255,0,0)
             type_color_map = {"no_type" : (0,0,0)}
             role_color_map = {"" : (0,0,0)}
@@ -155,7 +155,7 @@ class PlotlyVisualiser(AbstractVisualiser):
             color_list = super().add_standard_edge_color()
             self.misc_edge_settings["legends"].clear()
             hide_legend = {"showlegend" : False}
-            self.misc_edge_settings["legends"] = self.misc_edge_settings["legends"] + [hide_legend for e in self.preset.edges]
+            self.misc_edge_settings["legends"] = self.misc_edge_settings["legends"] + [hide_legend for e in self.graph_view.edges]
             self.misc_edge_settings["line"]["color"] = color_list
             return color_list
         else:
@@ -164,7 +164,7 @@ class PlotlyVisualiser(AbstractVisualiser):
     def add_adaptive_edge_color(self):
         if self.edge_color_preset == self.add_adaptive_edge_color:
             self.misc_edge_settings["legends"].clear()
-            edges = self.preset.edges
+            edges = self.graph_view.edges
             curr_color = (255,0,0)
             color_map = {}
             legends = []
@@ -232,7 +232,7 @@ class PlotlyVisualiser(AbstractVisualiser):
             self.edge_marker_type = "markers"    
 
     def build(self,layout_elements = {},show=True):
-        if self.preset is None:
+        if self.graph_view is None:
             raise ValueError("No preset defined.")
 
         if self.layout is None:
@@ -245,7 +245,7 @@ class PlotlyVisualiser(AbstractVisualiser):
         data = []
         edge_color = self.edge_color_preset()  
         edges_list = []
-        for index,edge in enumerate(self.preset.edges()):
+        for index,edge in enumerate(self.graph_view.edges()):
             line = self._get_specific_node_settings(index,self.misc_edge_settings["line"])
             line["color"] = edge_color[index]
             if len(self.misc_edge_settings["legends"]) > index:
@@ -270,7 +270,7 @@ class PlotlyVisualiser(AbstractVisualiser):
         if self.node_color_preset is not None:
             node_color = self.node_color_preset()
         node_list = []
-        for index,node in enumerate(self.preset.nodes()):
+        for index,node in enumerate(self.graph_view.nodes()):
             # Some settings are generic (Same for all nodes), some are unique
             # When a list appears in the settings its unique so use node pos index to find its value.
             specialised_node_settings = self._get_specific_node_settings(index,self.misc_node_settings["marker"])

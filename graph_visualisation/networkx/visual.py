@@ -304,7 +304,6 @@ class NetworkXGraphBuilder:
         if self.build_settings["layout"] is None:
             raise ValueError("No Graph Layout provided.")
         else:
-            print(self.build_settings["layout"])
             position = self.build_settings["layout"]()
             y_off = 0.05
             pos_higher = {}
