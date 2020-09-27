@@ -27,38 +27,88 @@ class AbstractVisualiser:
 
 
     # ---------------------- Set Preset (Sets one or more other settings to focus on a specific thing in the graph) ----------------------
+
+    def _set_preset(self,functions):
+        for func in functions:
+            func()
+        return functions
+
     def set_interaction_preset(self):
-        pass
+        '''
+        Master Function to provide insight into Interactions between components.
+        '''
+        sub_functions = [
+            self.set_interaction_view,
+            self.add_node_name_labels
+        ]
+        return self._set_preset(sub_functions)
+
 
     def set_parts_preset(self):
-        pass
+        '''
+        Master Function to provide insight into heiraachy of components.
+        '''
+        sub_functions = [
+            self.set_parts_view,
+            self.add_standard_edge_color,
+            self.add_node_name_labels
+        ]
+        return self._set_preset(sub_functions)
 
     def set_parent_preset(self):
-        pass
-
-    def set_dbtl_preset(self):
-        pass
+        '''
+        Master Function to provide insight into parent-child relationship between sbol elements.
+        '''
+        sub_functions = [
+            self.set_parent_view,
+            self.add_node_name_labels
+        ]
+        return self._set_preset(sub_functions)
 
     def set_adjacency_preset(self):
         '''
-        Sets other settings to best show how nodes are interconnected.
-        Sets:
-            . Full Graph
-            . Layout ?? - Maybe circular.
-            . Standard Edge Color 
-            . Adjacency Node Color
-            . No Edge Labels.
-            . Adjacency Node Labels
+        Master Function to best show how nodes are interconnected.
         '''
         sub_functions = [
             self.set_full_graph_view,
-            self.set_circular_layout,
             self.add_node_adjacency_labels,
             self.add_standard_edge_color,
         ]
-        for func in sub_functions:
-            func()
-        return sub_functions
+        return self._set_preset(sub_functions)
+
+    def set_functional_preset(self):
+        '''
+        Master Function to provide insight into the Functional aspect of a graph.
+        '''
+        sub_functions = [
+            self.set_functional_view,
+            self.add_node_name_labels,
+            self.add_standard_edge_color,
+        ]
+        return self._set_preset(sub_functions)
+
+    def set_component_preset(self):
+        '''
+        Master Function to display interconected components of the graph.
+        '''
+        sub_functions = [
+            self.set_components_view,
+            self.add_node_name_labels,
+            self.add_standard_edge_color,
+        ]
+        return self._set_preset(sub_functions)
+
+    def set_DBTL_preset(self):
+        '''
+        Master Function to provide insight into parent-child relationship between sbol elements.
+        '''
+        sub_functions = [
+            self.set_parent_view,
+            self.add_node_name_labels,
+
+        ]
+        return self._set_preset(sub_functions)
+
 
     # ---------------------- Set Graph (Set a different graph view) ----------------------
     def set_full_graph_view(self):

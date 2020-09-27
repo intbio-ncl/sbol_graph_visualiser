@@ -33,12 +33,80 @@ class CytoscapeVisualiser(AbstractVisualiser):
 
         return current_settings
 
+    # ---------------------- Set Preset (Sets one or more other settings to focus on a specific thing in the graph) ----------------------
+    def set_interaction_preset(self):
+        '''
+        Master Function to provide insight into Interactions between components.
+        '''
+        parent_sub_functions = super().set_interaction_preset()
+        sub_class_sub_functions = [
+            self.set_klay_layout,
+            self.add_adaptive_node_color,
+            self.add_adaptive_edge_color,
+            self.add_edge_name_labels]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
 
-    def set_preset_layout(self):
-        if self.layout == self.set_preset_layout:
+    def set_parts_preset(self):
+        '''
+        Master Function to provide insight into heiraachy of components.
+        '''
+        parent_sub_functions = super().set_parts_preset()
+        sub_class_sub_functions = [
+            self.set_dagre_layout,
+            self.add_adaptive_node_color]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
+    def set_parent_preset(self):
+        '''
+        Master Function to provide insight into parent-child relationship between sbol elements.
+        '''
+        parent_sub_functions = super().set_parent_preset()
+        sub_class_sub_functions = [
+            self.set_breadthfirst_layout,
+            self.add_edge_name_labels,
+            self.add_adaptive_node_color,
+            self.add_adaptive_edge_color]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
+    def set_adjacency_preset(self):
+        parent_sub_functions = super().set_adjacency_preset()
+        sub_class_sub_functions = [
+            self.set_circular_layout,
+            self.add_edge_no_labels,
+            self.add_node_adjacency_color
+        ]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
+    def set_functional_preset(self):
+        '''
+        Master Function to provide insight into the Functional aspect of a graph.
+        '''
+        parent_sub_functions = super().set_functional_preset()
+
+        sub_class_sub_functions = [
+            self.set_euler_layout,
+            self.add_adaptive_node_color
+        ]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
+    def set_component_preset(self):
+        '''
+        Master Function to display interconected components of the graph.
+        '''
+        parent_sub_functions = super().set_component_preset()
+        sub_class_sub_functions = [
+            self.set_dagre_layout,
+            self.add_adaptive_node_color,
+            self.add_edge_no_labels
+        ]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
+    # ---------------------- Pick a layout ----------------------
+    def set_no_layout(self):
+        if self.layout == self.set_no_layout:
             return {"name" : "preset"}
         else:
-            self.layout = self.set_preset_layout
+            self.layout = self.set_no_layout
 
     def set_random_layout(self):
         if self.layout == self.set_random_layout:
@@ -101,37 +169,58 @@ class CytoscapeVisualiser(AbstractVisualiser):
 
     def set_cose_bilkent_layout(self):
         if self.layout == self.set_cose_bilkent_layout:
+            self.pos = None
             return {"name" : "cose-bilkent"}
         else:
             self.layout = self.set_cose_bilkent_layout
 
     def set_cola_layout(self):
         if self.layout == self.set_cola_layout:
+            self.pos = None
             return {"name" : "cola"}
         else:
             self.layout = self.set_cola_layout
 
     def set_euler_layout(self):
         if self.layout == self.set_euler_layout:
+            self.pos = None
             return {"name" : "euler"}
         else:
             self.layout = self.set_euler_layout
 
     def set_spread_layout(self):
         if self.layout == self.set_spread_layout:
+            self.pos = None
             return {"name" : "spread"}
         else:
             self.layout = self.set_spread_layout
 
     def set_dagre_layout(self):
         if self.layout == self.set_dagre_layout:
+            self.pos = None
             return {"name" : "dagre"}
         else:
             self.layout = self.set_dagre_layout
 
     def set_klay_layout(self):
         if self.layout == self.set_klay_layout:
-            return {"name" : "klay"}
+            self.pos = None
+            return {"name" : "klay",
+                    'idealEdgeLength': 100,
+                    'nodeOverlap': 20,
+                    'refresh': 20,
+                    'fit': True,
+                    'padding': 30,
+                    'randomize': False,
+                    'componentSpacing': 100,
+                    'nodeRepulsion': 400000,
+                    'edgeElasticity': 100,
+                    'nestingFactor': 5,
+                    'gravity': 80,
+                    'numIter': 1000,
+                    'initialTemp': 200,
+                    'coolingFactor': 0.95,
+                    'minTemp': 1.0}
         else:
             self.layout = self.set_klay_layout
             
@@ -140,14 +229,14 @@ class CytoscapeVisualiser(AbstractVisualiser):
     # ---------------------- Pick the edge content ----------------------
     def add_edge_no_labels(self):
         if self.edge_text_preset == self.add_edge_no_labels:
-            return [None] * len(self.preset.edges())
+            return [None] * len(self.graph_view.edges())
         else:
             self.edge_text_preset = self.add_edge_no_labels
 
     def add_edge_name_labels(self):
         if self.edge_text_preset == self.add_edge_name_labels:
             edge_names = []
-            for index,edge in enumerate(self.preset.edges(data=True)):
+            for index,edge in enumerate(self.graph_view.edges(data=True)):
                 edge_names.append(edge[2]["display_name"])
             return edge_names
         else:
@@ -165,7 +254,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
             adj_colors = []
             adj_curr_color = (255,0,0)
             adj_color_map = {}
-            for node, adjacencies in enumerate(self.preset.adjacency()):
+            for node, adjacencies in enumerate(self.graph_view.adjacency()):
                 node_adj = len(adjacencies[1])
                 if node_adj in adj_color_map.keys():
                     pass
@@ -182,7 +271,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
         if self.node_color_preset == self.add_adaptive_node_color:
             node_colors = []
             node_edge_colors = []
-            nodes = self.preset.nodes()
+            nodes = self.graph_view.nodes()
             type_curr_color = (255,0,0)
             type_color_map = {"no_type" : (0,0,0)}
             role_color_map = {"no_role" : (0,0,0)}
@@ -229,7 +318,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
     def add_adaptive_edge_color(self):
         edge_colors = []
         if self.edge_color_preset == self.add_adaptive_edge_color:
-            edges = self.preset.edges
+            edges = self.graph_view.edges
             curr_color = (255,0,0)
             color_map = {}
             for u,v in edges:
@@ -292,7 +381,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
         stylesheet = []
         temp_node_selectors = []
         temp_edge_selectors = []
-        if self.layout != self.preset and self.layout is not None:
+        if self.layout != self.graph_view and self.layout is not None:
             # Builtin presets will calculate the positons.
             layout = self.layout()
 
@@ -303,11 +392,12 @@ class CytoscapeVisualiser(AbstractVisualiser):
             node_text = self.node_text_preset()
             stylesheet.append({'selector': 'node','style': {'content': 'data(label)',
                                                             "height" : self._node_size,
-                                                            "width" : self._node_size}})
+                                                            "width" : self._node_size,
+                                                            "font-size" : '5'}})
         if self.node_color_preset is not None:
             node_color = self.node_color_preset()
         cyto_nodes = []
-        for index,node in enumerate(self.preset.nodes()):
+        for index,node in enumerate(self.graph_view.nodes()):
             color_key =  list(node_color[index].keys())[0]
             try:
                 node_edge_color_key = list(self._node_edge_colors[index].keys())[0]
@@ -324,7 +414,6 @@ class CytoscapeVisualiser(AbstractVisualiser):
             if self.pos != [] and self.pos is not None:
                 cyto_node["position"] = {'x': 2000 * self.pos[node][0], 'y': 2000 * self.pos[node][1]}
             cyto_nodes.append(cyto_node)
-
 
             if color_key not in temp_node_selectors:
                 stylesheet.append({"selector" : "." + color_key,"style" : {"background-color" : node_color[index][color_key]}})    
@@ -343,17 +432,18 @@ class CytoscapeVisualiser(AbstractVisualiser):
         if self.edge_text_preset is not None:
             edge_text = self.edge_text_preset()
         else:
-            edge_text = ["" for e in self.preset.edges]
+            edge_text = ["" for e in self.graph_view.edges]
 
         stylesheet.append({'selector': 'edge','style': {'content': 'data(label)',
                                                 'height' : self._edge_width,
                                                 "width" : self._edge_width,
                                                 "mid-target-arrow-color": "grey",
-                                                "mid-target-arrow-shape": "triangle"}})
+                                                "mid-target-arrow-shape": "triangle",
+                                                "font-size" : '5'}})
         if self.edge_color_preset is not None:
             edge_color = self.edge_color_preset()  
         
-        for index,e in enumerate(self.preset.edges(data=True)):
+        for index,e in enumerate(self.graph_view.edges(data=True)):
             u,v,edge  = e
             color_key =  list(edge_color[index].keys())[0]
             cyto_edge = {

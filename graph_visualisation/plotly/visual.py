@@ -34,6 +34,87 @@ class PlotlyVisualiser(AbstractVisualiser):
         return current_settings
 
 
+    # ---------------------- Set Preset (Sets one or more other settings to focus on a specific thing in the graph) ----------------------
+    def set_interaction_preset(self):
+        '''
+        Master Function to provide insight into Interactions between components.
+        '''
+        parent_sub_functions = super().set_interaction_preset()
+        sub_class_sub_functions = [
+            self.set_spring_layout,
+            self.add_adaptive_node_color,
+            self.add_adaptive_edge_color,
+            self.add_edge_name_labels]
+
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
+    def set_parts_preset(self):
+        '''
+        Master Function to provide insight into heiraachy of components.
+        '''
+        parent_sub_functions = super().set_parts_preset()
+        sub_class_sub_functions = [
+            self.set_planar_layout,
+            self.add_adaptive_node_color]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
+    def set_parent_preset(self):
+        '''
+        Master Function to provide insight into parent-child relationship between sbol elements.
+        '''
+        parent_sub_functions = super().set_parent_preset()
+        sub_class_sub_functions = [
+            self.set_kamada_kawai_layout,
+            self.add_edge_name_labels,
+            self.add_adaptive_node_color,
+            self.add_adaptive_edge_color]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
+    def set_adjacency_preset(self):
+        '''
+        Master Function to best show how nodes are interconnected.
+        '''
+        parent_sub_functions = super().set_adjacency_preset()
+
+        sub_class_sub_functions = [
+            self.set_circular_layout,
+            self.add_edge_no_labels,
+            self.add_node_adjacency_color
+        ]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
+    def set_functional_preset(self):
+        '''
+        Master Function to provide insight into the Functional aspect of a graph.
+        '''
+        parent_sub_functions = super().set_functional_preset()
+
+        sub_class_sub_functions = [
+            self.set_kamada_kawai_layout,
+            self.add_adaptive_node_color
+        ]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
+    def set_component_preset(self):
+        '''
+        Master Function to display interconected components of the graph.
+        '''
+        parent_sub_functions = super().set_component_preset()
+        sub_class_sub_functions = [
+            self.set_planar_layout,
+            self.add_adaptive_node_color,
+            self.add_edge_no_labels
+        ]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
+    def set_DBTL_preset(self):
+        '''
+        Master Function to provide insight into parent-child relationship between sbol elements.
+        '''
+        parent_sub_functions = super().set_dbtl_preset()
+        sub_class_sub_functions = []
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
     # ---------------------- Pick the edge content ----------------------
 
     def add_edge_no_labels(self):

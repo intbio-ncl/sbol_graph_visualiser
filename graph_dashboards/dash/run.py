@@ -122,7 +122,9 @@ def dash_runner(visualiser,name = ""):
 
     # Bind the callbacks
     def update_plotly_preset_inner(preset_name,*states):
-        return update_plotly_preset(dashboard,preset_name,plotly_maps,states)
+        return update_preset(dashboard,preset_name,plotly_maps,states)
+    def update_cyto_preset_inner(preset_name,*states):
+        return update_preset(dashboard,preset_name,cyto_maps,states)
     def update_plotly_graph_inner(*args):
         return update_plotly_graph(dashboard,args)
     def update_cyto_graph_inner(*args):
@@ -137,6 +139,7 @@ def dash_runner(visualiser,name = ""):
         return remove_selected_nodes(_,node_id,data)
 
     dashboard.add_callback(update_plotly_preset_inner,list(plotly_preset_inputs.values()),list(plotly_preset_outputs.values()),list(plotly_preset_state.values()))
+    dashboard.add_callback(update_cyto_preset_inner,list(cyto_preset_inputs.values()),list(cyto_preset_outputs.values()),list(cyto_preset_state.values()))
     dashboard.add_callback(update_plotly_graph_inner,list(plotly_update_inputs.values()),list(plotly_update_outputs.values()))
     dashboard.add_callback(update_cyto_graph_inner,list(cyto_update_inputs.values()),list(cyto_update_outputs.values()))
     dashboard.add_callback(load_graph_inner,list(load_inputs.values()),list(load_outputs.values()),list(load_states.values()))
@@ -147,7 +150,7 @@ def dash_runner(visualiser,name = ""):
 
 
 
-def update_plotly_preset(dashboard,preset_name,mappings,*states):
+def update_preset(dashboard,preset_name,mappings,*states):
     if preset_name is None:
         raise dash.exceptions.PreventUpdate()
 
@@ -159,6 +162,7 @@ def update_plotly_preset(dashboard,preset_name,mappings,*states):
     states = states[0]
     modified_vals = setter()
     modified_vals = [m.__name__ for m in modified_vals]
+    print(modified_vals)
     final_outputs = []
     # We need to return: value of each option on the sidebar.
     # Need the current values.
@@ -167,13 +171,11 @@ def update_plotly_preset(dashboard,preset_name,mappings,*states):
         states_possible_vals = list(mappings.items())[index][1]
         for mod in modified_vals:
             if mod in states_possible_vals:
-                print(mod)
                 final_outputs.append(mod)
                 is_modified = True
                 break 
         if not is_modified:
             final_outputs.append(state)
-
     return final_outputs
 
 def update_plotly_graph(dashboard,*args):
