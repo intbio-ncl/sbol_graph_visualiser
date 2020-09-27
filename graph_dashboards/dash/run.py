@@ -162,7 +162,6 @@ def update_preset(dashboard,preset_name,mappings,*states):
     states = states[0]
     modified_vals = setter()
     modified_vals = [m.__name__ for m in modified_vals]
-    print(modified_vals)
     final_outputs = []
     # We need to return: value of each option on the sidebar.
     # Need the current values.
@@ -345,9 +344,11 @@ def _create_form_elements(visualiser,dashboard,style = {},id_prefix = ""):
             misc_div = dashboard.create_div(id_prefix + "_misc_container",miscs,add=False,style=style)
             continue
         elif isinstance(v,(int,float)):
-            min_v = v/2
-            max_v = v*2
-            element = dashboard.create_slider(identifier ,display_name,min_v,max_v,default_val=v,add=False)
+            min_v = v/4
+            max_v = v*4
+            default_val = (min_v + max_v) / 2
+            step = 1
+            element = dashboard.create_slider(identifier ,display_name,min_v,max_v,default_val=default_val,step=step,add=False)
             identifiers[k] =  Input(identifier,"value")
             variable_input_list_map[identifier] = [min_v,max_v]
 

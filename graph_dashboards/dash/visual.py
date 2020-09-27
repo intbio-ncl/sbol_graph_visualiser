@@ -132,16 +132,13 @@ class DashBoard:
         else:
             return [label,checklist]
 
-    def create_slider(self,identifier,name,min_val, max_val, default_val = None,step=None,marks = None, add=True,**kwargs):
+    def create_slider(self,identifier,name,min_val, max_val, default_val = None, step=None, marks = None, add=True,**kwargs):
         label = html.Label(name)
         if default_val is None:
             default_val = max_val/2
         if marks is None:
             marks = {}
             marks[min_val] = str(min_val)
-            marks[default_val/2] = str(default_val/2)
-            marks[default_val] = str(default_val)
-            marks[max_val*0.75] = str(max_val*0.75)
             marks[max_val] = str(max_val)
         if step is None:
             step = max_val/10

@@ -18,6 +18,8 @@ class CytoscapeVisualiser(AbstractVisualiser):
         self._node_size = 15
         self._edge_width = 1
         self._node_edge_size = 3
+        self._node_text_size = 5
+        self._edge_text_size = 5
         self.edge_shape = "straight"
         self._node_edge_colors = []
 
@@ -374,7 +376,16 @@ class CytoscapeVisualiser(AbstractVisualiser):
         if width is None:
             return self._edge_width
         self._edge_width = float(width)
-    
+
+    def node_text_size(self,size = None):
+        if size is None:
+            return self._node_text_size
+        self._node_text_size = float(size)
+
+    def edge_text_size(self,size = None):
+        if size is None:
+            return self._edge_text_size
+        self._edge_text_size = float(size)
 
     def build(self,layout_elements = {},show=True):
         elements = []
@@ -393,7 +404,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
             stylesheet.append({'selector': 'node','style': {'content': 'data(label)',
                                                             "height" : self._node_size,
                                                             "width" : self._node_size,
-                                                            "font-size" : '5'}})
+                                                            "font-size" : self._node_text_size}})
         if self.node_color_preset is not None:
             node_color = self.node_color_preset()
         cyto_nodes = []
@@ -439,7 +450,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
                                                 "width" : self._edge_width,
                                                 "mid-target-arrow-color": "grey",
                                                 "mid-target-arrow-shape": "triangle",
-                                                "font-size" : '5'}})
+                                                "font-size" : self._edge_text_size}})
         if self.edge_color_preset is not None:
             edge_color = self.edge_color_preset()  
         
