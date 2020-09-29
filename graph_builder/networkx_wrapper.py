@@ -109,7 +109,7 @@ class NetworkXGraphWrapper:
     def get_connected_nodes(self,node):
         return nx.node_connected_component(self.graph, node)
 
-    def search(self,pattern):
+    def search(self,pattern,graph_edges=None):
         '''
         Given a tuple of size 3 search the graph for the related edge.
         provide None in the index where the search is to be made. 
@@ -118,18 +118,19 @@ class NetworkXGraphWrapper:
         '''
         matches = []
         (s, p, o) = pattern
+        if graph_edges is None:
+            graph_edges = self.graph.edges
         if isinstance(self.graph, nx.classes.multidigraph.MultiDiGraph):
-            for subject,node,edge in self.graph.edges:
+            for subject,node,edge in graph_edges:
                 if ((subject == s or not s or (isinstance(s,list) and subject in s)) and 
                    (edge == p or not p or (isinstance(p,list) and edge in p)) and 
                    (node == o or not o or (isinstance(o,list) and node in o))):
                         matches.append((subject,node,edge))
 
         elif isinstance(self.graph,nx.classes.graph.Graph):                
-            for subject,node in self.graph.edges:
-                edge = self.graph.edges[subject,node]
+            for subject,node in graph_edges:
+                edge = graph_edges[subject,node]
                 triple = edge["triples"][0]
-
                 if ((triple[0] == s or not s or (isinstance(s,list) and triple[0] in s)) and 
                 (triple[1] == p or not p or (isinstance(p,list) and triple[1] in p)) and 
                 (triple[2] == o or not o or (isinstance(o,list) and triple[2] in o))):
