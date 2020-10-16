@@ -49,7 +49,75 @@ class CytoscapeVisualiser(AbstractVisualiser):
 
         return current_settings
 
+    # ---------------------- Set Clustering ----------------------------------------------------------------------------------------------
+
+    def set_non_clustering(self):
+        self._reset_parent_labels()
+        
+    def set_type_clustering(self):
+        '''
+        Definition:
+            Cluster as to wether a node has a rdf_type egde.
+            Only two levels of clustering.
+        '''
+        self._reset_parent_labels()
+        objects = self.graph_view.search((None,identifiers.predicates.rdf_type,None),)
+        for n,v,e in objects:
+            node_edges = self.graph_view.edges(n)
+            self.graph_view.nodes[n]["is_parent"] = True
+            for node_edge in node_edges:
+                self.graph_view.nodes[node_edge[1]]["parent"] = n
+
+    def set_parent_clustering(self):
+        '''
+        Cluster Based on SBOL parent-child relationships.
+        TopLevels are roots, Non-TopLevels with rdf-types are branches and leafs, 
+        Non-rdf-type elements aren't clustered.
+        '''
+        def handle_object(element):
+            node_edges = self.graph_view.edges(element,data=True)
+            for n,v,e in node_edges:
+                predicate = e["triples"][0][1]
+                if predicate in identifiers.predicates.ownership_predicates:
+                    self.graph_view.nodes[n]["is_parent"] = True
+                    self.graph_view.nodes[v]["parent"] = element
+                elif (predicate == identifiers.predicates.component and 
+                self._graph.retrieve_node(n,identifiers.predicates.rdf_type) == identifiers.objects.component_definition):
+                    self.graph_view.nodes[n]["is_parent"] = True
+                    self.graph_view.nodes[v]["parent"] = element
+                node_type = self._graph.retrieve_node(v,identifiers.predicates.rdf_type)
+                if node_type is not None:
+                    handle_object(v)
+        self._reset_parent_labels()
+        components = self.graph_view.search((None,identifiers.predicates.rdf_type,None))
+        top_levels = [c for c in components if c[1] in identifiers.objects.top_levels]
+            
+        for obj in top_levels:
+            handle_object(obj[0])
+
+    def _reset_parent_labels(self):
+        for node in self.graph_view.nodes(data=True):
+            try:
+                del node[1]["parent"]
+            except KeyError:
+                pass
+
+            try:
+                del node[1]["is_parent"]
+            except KeyError:
+                pass
     # ---------------------- Set Preset (Sets one or more other settings to focus on a specific thing in the graph) ----------------------
+    def set_protein_protein_interaction_preset(self):
+        '''
+        Master Function to provide insight into Interactions between components.
+        '''
+        parent_sub_functions = super().set_protein_protein_interaction_preset()
+        sub_class_sub_functions = [
+            self.set_cola_layout,
+            self.add_adaptive_edge_color,
+            self.add_edge_name_labels]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
     def set_interaction_preset(self):
         '''
         Master Function to provide insight into Interactions between components.
@@ -89,7 +157,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
         sub_class_sub_functions = [
             self.set_circular_layout,
             self.add_edge_no_labels,
-            self.add_node_adjacency_color
+            self.add_node_total_adjacency_color
         ]
         return parent_sub_functions + self._set_preset(sub_class_sub_functions)
 
@@ -117,21 +185,65 @@ class CytoscapeVisualiser(AbstractVisualiser):
         ]
         return parent_sub_functions + self._set_preset(sub_class_sub_functions)
 
+    def set_combinatorial_derivation_preset(self):
+        '''
+        Master Function to attempt to make a preset that makes cbd more easy to understabd
+        '''
+        parent_sub_functions = super().set_combinatorial_derivation_preset()
+        sub_class_sub_functions = [
+            self.set_breadthfirst_layout,
+            self.add_edge_name_labels,
+            self.add_adaptive_node_color,
+            self.add_adaptive_edge_color
+        ]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+        
+    def set_common_part_preset(self):
+        '''
+        Master Function to attempt to make common parts between constructs more visible.
+        '''
+        parent_sub_functions = super().set_common_part_preset()
+        sub_class_sub_functions = [
+            self.set_breadthfirst_layout,
+            self.add_edge_no_labels,
+            self.add_node_in_adjacency_color
+        ]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+    
+    def set_glyph_preset(self):
+        '''
+        Master function to attempt to display the graph in a glyph like form.
+        '''
+        parent_sub_functions = super().set_glyph_preset()
+        sub_class_sub_functions = []
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
+    def set_DBTL_preset(self):
+        '''
+        Master Function to provide insight into parent-child relationship between sbol elements.
+        '''
+        parent_sub_functions = super().set_DBTL_preset()
+        sub_class_sub_functions = []
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
     # ---------------------- Pick a layout ----------------------
     def set_no_layout(self):
         if self.layout == self.set_no_layout:
+            self.pos = None
             return {"name" : "preset"}
         else:
             self.layout = self.set_no_layout
 
     def set_random_layout(self):
         if self.layout == self.set_random_layout:
+            self.pos = None
             return {"name" : "random"}
         else:
             self.layout = self.set_random_layout
 
     def set_grid_layout(self):
         if self.layout == self.set_grid_layout:
+            self.pos = None
             row_num = cols_num = (math.ceil(math.sqrt(len(self.graph_view.nodes)))) 
 
             return {"name" : "grid",
@@ -142,6 +254,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
 
     def set_semi_circular_layout(self):
         if self.layout == self.set_semi_circular_layout:
+            self.pos = None
             return {"name" : "circle",
                     'radius': 250,
                     'startAngle': math.pi * 1/6,
@@ -151,12 +264,14 @@ class CytoscapeVisualiser(AbstractVisualiser):
 
     def set_concentric_layout(self):
         if self.layout == self.set_concentric_layout:
+            self.pos = None
             return {"name" : "concentric"}
         else:
             self.layout = self.set_concentric_layout
 
     def set_breadthfirst_layout(self):
         if self.layout == self.set_breadthfirst_layout:
+            self.pos = None
             return {"name" : "breadthfirst",
                     'directed': True,}
         else:
@@ -164,22 +279,23 @@ class CytoscapeVisualiser(AbstractVisualiser):
 
     def set_cose_layout(self):
         if self.layout == self.set_cose_layout:
+            self.pos = None
             return {"name" : "cose",
-            'idealEdgeLength': 100,
-            'nodeOverlap': 20,
-            'refresh': 20,
-            'fit': True,
-            'padding': 30,
-            'randomize': False,
-            'componentSpacing': 100,
-            'nodeRepulsion': 400000,
-            'edgeElasticity': 100,
-            'nestingFactor': 5,
-            'gravity': 80,
-            'numIter': 1000,
-            'initialTemp': 200,
-            'coolingFactor': 0.95,
-            'minTemp': 1.0}
+                    'idealEdgeLength': 100,
+                    'nodeOverlap': 20,
+                    'refresh': 20,
+                    'fit': True,
+                    'padding': 30,
+                    'randomize': False,
+                    'componentSpacing': 100,
+                    'nodeRepulsion': 400000,
+                    'edgeElasticity': 100,
+                    'nestingFactor': 5,
+                    'gravity': 80,
+                    'numIter': 1000,
+                    'initialTemp': 200,
+                    'coolingFactor': 0.95,
+                    'minTemp': 1.0}
         else:
             self.layout = self.set_cose_layout
 
@@ -265,13 +381,14 @@ class CytoscapeVisualiser(AbstractVisualiser):
         else:
             self.node_color_preset = self.add_standard_node_color
 
-    def add_node_adjacency_color(self):
-        if self.node_color_preset == self.add_node_adjacency_color:
+    def add_node_total_adjacency_color(self):
+        if self.node_color_preset == self.add_node_total_adjacency_color:
+            self._node_edge_colors.clear()
             adj_colors = []
             adj_curr_color = (255,0,0)
             adj_color_map = {}
-            for node, adjacencies in enumerate(self.graph_view.adjacency()):
-                node_adj = len(adjacencies[1])
+            for node in self.graph_view.nodes:
+                node_adj = len(self.graph_view.in_edges(node)) + len(self.graph_view.out_edges(node)) 
                 if node_adj in adj_color_map.keys():
                     pass
                 else:
@@ -281,8 +398,50 @@ class CytoscapeVisualiser(AbstractVisualiser):
                 adj_colors.append({str(node_adj) : "rgb" +  str(adj_color)})
             return adj_colors
         else:
-            self.node_color_preset = self.add_node_adjacency_color
+            self.node_color_preset = self.add_node_total_adjacency_color
     
+    def add_node_in_adjacency_color(self):
+        if self.node_color_preset == self.add_node_in_adjacency_color:
+            if not isinstance(self.graph_view.graph,nx.classes.digraph.DiGraph):
+                raise ValueError("Graph doesnt have input/output edges.")
+            self._node_edge_colors.clear()
+            adj_colors = []
+            adj_curr_color = (255,0,0)
+            adj_color_map = {}
+            for node in self.graph_view.nodes:
+                node_adj = len(self.graph_view.in_edges(node)) 
+                if node_adj in adj_color_map.keys():
+                    pass
+                else:
+                    adj_color = adj_curr_color
+                    adj_color_map[node_adj] = adj_color
+                    adj_curr_color = calculate_next_color(adj_curr_color)
+                adj_colors.append({str(node_adj) : "rgb" +  str(adj_color)})
+            return adj_colors
+        else:
+            self.node_color_preset = self.add_node_in_adjacency_color
+
+    def add_node_out_adjacency_color(self):
+        if self.node_color_preset == self.add_node_out_adjacency_color:
+            if not isinstance(self.graph_view.graph,nx.classes.digraph.DiGraph):
+                raise ValueError("Graph doesnt have input/output edges.")
+            self._node_edge_colors.clear()
+            adj_colors = []
+            adj_curr_color = (255,0,0)
+            adj_color_map = {}
+            for node in self.graph_view.nodes:
+                node_adj = len(self.graph_view.out_edges(node)) 
+                if node_adj in adj_color_map.keys():
+                    pass
+                else:
+                    adj_color = adj_curr_color
+                    adj_color_map[node_adj] = adj_color
+                    adj_curr_color = calculate_next_color(adj_curr_color)
+                adj_colors.append({str(node_adj) : "rgb" +  str(adj_color)})
+            return adj_colors
+        else:
+            self.node_color_preset = self.add_node_out_adjacency_color
+
     def add_adaptive_node_color(self):
         if self.node_color_preset == self.add_adaptive_node_color:
             node_colors = []
@@ -340,7 +499,6 @@ class CytoscapeVisualiser(AbstractVisualiser):
             for u,v in edges:
                 edge = edges[u,v]
                 predicate = edge["triples"][0][1]
-
                 predicate_type = self._graph._get_name(predicate)
                 if predicate_type in color_map.keys():
                     color = color_map[predicate_type]
@@ -366,7 +524,6 @@ class CytoscapeVisualiser(AbstractVisualiser):
             nodes = self.graph_view.nodes()
             for node in nodes:
                 obj_type = self._graph.retrieve_node(node,identifiers.predicates.rdf_type)
-                print(node,obj_type)
                 if obj_type is None:
                     shape = shape_map["no_type"]
                     obj_type = "No Type"
@@ -539,10 +696,11 @@ class CytoscapeVisualiser(AbstractVisualiser):
         stylesheet = []
         temp_node_selectors = []
         temp_edge_selectors = []
-        if self.layout != self.graph_view and self.layout is not None:
+
+        self.mode()
+        if self.layout != self.graph_view.graph and self.layout is not None:
             # Builtin presets will calculate the positons.
             layout = self.layout()
-
         elif self.pos == [] and self.pos is None:
             raise ValueError("Unable to visualise with no positional data.")
 
@@ -555,8 +713,9 @@ class CytoscapeVisualiser(AbstractVisualiser):
         node_color = self.node_color_preset()
         node_shapes = self._node_shape_preset()
         cyto_nodes = []
-
-        for index,node in enumerate(self.graph_view.nodes()):
+        for index,node in enumerate(self.graph_view.nodes(data=True)):
+            label = node[1]
+            node = node[0]
             color_key =  list(node_color[index].keys())[0]
             node_shape = node_shapes[index]
             node_shape_value = str(list(node_shape.values())[0])
@@ -569,21 +728,38 @@ class CytoscapeVisualiser(AbstractVisualiser):
                 node_edge_color_key = "no_edge_color"
                 node_edge_color_color = "#888"
 
-            cyto_node = {
-                'data': {'id': node, 'label': node_text[index]},
-                "classes" : "top-center " + color_key + " " + node_edge_color_key + " " + node_shape_value,
-            }
+            try:
+                parent = label["parent"]
+            except KeyError:
+                parent = None
+            try:
+                is_parent = label["is_parent"]
+            except KeyError:
+                is_parent = False
+                
+            if is_parent:
+                cyto_node = {
+                    'data': {'id': node, 'label': node_text[index], 'parent' : parent},
+                    "classes" : "top-center " + "parent"
+                }
+
+            else:
+                cyto_node = {
+                    'data': {'id': node, 'label': node_text[index], 'parent' : parent},
+                    "classes" : "top-center " + color_key + " " + node_edge_color_key + " " + node_shape_value,
+                }
+
+                if color_key not in temp_node_selectors:
+                    stylesheet.append({"selector" : "." + color_key,"style" : {"background-color" : node_color[index][color_key]}})    
+                    temp_node_selectors.append(color_key)                             
+                if node_edge_color_key not in temp_edge_selectors:
+                    stylesheet.append({"selector" : "." + node_edge_color_key,"style" : {"border-color": node_edge_color_color,
+                                                                                        "border-width": self._node_edge_size}})                                    
+                    temp_edge_selectors.append(node_edge_color_key)
+
             if self.pos != [] and self.pos is not None:
                 cyto_node["position"] = {'x': 2000 * self.pos[node][0], 'y': 2000 * self.pos[node][1]}
             cyto_nodes.append(cyto_node)
-
-            if color_key not in temp_node_selectors:
-                stylesheet.append({"selector" : "." + color_key,"style" : {"background-color" : node_color[index][color_key]}})    
-                temp_node_selectors.append(color_key)                             
-            if node_edge_color_key not in temp_edge_selectors:
-                stylesheet.append({"selector" : "." + node_edge_color_key,"style" : {"border-color": node_edge_color_color,
-                                                                                     "border-width": self._node_edge_size}})                                    
-                temp_edge_selectors.append(node_edge_color_key)
 
 
         cyto_edges = []

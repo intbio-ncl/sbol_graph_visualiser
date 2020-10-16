@@ -48,6 +48,17 @@ class PlotlyVisualiser(AbstractVisualiser):
 
         return parent_sub_functions + self._set_preset(sub_class_sub_functions)
 
+    def set_protein_protein_interaction_preset(self):
+        '''
+        Master Function to provide insight into Interactions between components.
+        '''
+        parent_sub_functions = super().set_protein_protein_interaction_preset()
+        sub_class_sub_functions = [
+            self.set_kamada_kawai_layout,
+            self.add_adaptive_edge_color,
+            self.add_edge_name_labels]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
     def set_parts_preset(self):
         '''
         Master Function to provide insight into heiraachy of components.
@@ -79,7 +90,7 @@ class PlotlyVisualiser(AbstractVisualiser):
         sub_class_sub_functions = [
             self.set_circular_layout,
             self.add_edge_no_labels,
-            self.add_node_adjacency_color
+            self.add_node_total_adjacency_color
         ]
         return parent_sub_functions + self._set_preset(sub_class_sub_functions)
 
@@ -107,11 +118,41 @@ class PlotlyVisualiser(AbstractVisualiser):
         ]
         return parent_sub_functions + self._set_preset(sub_class_sub_functions)
 
+    def set_combinatorial_derivation_preset(self):
+        '''
+        Master Function to attempt to make a preset that makes cbd more easy to understabd
+        '''
+        parent_sub_functions = super().set_combinatorial_derivation_preset()
+        sub_class_sub_functions = [
+            self.set_kamada_kawai_layout,
+            self.add_adaptive_node_color,
+            self.add_edge_no_labels
+        ]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+
+    def set_common_part_preset(self):
+        '''
+        Master Function to attempt to make common parts between constructs more visible.
+        '''
+        parent_sub_functions = super().set_common_part_preset()
+        sub_class_sub_functions = [
+           # self.set_breadthfirst_layout,
+            self.add_edge_no_labels,
+            self.add_node_in_adjacency_color
+        ]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
+    def set_glyph_preset(self):
+        '''
+        Master function to attempt to display the graph in a glyph like form.
+        '''
+        parent_sub_functions = super().set_glyph_preset()
+        sub_class_sub_functions = []
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
     def set_DBTL_preset(self):
         '''
         Master Function to provide insight into parent-child relationship between sbol elements.
         '''
-        parent_sub_functions = super().set_dbtl_preset()
+        parent_sub_functions = super().set_DBTL_preset()
         sub_class_sub_functions = []
         return parent_sub_functions + self._set_preset(sub_class_sub_functions)
 
@@ -156,15 +197,15 @@ class PlotlyVisualiser(AbstractVisualiser):
         else:
             self.node_color_preset = self.add_standard_node_color
 
-    def add_node_adjacency_color(self):
-        if self.node_color_preset == self.add_node_adjacency_color:
+    def add_node_total_adjacency_color(self):
+        if self.node_color_preset == self.add_node_total_adjacency_color:
             self.misc_node_settings["legends"].clear()
             legends = []
             adj_colors = []
             adj_curr_color = (255,0,0)
             adj_color_map = {}
-            for node, adjacencies in enumerate(self.graph_view.adjacency()):
-                node_adj = len(adjacencies[1])
+            for node in self.graph_view.nodes:
+                node_adj = len(self.graph_view.in_edges(node)) + len(self.graph_view.out_edges(node)) 
                 if node_adj in adj_color_map.keys():
                     adj_colors.append(adj_color_map[node_adj])
                 else:
@@ -174,14 +215,60 @@ class PlotlyVisualiser(AbstractVisualiser):
                     adj_curr_color = calculate_next_color(adj_curr_color)
                 adj = [node_adj]
                 legends = self._produce_legend(adj,legends)
-                
-
             self.misc_node_settings["marker"]["line"]["color"] = ["rgb" + str(u) for u in adj_colors]
             self.misc_node_settings["legends"] = self.misc_node_settings["legends"] + legends
             return ["rgb" + str(u) for u in adj_colors]
         else:
-            self.node_color_preset = self.add_node_adjacency_color
+            self.node_color_preset = self.add_node_total_adjacency_color
 
+
+    def add_node_in_adjacency_color(self):
+        if self.node_color_preset == self.add_node_in_adjacency_color:
+            self.misc_node_settings["legends"].clear()
+            legends = []
+            adj_colors = []
+            adj_curr_color = (255,0,0)
+            adj_color_map = {}
+            for node in self.graph_view.nodes:
+                node_adj = len(self.graph_view.in_edges(node)) 
+                if node_adj in adj_color_map.keys():
+                    adj_colors.append(adj_color_map[node_adj])
+                else:
+                    adj_color = adj_curr_color
+                    adj_color_map[node_adj] = adj_color
+                    adj_colors.append(adj_color)
+                    adj_curr_color = calculate_next_color(adj_curr_color)
+                adj = [node_adj]
+                legends = self._produce_legend(adj,legends)
+            self.misc_node_settings["marker"]["line"]["color"] = ["rgb" + str(u) for u in adj_colors]
+            self.misc_node_settings["legends"] = self.misc_node_settings["legends"] + legends
+            return ["rgb" + str(u) for u in adj_colors]
+        else:
+            self.node_color_preset = self.add_node_in_adjacency_color
+
+    def add_node_out_adjacency_color(self):
+        if self.node_color_preset == self.add_node_out_adjacency_color:
+            self.misc_node_settings["legends"].clear()
+            legends = []
+            adj_colors = []
+            adj_curr_color = (255,0,0)
+            adj_color_map = {}
+            for node in self.graph_view.nodes:
+                node_adj = len(self.graph_view.out_edges(node)) 
+                if node_adj in adj_color_map.keys():
+                    adj_colors.append(adj_color_map[node_adj])
+                else:
+                    adj_color = adj_curr_color
+                    adj_color_map[node_adj] = adj_color
+                    adj_colors.append(adj_color)
+                    adj_curr_color = calculate_next_color(adj_curr_color)
+                adj = [node_adj]
+                legends = self._produce_legend(adj,legends)
+            self.misc_node_settings["marker"]["line"]["color"] = ["rgb" + str(u) for u in adj_colors]
+            self.misc_node_settings["legends"] = self.misc_node_settings["legends"] + legends
+            return ["rgb" + str(u) for u in adj_colors]
+        else:
+            self.node_color_preset = self.add_node_out_adjacency_color
 
     def add_adaptive_node_color(self):
         if self.node_color_preset == self.add_adaptive_node_color:

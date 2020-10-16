@@ -62,13 +62,18 @@ remove_node_state = {"cyto_elements_id" : State(cyto_graph_id, 'elements'),
                      "cyto_selected_node_id" : State(cyto_graph_id, 'selectedNodeData')}
 
 
-
+default_options = []
 def dash_runner(visualiser,name = ""):
     dashboard = DashBoard(visualiser)
 
     # Add Options
-    plotly_form_elements,plotly_identifiers,plotly_maps = _create_form_elements(PlotlyVisualiser(),dashboard,style=background_color,id_prefix=plotly_id_prefix)
-    cyto_form_elements,cyto_identifiers,cyto_maps = _create_form_elements(CytoscapeVisualiser(),dashboard,style=background_color,id_prefix=cyto_id_prefix)
+    plotly_form_elements,plotly_identifiers,plotly_maps = _create_form_elements(PlotlyVisualiser(),dashboard,
+                                                            default_vals = default_options,
+                                                            style=background_color,id_prefix=plotly_id_prefix)
+    cyto_form_elements,cyto_identifiers,cyto_maps = _create_form_elements(CytoscapeVisualiser(),dashboard,
+                                                            default_vals = default_options,
+                                                            style=background_color,id_prefix=cyto_id_prefix)
+
     del plotly_maps["plotly_preset"]
     del cyto_maps["cyto_preset"]
     plotly_preset_identifiers,plotly_identifiers,plotly_preset_output,plotly_preset_state = _generate_inputs_outputs(plotly_identifiers)
@@ -300,7 +305,6 @@ def reverse_graph(dashboard,old_settings,error_str = ""):
     error_string = "Error: " + str(error_str)
     return figure,True,error_string
 
-
 def generate_graph_div(dashboard):
     # Cyto is different to plotly, you dont add it to a graph it standalone in the component list.
     figure_layout_elements = {"autosize": True}
@@ -323,7 +327,14 @@ def generate_graph_div(dashboard):
     graph_container = dashboard.create_div(load_outputs["graph_container_id"].component_id, plotly_div + cyto_div, add=False)
     return graph_container,plotly_style,cyto_style
 
-def _create_form_elements(visualiser,dashboard,style = {},id_prefix = ""):
+def _create_form_elements(visualiser,dashboard,default_vals = [],style = {},id_prefix = ""):
+    default_options = [visualiser.set_network_mode,
+                    visualiser.set_full_graph_view,
+                    visualiser.set_spring_layout,
+                    visualiser.add_node_no_labels,
+                    visualiser.add_edge_no_labels,
+                    visualiser.add_standard_node_color,
+                    visualiser.add_standard_edge_color]
     options = _generate_options(visualiser)
     removal_words = ["Add","Set","Misc"]
     elements = []
@@ -364,13 +375,16 @@ def _create_form_elements(visualiser,dashboard,style = {},id_prefix = ""):
         elif isinstance(v,dict):
             removal_words = removal_words + [word for word in display_name.split(" ")]
             inputs = []
+            default_button = None
             for k1,v1 in v.items():
                 label = _beautify_name(k1)
                 label = "".join("" if i in removal_words else i + " " for i in label.split())
                 inputs.append({"label" : label, "value" : k1})
+                if v1 in default_options:
+                    default_button = k1
 
             variable_input_list_map[identifier] = [l["value"] for l in inputs]
-            element = dashboard.create_radio_item(identifier,display_name,inputs,add=False)
+            element = dashboard.create_radio_item(identifier,display_name,inputs,value=default_button,add=False)
             identifiers[k] = Input(identifier,"value")
 
         breaker = dashboard.create_horizontal_row(False)
@@ -394,6 +408,7 @@ def _beautify_filename(filename):
 
 def _generate_options(visualiser):
     blacklist_functions = ["build",
+                           "mode",
                            "misc_node_settings",
                            "misc_edge_settings",
                            "edge_pos",
@@ -405,6 +420,8 @@ def _generate_options(visualiser):
                            "copy_settings"]
 
     options = {"preset" : {},
+               "clustering" : {},
+               "mode" : {},
                "view" : {},
                "layout" : {}}
 
@@ -436,8 +453,14 @@ def _generate_options(visualiser):
             if func_str.split("_")[-1] == "preset":
                 option_name = "preset"
 
+            elif func_str.split("_")[-1] == "clustering":
+                option_name = "clustering"
+
             elif func_str.split("_")[-1] == "view":
                 option_name = "view"
+
+            elif func_str.split("_")[-1] == "mode":
+                option_name = "mode"
 
             elif func_str.split("_")[-1] == "layout":
                 option_name = "layout"

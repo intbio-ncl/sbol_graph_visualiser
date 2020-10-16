@@ -116,9 +116,9 @@ class DashBoard:
         else:
             return [dropdown]
 
-    def create_radio_item(self,identifier,name,options,add=True,**kwargs):
+    def create_radio_item(self,identifier,name,options,value=None,add=True,**kwargs):
         label = html.Label(name)
-        radio = dcc.RadioItems(id=identifier,options=options,**kwargs)
+        radio = dcc.RadioItems(id=identifier,options=options,value=value,**kwargs)
         if add:
             return self._create_element(label,radio)
         else:

@@ -16,10 +16,11 @@ class AbstractVisualiser:
         else:
             self._graph = NetworkXGraphWrapper(graph)
 
-        self.graph_view = self._graph.graph
+        self.mode = self.set_network_mode
+        self.graph_view = self._graph
         self.layout = self.set_spring_layout
         self.pos = []
-
+        
         self.node_text_preset = self.add_node_no_labels
         self.edge_text_preset = None
         self.node_color_preset = self.add_standard_node_color
@@ -38,17 +39,27 @@ class AbstractVisualiser:
         Master Function to provide insight into Interactions between components.
         '''
         sub_functions = [
+            self.set_network_mode,
             self.set_interaction_view,
             self.add_node_name_labels
         ]
         return self._set_preset(sub_functions)
 
+    def set_protein_protein_interaction_preset(self):
+        sub_functions = [
+            self.set_network_mode,
+            self.set_protein_protein_interaction_view,
+            self.add_node_name_labels,
+            self.add_standard_node_color
+        ]
+        return self._set_preset(sub_functions)
 
     def set_parts_preset(self):
         '''
         Master Function to provide insight into heiraachy of components.
         '''
         sub_functions = [
+            self.set_network_mode,
             self.set_parts_view,
             self.add_standard_edge_color,
             self.add_node_name_labels
@@ -60,6 +71,7 @@ class AbstractVisualiser:
         Master Function to provide insight into parent-child relationship between sbol elements.
         '''
         sub_functions = [
+            self.set_tree_mode,
             self.set_parent_view,
             self.add_node_name_labels
         ]
@@ -70,6 +82,7 @@ class AbstractVisualiser:
         Master Function to best show how nodes are interconnected.
         '''
         sub_functions = [
+            self.set_network_mode,
             self.set_full_graph_view,
             self.add_node_adjacency_labels,
             self.add_standard_edge_color,
@@ -81,6 +94,7 @@ class AbstractVisualiser:
         Master Function to provide insight into the Functional aspect of a graph.
         '''
         sub_functions = [
+            self.set_network_mode,
             self.set_functional_view,
             self.add_node_name_labels,
             self.add_standard_edge_color,
@@ -92,9 +106,42 @@ class AbstractVisualiser:
         Master Function to display interconected components of the graph.
         '''
         sub_functions = [
+            self.set_tree_mode,
             self.set_components_view,
             self.add_node_name_labels,
             self.add_standard_edge_color,
+        ]
+        return self._set_preset(sub_functions)
+
+    def set_combinatorial_derivation_preset(self):
+        '''
+        Master Function to attempt to make a preset that makes cbd more easy to understabd
+        '''
+        sub_functions = [
+            self.set_tree_mode,
+            self.set_combinatorial_derivation_view,
+            self.add_node_name_labels
+        ]
+        return self._set_preset(sub_functions)
+
+
+    def set_common_part_preset(self):
+        '''
+        Master Function to attempt to make common parts between constructs more visible.
+        '''
+        sub_functions = [
+            self.set_network_mode,
+            self.set_parts_view,
+            self.add_node_role_labels,
+            self.add_standard_edge_color,
+        ]
+        return self._set_preset(sub_functions)
+
+    def set_glyph_preset(self):
+        '''
+        Master function to attempt to display the graph in a glyph like form.
+        '''
+        sub_functions = [
         ]
         return self._set_preset(sub_functions)
 
@@ -102,13 +149,21 @@ class AbstractVisualiser:
         '''
         Master Function to provide insight into parent-child relationship between sbol elements.
         '''
-        sub_functions = [
-            self.set_parent_view,
-            self.add_node_name_labels,
-
-        ]
+        sub_functions = []
         return self._set_preset(sub_functions)
 
+    # ---------------------- Set Mode (Type of graph) ------------------------------------
+    def set_network_mode(self):
+        if self.mode == self.set_network_mode:
+            self.graph_view = self.graph_view.get_graph()
+        else:
+            self.mode = self.set_network_mode
+
+    def set_tree_mode(self):
+        if self.mode == self.set_tree_mode:
+            self.graph_view = self.graph_view.get_tree()
+        else:
+            self.mode = self.set_tree_mode
 
     # ---------------------- Set Graph (Set a different graph view) ----------------------
     def set_full_graph_view(self):
@@ -117,7 +172,7 @@ class AbstractVisualiser:
         Sets the rendered graph as the default graph (Whole graph.)
         :rtype: None
         '''
-        self.graph_view = self._graph.graph
+        self.graph_view = self._graph.produce_full_graph()
 
     def set_interaction_view(self):
         ''' 
@@ -127,8 +182,19 @@ class AbstractVisualiser:
         Edges - Interactions
         :rtype: None
         '''
-        parts_graph = self._graph.produce_interaction_graph()
-        self.graph_view = parts_graph
+        interaction_graph = self._graph.produce_interaction_graph()
+        self.graph_view = interaction_graph
+
+    def set_protein_protein_interaction_view(self):
+        ''' 
+        :type: preset
+        Sets the rendered graph as a graph displaying interactions between parts.
+        Nodes - ComponentDefinitions
+        Edges - Interactions
+        :rtype: None
+        '''
+        ppi_graph = self._graph.produce_protein_protein_interaction_graph()
+        self.graph_view = ppi_graph
 
     def set_components_view(self):
         ''' 
@@ -138,11 +204,11 @@ class AbstractVisualiser:
         Edges - Components (Instances of CD's)
         :rtype: None
         '''
-        components_preset = self._graph.produce_components_preset()
+        components_preset = self._graph.produce_components_graph()
         self.graph_view = components_preset
 
     def set_parts_view(self):
-        parts_graph = self._graph.produce_parts_preset()
+        parts_graph = self._graph.produce_parts_graph()
         self.graph_view = parts_graph
 
     def set_functional_view(self):
@@ -154,12 +220,20 @@ class AbstractVisualiser:
         Edges - Components (Instances of CD's)
         :rtype: None
         '''
-        functional_graph = self._graph.produce_functional_preset()
+        functional_graph = self._graph.produce_functional_graph()
         self.graph_view = functional_graph
 
     def set_parent_view(self):
-        parent_graph = self._graph.produce_parent_preset()
+        parent_graph = self._graph.produce_parent_graph()
         self.graph_view = parent_graph
+
+    def set_combinatorial_derivation_view(self):
+        cd_graph = self._graph.produce_set_combinatorial_derivation_graph()
+        self.graph_view = cd_graph
+
+    def set_sequence_view(self):
+        sequence_graph = self._graph.produce_sequence_preset()
+        self.graph_view = sequence_graph
 
     # ---------------------- Pick a layout ----------------------
     def set_spring_layout(self):
@@ -168,7 +242,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_spring_layout:
-            self.pos = nx.spring_layout(self.graph_view, iterations=200)
+            self.pos = nx.spring_layout(self.graph_view.graph, iterations=200)
     
         else:
             self.layout = self.set_spring_layout
@@ -179,7 +253,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_circular_layout:
-            self.pos = nx.circular_layout(self.graph_view)
+            self.pos = nx.circular_layout(self.graph_view.graph)
     
         else:
             self.layout = self.set_circular_layout
@@ -190,7 +264,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_kamada_kawai_layout:
-            self.pos = nx.kamada_kawai_layout(self.graph_view)
+            self.pos = nx.kamada_kawai_layout(self.graph_view.graph)
     
         else:
             self.layout = self.set_kamada_kawai_layout
@@ -201,7 +275,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_planar_layout:
-            self.pos = nx.planar_layout(self.graph_view)
+            self.pos = nx.planar_layout(self.graph_view.graph)
     
         else:
             self.layout = self.set_planar_layout
@@ -212,7 +286,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_shell_layout:
-            self.pos = nx.shell_layout(self.graph_view)
+            self.pos = nx.shell_layout(self.graph_view.graph)
     
         else:
             self.layout = self.set_shell_layout
@@ -223,7 +297,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_spiral_layout:
-            self.pos = nx.spiral_layout(self.graph_view)
+            self.pos = nx.spiral_layout(self.graph_view.graph)
     
         else:
             self.layout = self.set_spiral_layout
@@ -234,7 +308,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_spectral_layout:
-            self.pos = nx.spectral_layout(self.graph_view)
+            self.pos = nx.spectral_layout(self.graph_view.graph)
     
         else:
             self.layout = self.set_spectral_layout
@@ -245,7 +319,7 @@ class AbstractVisualiser:
         :rtype: None
         '''
         if self.layout == self.set_random_layout:
-            self.pos = nx.random_layout(self.graph_view)
+            self.pos = nx.random_layout(self.graph_view.graph)
     
         else:
             self.layout = self.set_random_layout
@@ -261,8 +335,15 @@ class AbstractVisualiser:
     def add_node_adjacency_labels(self):
         if self.node_text_preset == self.add_node_adjacency_labels:
             node_text = []
-            for node, adjacencies in enumerate(self.graph_view.adjacency()):
-                node_text.append('# of connections: '+str(len(adjacencies[1])))
+            if isinstance(self._graph.graph,nx.classes.digraph.DiGraph):
+                for node in self.graph_view.nodes:
+                    num_in = len(self.graph_view.in_edges(node))
+                    num_out = len(self.graph_view.out_edges(node)) 
+                    node_text.append(f"# IN: {str(num_in)}, # OUT: {str(num_out)}")
+
+            else:
+                for node, adjacencies in enumerate(self.graph_view.adjacency):
+                    node_text.append('# of connections: '+ str(len(adjacencies[1])))
             return node_text
         else:
             self.node_text_preset = self.add_node_adjacency_labels
@@ -325,6 +406,25 @@ class AbstractVisualiser:
         else:
             self.node_text_preset = self.add_node_parent_labels
 
+    def add_node_role_labels(self):
+        if self.node_text_preset == self.add_node_role_labels:
+            node_texts = []
+            nodes = self.graph_view.nodes()
+            for node in nodes:
+                obj_type = self._graph.retrieve_node(node,identifiers.predicates.rdf_type)
+                if obj_type is None:
+                    node_texts.append("No Type")
+                    continue
+        
+                role = self._graph.get_sbol_object_role(node,obj_type)
+                if role is None:
+                    node_texts.append(self._graph._get_name(str(obj_type)))
+                else:
+                    node_texts.append(self._graph._get_name(str(obj_type)) + " - " + role)
+            
+            return node_texts
+        else:
+            self.node_text_preset = self.add_node_role_labels
 
     # ---------------------- Pick the node color ----------------------
 

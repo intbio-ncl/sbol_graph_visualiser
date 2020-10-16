@@ -110,7 +110,16 @@ class Predicates:
         self.local = rdflib.term.URIRef(self.namespaces.sbol + 'local')
         self.remote = rdflib.term.URIRef(self.namespaces.sbol + 'remote')
 
+        self.strategy = rdflib.term.URIRef(self.namespaces.sbol + 'strategy')
+        self.variable_component = rdflib.term.URIRef(self.namespaces.sbol + 'variableComponent')
+        self.variable = rdflib.term.URIRef(self.namespaces.sbol + 'variable')
+        self.variant = rdflib.term.URIRef(self.namespaces.sbol + 'variant')
+        self.operator = rdflib.term.URIRef(self.namespaces.sbol + 'operator')
+        self.variant_collection = rdflib.term.URIRef(self.namespaces.sbol + 'variantCollection')
+        self.variant_derivation = rdflib.term.URIRef(self.namespaces.sbol + 'variantDerivation')
+
         self.module = rdflib.term.URIRef(self.namespaces.sbol + "module")
+        self.member = rdflib.term.URIRef(self.namespaces.sbol + "member")
         self.ownership_predicates = {rdflib.URIRef(self.namespaces.sbol + predicate) for predicate in
                                 ['module',
                                 'mapsTo',
