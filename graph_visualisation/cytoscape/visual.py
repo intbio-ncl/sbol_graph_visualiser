@@ -210,6 +210,17 @@ class CytoscapeVisualiser(AbstractVisualiser):
         ]
         return parent_sub_functions + self._set_preset(sub_class_sub_functions)
     
+    def set_sequence_preset(self):
+        '''
+        Master Function to attempt to make common parts between constructs more visible.
+        '''
+        parent_sub_functions = super().set_sequence_preset()
+        sub_class_sub_functions = [
+            self.set_klay_layout,
+            self.add_edge_no_labels
+        ]
+        return parent_sub_functions + self._set_preset(sub_class_sub_functions)   
+    
     def set_glyph_preset(self):
         '''
         Master function to attempt to display the graph in a glyph like form.

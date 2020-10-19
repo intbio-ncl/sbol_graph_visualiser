@@ -136,6 +136,18 @@ class AbstractVisualiser:
             self.add_standard_edge_color,
         ]
         return self._set_preset(sub_functions)
+    
+    def set_sequence_preset(self):
+        '''
+        Master Function to attempt to make common parts between constructs more visible.
+        '''
+        sub_functions = [
+            self.set_network_mode,
+            self.set_sequence_view,
+            self.add_node_name_labels,
+            self.add_standard_edge_color,
+        ]
+        return self._set_preset(sub_functions)
 
     def set_glyph_preset(self):
         '''

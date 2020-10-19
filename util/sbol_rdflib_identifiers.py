@@ -222,7 +222,6 @@ class ExternalIdentifiers:
                         self.component_definition_cds : "CDS",
                         self.component_definition_terminator : "Terminator",
                         self.component_definition_engineeredRegion : "Engineered Region",
-                        self.component_definition_engineeredRegion : "Engineered Region",
                         self.component_definition_operator : "Operator",
                         self.component_definition_gene : "Gene"}
         self.rna_roles = {self.component_definition_mRNA : "mRNA",
@@ -232,10 +231,24 @@ class ExternalIdentifiers:
         self.small_molecule_roles = {self.component_definition_effector : "Effector"}
         self.complex_roles = {}
 
-    def get_component_definition_identifier_name(self, type,role = None):
+    def get_component_definition_identifier_name(self, type=None,role = None):
         '''
         Reverse method that when you know the URI's return a descriptive name for said ComponentDefinition
         '''
+        if type is None:
+            potential_maps = [self.dna_roles,
+                              self.rna_roles,
+                              self.protein_roles,
+                              self.small_molecule_roles,
+                              self.complex_roles]
+
+            for roles in potential_maps:
+                try:
+                    return roles[role]
+                except KeyError:
+                    continue
+            return "Unknown"
+                
         if type == self.component_definition_DNA or type == self.component_definition_DNARegion:
             try:
                 return self.dna_roles[role]

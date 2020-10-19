@@ -14,7 +14,7 @@ default_prune_edges = [
     identifiers.predicates.display_id,
     identifiers.predicates.persistent_identity,
     identifiers.predicates.access,
-    identifiers.predicates.direction,
+    #identifiers.predicates.direction,
     identifiers.predicates.sequence,
     identifiers.predicates.encoding,
     identifiers.predicates.elements]
@@ -65,6 +65,7 @@ class NetworkXGraphWrapper:
                     self.graph.load(graph)
 
                 self.graph = graph_type(self.graph)
+            
             if prune:
                 self.prune_graph()
                 
@@ -229,9 +230,10 @@ class NetworkXGraphWrapper:
 
         elif isinstance(self.graph,nx.classes.graph.Graph):
             edges = self.graph.edges(node,data=True)
-            for e in edges:
-                if e[2]["triples"][0][1] == edge_name:
-                    return e[2]["triples"][0][2]
+            for edge in edges:
+                for e in edge[2]["triples"]:
+                    if edge_name == e[1]:
+                        return e[2]
             return None
 
     def retrieve_nodes(self,node,edge_names):
@@ -244,9 +246,10 @@ class NetworkXGraphWrapper:
 
         elif isinstance(self.graph,nx.classes.graph.Graph):
             edges = self.graph.edges(node,data=True)
-            for e in edges:
-                if e[2]["triples"][0][1] in edge_names:
-                    matches.append(e[2]["triples"][0][2])
+            for edge in edges:
+                for e in edge[2]["triples"]:
+                    if e[1] in edge_names:
+                        matches.append(e[2])
             return matches
 
     def remove(self,edges):
@@ -294,17 +297,20 @@ class NetworkXGraphWrapper:
                 if edge in prune_edges:
                     to_prune_edges.append((n1,n2))
         elif isinstance(self.graph,nx.classes.graph.Graph):
-            for n1,n2 in self.graph.edges:
+            for n1,n2,edge in self.graph.edges(data=True):
                 if n1 in prune_nodes:
                     to_prune_nodes.append(n1)
                 if n2 in prune_nodes:
                     to_prune_nodes.append(n2)
-                edge = self.graph.edges[n1,n2]
+               # edge = self.graph.edges[n1,n2]
                 if "display_name" in edge.keys():
                     if edge["display_name"] in [self._get_name(p) for p in prune_edges]:
                         to_prune_edges.append((n1,n2))
                 elif "triples" in edge.keys():
-                    if edge["triples"][0][1] in prune_edges:
+                    for index,triple in enumerate(edge["triples"]):
+                        if triple[1] in prune_edges:
+                            del edge["triples"][index]
+                    if len(edge["triples"]) == 0:
                         to_prune_edges.append((n1,n2))
 
         self.graph.remove_nodes_from(to_prune_nodes)
@@ -383,7 +389,7 @@ class NetworkXGraphWrapper:
             for subject,node in new_graph.edges:
                 try:
                     new_graph.nodes[subject].update(node_attrs[subject])
-                except KeyError:
+                except (KeyError,ValueError):
                     pass
                 if "display_name" not in new_graph.nodes[subject].keys():
                     if isinstance(subject,rdflib.URIRef):
@@ -394,7 +400,7 @@ class NetworkXGraphWrapper:
 
                 try:
                     new_graph.nodes[node].update(node_attrs[node])
-                except KeyError:
+                except (KeyError,ValueError):
                     pass
                 if "display_name" not in new_graph.nodes[node].keys():
                     if isinstance(node,rdflib.URIRef):
@@ -658,8 +664,16 @@ class NetworkXGraphWrapper:
         cd_graph = self._sub_graph(cd_edges_graph)
         return cd_graph
     
+
     def produce_sequence_preset(self):
+        '''
+        Current Problemos
+        1. Handle Constraints.
+        3. Overlapping locations incorrect.
+        4. Change range name to component name if present?
+        '''
         sequence_edges = []
+        node_attrs = {}
         component_definitions = self.search((None,None,identifiers.objects.component_definition))
         for cd in component_definitions:
             cd_name = cd[0]
@@ -669,15 +683,23 @@ class NetworkXGraphWrapper:
             sequence_constraints = self.retrieve_nodes(cd_name,identifiers.predicates.sequence_constraint)
 
             for sa in sequence_annotations:
-
-                sa_edge = self._create_edge_dict(cd_name,identifiers.predicates.sequence_annotation,sa)
-                sequence_edges.append((cd_name,sa,sa_edge))
+                roles = self.retrieve_nodes(sa,identifiers.predicates.role)
                 component = self.retrieve_node(sa,identifiers.predicates.component)
-                definition = self.retrieve_node(component,identifiers.predicates.definition)
-                d_type = self.retrieve_node(definition,identifiers.predicates.type)
-                d_role = self.retrieve_node(definition,identifiers.predicates.role)
-                d_role_name = identifiers.external.get_component_definition_identifier_name(d_type,d_role)
+                if component is not None:
+                    definition = self.retrieve_node(component,identifiers.predicates.definition)
+                    roles = roles + self.retrieve_nodes(definition,identifiers.predicates.role)
+                role_name = ""
+                for role in roles:
+                    rn = identifiers.external.get_component_definition_identifier_name(type=None,role=role)
+                    if rn == "Unknown":
+                        rn = self._get_name(role)
+                        if rn.isdigit():
+                            continue
+                    if rn.lower() in role_name.lower():
+                        continue
+                    role_name = role_name + " " + rn 
 
+                
                 locations = self.retrieve_nodes(sa,identifiers.predicates.location)
                 for location in locations:
                     location_type = self.retrieve_node(location,identifiers.predicates.rdf_type)
@@ -689,12 +711,11 @@ class NetworkXGraphWrapper:
                         end = start
                     else:
                         pass # Generic Location??
-                    print(location)
-                    print(start,end)
-                    sequence_locations.append((location,d_role_name,(int(start),int(end))))
+                    attributes = self.nodes[location]
+                    sequence_locations.append((location,role_name,(int(start),int(end)),attributes))
 
             # Need to order
-            ordered_locations = []  
+            ordered_locations = []
             for index,sl in enumerate(sequence_locations):
                 sl_1_loc = sl[2]
                 if index == 0:
@@ -707,16 +728,35 @@ class NetworkXGraphWrapper:
                     if sl_1_loc[0] < sl_2_loc[0]:
                         ordered_locations.insert(ordered_index,sl)
                         break
-
-            print("Finished Ordering")
-            for sl in ordered_locations:
-                print(sl)
-    
+                    if ordered_index == len(ordered_locations) - 1:
+                        ordered_locations.append(sl)
+                        break
+            
             # add connections between ordered locations.
+            if len(ordered_locations) == 1:
+                location_copy = (ordered_locations[0][0],ordered_locations[0][1],(ordered_locations[0][2][0],ordered_locations[0][2][0]),ordered_locations[0][3])
+                ordered_locations.insert(0,location_copy)
+            for index,loc in enumerate(ordered_locations):
+                if index == len(ordered_locations) - 1:
+                    continue
+                
+                from_location = loc
+                from_uri = from_location[0]
+                from_name = f'{self._get_name(from_uri)} - {from_location[1]}' 
+                from_location[3]["display_name"] = from_name
+                node_attrs[from_uri] = from_location[3]
 
+                to_location = ordered_locations[index+1]
+                to_uri = to_location[0]
+                to_name = f'{self._get_name(ordered_locations[index+1][0])} - {ordered_locations[index+1][1]}'
+                to_location[3]["display_name"] = to_name
+                node_attrs[to_uri] = to_location[3]
 
-
-        sequence_graph = self._sub_graph(sequence_edges)
+                edge_name = f'{from_location[2][1]} - {to_location[2][1]}'
+                sa_edge = self._create_edge_dict(from_uri,edge_name,to_uri)
+                sequence_edges.append((from_uri,to_uri,sa_edge))
+        
+        sequence_graph = self._sub_graph(sequence_edges,node_attrs=node_attrs)
         return sequence_graph
 
     def get_sbol_object_role(self,node,obj_type = None, obj_role=None):
