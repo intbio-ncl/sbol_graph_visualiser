@@ -223,24 +223,20 @@ class DashBoard:
             return [sequence_box]
 
     
-    def create_modal(self,add=True):
-        modal = html.Div([  # modal div
-                    html.Div([  # content div
-                        html.Div([
-                            'This is the content of the modal',
-
-                        ]),
-
+    def create_modal(self,modal_identifier,close_identifier,content_identifier,add=True):
+        modal = html.Div([
+                    html.Div([
+                        html.Div(id=content_identifier,children=[]),
                         html.Hr(),
-                        html.Button('Close', id='modal-close-button')
+                        html.Button('Close', id=close_identifier)
                     ],
                         style={'textAlign': 'center', },
                         className='modal-content',
                     ),
                     ],
-                        id='modal',
+                        id=modal_identifier,
                         className='modal',
-                        style={"display": "block"},
+                        style={"display": "none"},
                     )
 
         if add:

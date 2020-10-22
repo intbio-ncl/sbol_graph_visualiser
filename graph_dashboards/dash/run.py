@@ -61,9 +61,12 @@ remove_node_outputs = {"cyto_elements_id" : Output(cyto_graph_id, 'elements')}
 remove_node_state = {"cyto_elements_id" : State(cyto_graph_id, 'elements'),
                      "cyto_selected_node_id" : State(cyto_graph_id, 'selectedNodeData')}
 
-enhance_input = {"enhance_button_id" : Input("ehance_graph","n_clicks")}
+open_modal_input = {"enhance_button_id" : Input("enhance_graph_button","n_clicks")}
+open_modal_output = {"enhance_modal_id" : Output("enhance_graph_modal","style"),
+                     "enhance_modal_options" : Output("enhance_modal_options","children")}
 
-
+close_modal_input = {"enhance_close_button_id" : Input("enhance_graph_close_button","n_clicks")}
+close_modal_output = {"enhance_button_id" : Output("enhance_graph_button","n_clicks")}
 
 default_options = []
 def dash_runner(visualiser,name = ""):
@@ -107,8 +110,10 @@ def dash_runner(visualiser,name = ""):
 
     # Add Toolbox utility.
     toolbox_elements = dashboard.create_file_upload(load_inputs["file_upload_id"].component_id,"Upload Graph","graph_container",add=False)
-    toolbox_elements = toolbox_elements + dashboard.create_button(enhance_input["enhance_button_id"].component_id,"Enhance Graph",add=False)
-    #toolbox_elements = toolbox_elements + dashboard.create_modal(add=False)
+    toolbox_elements = toolbox_elements + dashboard.create_button(open_modal_input["enhance_button_id"].component_id,"Enhance Graph",add=False)
+    toolbox_elements = toolbox_elements + dashboard.create_modal(open_modal_output["enhance_modal_id"].component_id,
+                                                                close_modal_input["enhance_close_button_id"].component_id,
+                                                                open_modal_output["enhance_modal_options"].component_id,add=False)
     graph_picker_options = [{"label" : k,"value":k} for k in graph_types.keys()]
     toolbox_elements = toolbox_elements + dashboard.create_dropdown(graph_type_inputs["graph_type_dropdown_id"].component_id,"Graph Type",options=graph_picker_options, add=False)
     toolbox_div = dashboard.create_div(not_modifier_identifiers["toolbox_id"],toolbox_elements,add=False)
@@ -133,6 +138,11 @@ def dash_runner(visualiser,name = ""):
         return update_zoom(value)
     def remove_node_inner(_,node_id,data):
         return remove_selected_nodes(_,node_id,data)
+    def display_enhancer_modal_inner(n_clicks):
+        return display_enhancer_modal(dashboard,n_clicks)
+    def close_enhancer_modal_inner(n_clicks):
+        return close_modal(n_clicks)
+
 
     dashboard.add_callback(update_plotly_preset_inner,list(plotly_preset_inputs.values()),list(plotly_preset_outputs.values()),list(plotly_preset_state.values()))
     dashboard.add_callback(update_cyto_preset_inner,list(cyto_preset_inputs.values()),list(cyto_preset_outputs.values()),list(cyto_preset_state.values()))
@@ -142,6 +152,8 @@ def dash_runner(visualiser,name = ""):
     dashboard.add_callback(change_graph_type_inner,list(graph_type_inputs.values()),list(graph_type_outputs.values()))
     dashboard.add_callback(update_zoom_inner,list(zoom_inputs.values()),Output(cyto_graph_id,"zoom"))
     dashboard.add_callback(remove_node_inner,list(remove_node_inputs.values()),list(remove_node_outputs.values()),list(remove_node_state.values()))
+    dashboard.add_callback(display_enhancer_modal_inner,list(open_modal_input.values()),list(open_modal_output.values()))
+    dashboard.add_callback(close_enhancer_modal_inner,list(close_modal_input.values()),list(close_modal_output.values()))
     dashboard.run()
 
 
@@ -301,6 +313,19 @@ def remove_selected_nodes(_, elements, data):
         new_elements = [ele for ele in elements if ele['data']['id'] not in ids_to_remove]
         return [new_elements]
     return [elements]
+
+def display_enhancer_modal(dashboard,n):
+    if n is not None and n > 0:
+        # Get Potential Enhancement here....
+        children = (dashboard.create_heading_2("Enhancer Heading","Design Enhancement",add=False) +
+                   dashboard.create_line_break(add=False) + 
+                   dashboard.create_heading_6("enh_desc","Tick boxes for Enhancement you would like to enable.",add=False))
+
+        return [{"display": "block"},children]
+    return [{"display": "none"},[]]
+
+def close_modal(n):
+    return [0]
 
 def reverse_graph(dashboard,old_settings,error_str = ""):
     for setting in old_settings:
