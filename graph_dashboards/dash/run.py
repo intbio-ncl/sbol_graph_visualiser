@@ -61,6 +61,9 @@ remove_node_outputs = {"cyto_elements_id" : Output(cyto_graph_id, 'elements')}
 remove_node_state = {"cyto_elements_id" : State(cyto_graph_id, 'elements'),
                      "cyto_selected_node_id" : State(cyto_graph_id, 'selectedNodeData')}
 
+enhance_input = {"enhance_button_id" : Input("ehance_graph","n_clicks")}
+
+
 
 default_options = []
 def dash_runner(visualiser,name = ""):
@@ -104,6 +107,8 @@ def dash_runner(visualiser,name = ""):
 
     # Add Toolbox utility.
     toolbox_elements = dashboard.create_file_upload(load_inputs["file_upload_id"].component_id,"Upload Graph","graph_container",add=False)
+    toolbox_elements = toolbox_elements + dashboard.create_button(enhance_input["enhance_button_id"].component_id,"Enhance Graph",add=False)
+    #toolbox_elements = toolbox_elements + dashboard.create_modal(add=False)
     graph_picker_options = [{"label" : k,"value":k} for k in graph_types.keys()]
     toolbox_elements = toolbox_elements + dashboard.create_dropdown(graph_type_inputs["graph_type_dropdown_id"].component_id,"Graph Type",options=graph_picker_options, add=False)
     toolbox_div = dashboard.create_div(not_modifier_identifiers["toolbox_id"],toolbox_elements,add=False)
