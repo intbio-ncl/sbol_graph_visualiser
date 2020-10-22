@@ -14,7 +14,7 @@ default_prune_edges = [
     identifiers.predicates.display_id,
     identifiers.predicates.persistent_identity,
     identifiers.predicates.access,
-    #identifiers.predicates.direction,
+    identifiers.predicates.direction,
     identifiers.predicates.sequence,
     identifiers.predicates.encoding,
     identifiers.predicates.elements]
@@ -442,8 +442,20 @@ class NetworkXGraphWrapper:
         :return: Interaction SubGraph 
         :rtype: nx.classes.graph.Graph
         '''
+        module_definitions = self.search((None,identifiers.predicates.rdf_type,identifiers.objects.module_definition))
         components = self.search((None,[identifiers.predicates.component,identifiers.predicates.functional_component],None))
         cd_edges = []
+        node_attrs = {}
+        for s,p,o in module_definitions:
+            modules = self.retrieve_nodes(s,identifiers.predicates.module)
+            for module in modules:
+                definition = self.retrieve_node(module,identifiers.predicates.definition)
+
+                new_edge = self._create_edge_dict(s,identifiers.objects.module,definition)
+                cd_edges.append((s,definition,new_edge))
+                node_attrs[s] = self.nodes[s]
+                node_attrs[definition] = self.nodes[definition]
+
         for s,p,o in components:
             subject_type = self.retrieve_node(s,identifiers.predicates.rdf_type)
             if subject_type != identifiers.objects.component_definition and subject_type != identifiers.objects.module_definition:
@@ -454,8 +466,10 @@ class NetworkXGraphWrapper:
                 raise ValueError(f'{p} is a component with no definition')
 
             cd_edges.append((s,cd,o))
+            node_attrs[s] = self.nodes[s]
+            node_attrs[cd] = self.nodes[cd]
         
-        parts_graph = self._sub_graph(cd_edges)
+        parts_graph = self._sub_graph(cd_edges,node_attrs=node_attrs)
         return parts_graph
 
     def produce_interaction_graph(self):
@@ -470,69 +484,62 @@ class NetworkXGraphWrapper:
         for interaction in interactions:
             done_list = []
             participants = self.search((interaction[1],identifiers.predicates.participation,None))
-            for participant1 in participants:
+            if len(participants) == 1:
+                participant1 = participants[0]
                 cd1 = self._get_cd_from_part(participant1[1])
                 participant1_type = self.retrieve_node(participant1[1],identifiers.predicates.role)
-
-                for participant2 in participants:
-                    if participant1 == participant2 or participant1[2] in done_list or participant2[2] in done_list:
-                        continue
-                    
-                    cd2 = self._get_cd_from_part(participant2[1])
+                interaction_type = self.retrieve_node(interaction[1],identifiers.predicates.type)
+                interaction_edges = interaction_edges + self._get_in_out_participants(cd1,cd1,participant1_type,participant1_type,interaction_type)
+            else:
+                for participant1 in participants:
+                    cd1 = self._get_cd_from_part(participant1[1])
+                    participant1_type = self.retrieve_node(participant1[1],identifiers.predicates.role)
                     interaction_type = self.retrieve_node(interaction[1],identifiers.predicates.type)
-                    participant2_type = self.retrieve_node(participant2[1],identifiers.predicates.role)
-
-                    interaction_type_name = identifiers.external.get_interaction_type_name(interaction_type)
-                    interaction_edges = interaction_edges + self._get_in_out_participants(cd1,cd2,participant1_type,participant2_type,interaction_type_name)
-
-                    done_list.append(participant1[2])
+                    for participant2 in participants:
+                        if participant1 == participant2 or participant1[2] in done_list or participant2[2] in done_list:
+                            continue
+                        
+                        cd2 = self._get_cd_from_part(participant2[1])
+                        
+                        participant2_type = self.retrieve_node(participant2[1],identifiers.predicates.role)
+                        interaction_edges = interaction_edges + self._get_in_out_participants(cd1,cd2,participant1_type,participant2_type,interaction_type)
+                        done_list.append(participant1[2])
 
         interaction_graph = self._sub_graph(interaction_edges)
         return interaction_graph
     
     def produce_protein_protein_interaction_graph(self):
-        '''
-        Creates a SubGraph from the larger graph that displays a graph of 
-        interacting proteins within the provided graph.
-        :return: PPI SubGraph 
-        :rtype: nx.classes.graph.Graph
-        '''
         ppi_edges = []
-        interactions = self.search((None,identifiers.predicates.interaction,None))
-        for interaction in interactions:
-            done_list = []
-            participants = self.search((interaction[1],identifiers.predicates.participation,None))
-            for participant1 in participants:
-                atleast_one = False
-                cd1 = self._get_cd_from_part(participant1[1])
-                cd1_type = self.retrieve_node(cd1,identifiers.predicates.type)
-                participant1_type = self.retrieve_node(participant1[1],identifiers.predicates.role)
-                if cd1_type != identifiers.external.component_definition_protein:
-                    continue
-                interaction_type = self.retrieve_node(interaction[1],identifiers.predicates.type)
-                interaction_type_name = identifiers.external.get_interaction_type_name(interaction_type)
-                if len(participants) > 1 :
-                    for participant2 in participants:
-                        if participant1 == participant2 or participant1[2] in done_list or participant2[2] in done_list:
-                            atleast_one = True
-                            continue
-
-                        cd2 = self._get_cd_from_part(participant2[1])
-                        cd2_type = self.retrieve_node(cd2,identifiers.predicates.type)
-                        if cd2_type != identifiers.external.component_definition_protein:
-                            continue
-
-                        participant2_type = self.retrieve_node(participant2[1],identifiers.predicates.role)
-                        ppi_edges = ppi_edges + self._get_in_out_participants(cd1,cd2,participant1_type,participant2_type,interaction_type_name)
-
-                        done_list.append(participant1[2])
-                        atleast_one = True
-
-                if not atleast_one:
-                    edge = self._create_edge_dict(cd1,interaction_type_name,cd1)
-                    ppi_edges.append((cd1,cd1,edge))
-        ppi_network = self._sub_graph(ppi_edges)
-        return ppi_network
+        node_attrs = {}
+        interaction_graph = self.produce_interaction_graph()
+        for n in interaction_graph.nodes(data=True):
+            name = n[0]
+            labels = n[1]
+            cd_type = self.retrieve_node(name,identifiers.predicates.type)
+            if cd_type != identifiers.external.component_definition_protein:
+                continue
+            node_edges = interaction_graph.edges(name,data=True)
+            if node_edges == []:
+                continue
+            for node,vertex,edge in node_edges:
+                interaction_type = edge["triples"][0][1]
+                def handle_edge(vertex):
+                    vertex_type = self.retrieve_node(vertex,identifiers.predicates.type)
+                    if vertex_type == identifiers.external.component_definition_protein:
+                        node_attrs[name] = labels
+                        node_attrs[vertex] = self.nodes[vertex]
+                        ppi_edge = {'triples': [(name,interaction_type,vertex)], 
+                                    'weight': 1, 
+                                    'display_name': identifiers.external.get_interaction_type_name(interaction_type)}
+                        ppi_edges.append((name,vertex,ppi_edge))
+                    else:
+                        inner_edges = interaction_graph.edges(vertex,data=True)
+                        for e in inner_edges:
+                            handle_edge(e[1])
+                    return None
+                handle_edge(vertex)
+        ppi_graph = self._sub_graph(ppi_edges,node_attrs=node_attrs)
+        return ppi_graph
 
     def produce_functional_graph(self):
         '''
@@ -900,8 +907,9 @@ class NetworkXGraphWrapper:
         
         return cd1
 
-    def _get_in_out_participants(self,cd1,cd2,participant1_type,participant2_type,interaction_type_name):
+    def _get_in_out_participants(self,cd1,cd2,participant1_type,participant2_type,interaction_type):
         interaction_edges = []
+        interaction_type_name = identifiers.external.get_interaction_type_name(interaction_type)
         try:
             particiant_1_mapping = participant_type_mapping[participant1_type]
         except KeyError:
@@ -920,12 +928,12 @@ class NetworkXGraphWrapper:
         else:
             in_part = cd1
             out_part = cd2
-            edge = {'triples': [(out_part,interaction_type_name,in_part)], 
+            edge = {'triples': [(out_part,interaction_type,in_part)], 
                     'weight': 1, 
                     'display_name': interaction_type_name}
             interaction_edges.append((out_part,in_part,edge))
 
-        edge = {'triples': [(cd1,interaction_type_name,cd2)], 
+        edge = {'triples': [(cd1,interaction_type,cd2)], 
                             'weight': 1, 
                             'display_name': interaction_type_name}
                             
