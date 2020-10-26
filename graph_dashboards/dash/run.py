@@ -5,10 +5,13 @@ import dash
 import base64
 import os
 import sys,os
+from collections import OrderedDict 
+
 sys.path.insert(0,os.path.expanduser(os.path.join(os.getcwd(),"graph_visualisation")))
+
 from graph_visualisation.plotly.visual import PlotlyVisualiser
 from graph_visualisation.cytoscape.visual import CytoscapeVisualiser
-from collections import OrderedDict 
+from sbol_enhancer.specified_enhancer.enhancer import SBOLEnhancer
 
 
 options_color = "#f8f9fa"
@@ -64,13 +67,15 @@ remove_node_state = {"cyto_elements_id" : State(cyto_graph_id, 'elements'),
 open_modal_input = {"enhance_button_id" : Input("enhance_graph_button","n_clicks")}
 open_modal_output = {"enhance_modal_id" : Output("enhance_graph_modal","style"),
                      "enhance_modal_options" : Output("enhance_modal_options","children")}
-
 close_modal_input = {"enhance_close_button_id" : Input("enhance_graph_close_button","n_clicks")}
 close_modal_output = {"enhance_button_id" : Output("enhance_graph_button","n_clicks")}
 
+submit_modal_input = {"enhance_submit_button_id" : Input("enhance_submit_button_id","n_clicks")}
+submit_modal_output = {"file_upload_id" : Output("file_upload","contents")}
+
 default_options = []
-def dash_runner(visualiser,name = ""):
-    dashboard = DashBoard(visualiser)
+def dash_runner(visualiser,enhancer,name = ""):
+    dashboard = DashBoard(visualiser,enhancer)
 
     # Add Options
     plotly_form_elements,plotly_identifiers,plotly_maps = _create_form_elements(PlotlyVisualiser(),dashboard,
@@ -111,9 +116,7 @@ def dash_runner(visualiser,name = ""):
     # Add Toolbox utility.
     toolbox_elements = dashboard.create_file_upload(load_inputs["file_upload_id"].component_id,"Upload Graph","graph_container",add=False)
     toolbox_elements = toolbox_elements + dashboard.create_button(open_modal_input["enhance_button_id"].component_id,"Enhance Graph",add=False)
-    toolbox_elements = toolbox_elements + dashboard.create_modal(open_modal_output["enhance_modal_id"].component_id,
-                                                                close_modal_input["enhance_close_button_id"].component_id,
-                                                                open_modal_output["enhance_modal_options"].component_id,add=False)
+    toolbox_elements = toolbox_elements + _create_modal(dashboard)
     graph_picker_options = [{"label" : k,"value":k} for k in graph_types.keys()]
     toolbox_elements = toolbox_elements + dashboard.create_dropdown(graph_type_inputs["graph_type_dropdown_id"].component_id,"Graph Type",options=graph_picker_options, add=False)
     toolbox_div = dashboard.create_div(not_modifier_identifiers["toolbox_id"],toolbox_elements,add=False)
@@ -271,6 +274,7 @@ def load_graph(dashboard,contents,filename):
         elif isinstance(dashboard.visualiser,CytoscapeVisualiser):
             dashboard.visualiser = CytoscapeVisualiser(filename)
         dashboard.visualiser._graph.prune_graph()
+        dashboard.enhancer = SBOLEnhancer(filename)
 
         graph_container,plotly_style,cyto_style = generate_graph_div(dashboard)
         title = _beautify_filename(filename)
@@ -321,6 +325,12 @@ def display_enhancer_modal(dashboard,n):
                    dashboard.create_line_break(add=False) + 
                    dashboard.create_heading_6("enh_desc","Tick boxes for Enhancement you would like to enable.",add=False))
 
+        dashboard.enhancer.get_enhancements()
+        for e in dashboard.enhancer.enhancers.values():
+            print(e.name)
+            print(e.description)
+            print(e.enhancements)
+            print("\n\n")
         return [{"display": "block"},children]
     return [{"display": "none"},[]]
 
@@ -532,3 +542,18 @@ def _generate_inputs_outputs(identifiers):
     outputs = {k:Output(v.component_id,v.component_property) for k,v in identifiers.items()}
     states = {k:State(v.component_id,v.component_property) for k,v in identifiers.items()}
     return preset_identifiers,identifiers,outputs,states
+
+def _create_modal(dashboard):
+    content = (dashboard.create_div(open_modal_output["enhance_modal_options"].component_id,[],add=False) + 
+                dashboard.create_line_break(add=False) + 
+                dashboard.create_button(close_modal_input["enhance_close_button_id"].component_id,"Cancel",add=False))
+    content_div = dashboard.create_div("modal_contenttttt", content, style={'textAlign': 'center'}, className='modal-content',add=False)
+    modal_div = dashboard.create_div(open_modal_output["enhance_modal_id"].component_id, content_div, 
+                                     className='modal', style={"display": "none"},add=False)
+
+    return modal_div
+
+
+    
+    
+    

@@ -7,10 +7,11 @@ from dash.dependencies import Input, Output
 import dash_bio as dashbio
 
 class DashBoard:
-    def __init__(self,graph_visualiser):
+    def __init__(self,graph_visualiser,enhancer):
         app = dash.Dash(__name__,suppress_callback_exceptions=True)
         self.app = app
         self.visualiser = graph_visualiser
+        self.enhancer = enhancer
         self.style = {}
         self.children = []
         self.parameters_calls = []
@@ -222,25 +223,4 @@ class DashBoard:
         else:
             return [sequence_box]
 
-    
-    def create_modal(self,modal_identifier,close_identifier,content_identifier,add=True):
-        modal = html.Div([
-                    html.Div([
-                        html.Div(id=content_identifier,children=[]),
-                        html.Hr(),
-                        html.Button('Close', id=close_identifier)
-                    ],
-                        style={'textAlign': 'center', },
-                        className='modal-content',
-                    ),
-                    ],
-                        id=modal_identifier,
-                        className='modal',
-                        style={"display": "none"},
-                    )
-
-        if add:
-            return self._create_element(modal)
-        else:
-            return [modal]
 

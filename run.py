@@ -12,6 +12,8 @@ from graph_visualisation.networkx.run import nwx_runner
 from graph_visualisation.plotly.run import plotly_runner
 from graph_dashboards.dash.run import dash_runner
 
+from sbol_enhancer.specified_enhancer.enhancer import SBOLEnhancer
+
 visual_mapper = {
                 "networkx" : {"builder" : NetworkXGraphWrapper,"visual" : {"networkx" : NetworkXGraphBuilder}, "run" : nwx_runner},
                 "plotly"   : {"builder" : NetworkXGraphWrapper,"visual" : {"plotly" : PlotlyVisualiser}, "run" : plotly_runner},
@@ -21,9 +23,10 @@ visual_mapper = {
 
 def process_input(filename,visualiser,graph_type):
     graph_builder = visual_mapper[visualiser]["builder"](filename,prune=True)
+    enhancer = SBOLEnhancer(filename)
     graph_visualiser = visual_mapper[visualiser]["visual"][graph_type](graph_builder)
     graph_title = filename.split(os.path.sep)[-1].split(".")[0]
-    visual_mapper[visualiser]["run"](graph_visualiser,graph_title)
+    visual_mapper[visualiser]["run"](graph_visualiser,enhancer,graph_title)
 
 def language_processor_args():
     parser = argparse.ArgumentParser(description="Network Visualisation Tool")
