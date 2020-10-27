@@ -101,28 +101,28 @@ def dash_runner(visualiser,enhancer,name = ""):
 
     # Add a title.
     title = "Graph for " + _beautify_name(name)
-    title = dashboard.create_heading_1(load_outputs["title_id"].component_id,title,add=False)
+    title = dashboard.create_heading_1(load_outputs["title_id"].component_id,title)
 
     # Add Graph
     graph_container,plotly_style,cyto_style = generate_graph_div(dashboard)
-    plotly_form_div = dashboard.create_div(graph_type_outputs["plotly_options_id"].component_id,plotly_form_elements,add=False,style=plotly_style)
-    cytoscape_form_div = dashboard.create_div(graph_type_outputs["cyto_options_id"].component_id,cyto_form_elements,add=False,style=cyto_style)
-    dashboard.create_sidebar(not_modifier_identifiers["sidebar_id"],"Options",plotly_form_div + cytoscape_form_div,style={})
+    plotly_form_div = dashboard.create_div(graph_type_outputs["plotly_options_id"].component_id,plotly_form_elements,style=plotly_style)
+    cytoscape_form_div = dashboard.create_div(graph_type_outputs["cyto_options_id"].component_id,cyto_form_elements,style=cyto_style)
+    dashboard.create_sidebar(not_modifier_identifiers["sidebar_id"],"Options",plotly_form_div + cytoscape_form_div,style={},add=True)
 
     # Add all non-sidebar stuff to content.
-    plotly_error = dashboard.create_alert(plotly_update_outputs["error_id"].component_id,"Error.",add=False,color="danger",dismissable=True,fade=True,is_open=False)
-    cyto_error = dashboard.create_alert(cyto_update_outputs["error_id"].component_id,"Error.",add=False,color="danger",dismissable=True,fade=True,is_open=False)
+    plotly_error = dashboard.create_alert(plotly_update_outputs["error_id"].component_id,"Error.",color="danger",dismissable=True,fade=True,is_open=False)
+    cyto_error = dashboard.create_alert(cyto_update_outputs["error_id"].component_id,"Error.",color="danger",dismissable=True,fade=True,is_open=False)
 
     # Add Toolbox utility.
-    toolbox_elements = dashboard.create_file_upload(load_inputs["file_upload_id"].component_id,"Upload Graph","graph_container",add=False)
-    toolbox_elements = toolbox_elements + dashboard.create_button(open_modal_input["enhance_button_id"].component_id,"Enhance Graph",add=False)
+    toolbox_elements = dashboard.create_file_upload(load_inputs["file_upload_id"].component_id,"Upload Graph","graph_container")
+    toolbox_elements = toolbox_elements + dashboard.create_button(open_modal_input["enhance_button_id"].component_id,"Enhance Graph")
     toolbox_elements = toolbox_elements + _create_modal(dashboard)
     graph_picker_options = [{"label" : k,"value":k} for k in graph_types.keys()]
-    toolbox_elements = toolbox_elements + dashboard.create_dropdown(graph_type_inputs["graph_type_dropdown_id"].component_id,"Graph Type",options=graph_picker_options, add=False)
-    toolbox_div = dashboard.create_div(not_modifier_identifiers["toolbox_id"],toolbox_elements,add=False)
+    toolbox_elements = toolbox_elements + dashboard.create_dropdown(graph_type_inputs["graph_type_dropdown_id"].component_id,"Graph Type",options=graph_picker_options)
+    toolbox_div = dashboard.create_div(not_modifier_identifiers["toolbox_id"],toolbox_elements)
 
     final_elements = toolbox_div + title + plotly_error + cyto_error + graph_container
-    dashboard.create_div("content",final_elements)
+    dashboard.create_div("content",final_elements,add=True)
 
     # Bind the callbacks
     def update_plotly_preset_inner(preset_name,*states):
@@ -145,6 +145,8 @@ def dash_runner(visualiser,enhancer,name = ""):
         return display_enhancer_modal(dashboard,n_clicks)
     def close_enhancer_modal_inner(n_clicks):
         return close_modal(n_clicks)
+    def submit_enhancer_inner(n_clicks):
+        return submit_enhancer(dashboard,n_clicks)
 
 
     dashboard.add_callback(update_plotly_preset_inner,list(plotly_preset_inputs.values()),list(plotly_preset_outputs.values()),list(plotly_preset_state.values()))
@@ -155,8 +157,10 @@ def dash_runner(visualiser,enhancer,name = ""):
     dashboard.add_callback(change_graph_type_inner,list(graph_type_inputs.values()),list(graph_type_outputs.values()))
     dashboard.add_callback(update_zoom_inner,list(zoom_inputs.values()),Output(cyto_graph_id,"zoom"))
     dashboard.add_callback(remove_node_inner,list(remove_node_inputs.values()),list(remove_node_outputs.values()),list(remove_node_state.values()))
+
     dashboard.add_callback(display_enhancer_modal_inner,list(open_modal_input.values()),list(open_modal_output.values()))
     dashboard.add_callback(close_enhancer_modal_inner,list(close_modal_input.values()),list(close_modal_output.values()))
+    dashboard.add_callback(submit_enhancer_inner,list(submit_modal_input.values()),list(submit_modal_output.values()))
     dashboard.run()
 
 
@@ -248,6 +252,7 @@ def update_cyto_graph(dashboard,*args):
 
     try:
         figure = dashboard.visualiser.build(show=False)
+        print(figure)
         cyto_utility = _generate_cyto_util_components(dashboard)
         return cyto_utility + [figure],False,["No Error"]
     except Exception as ex:
@@ -292,18 +297,18 @@ def change_graph_type(dashboard,graph_type):
 
     if graph_type == "plotly":
         plotly_options_style = {}
-        plotly_div_children = dashboard.create_graph(plotly_update_outputs["graph_id"].component_id,figure,add=False) 
+        plotly_div_children = dashboard.create_graph(plotly_update_outputs["graph_id"].component_id,figure) 
         plotly_div_style = {}
         cyto_options_style = {'display': 'none'}
-        cyto_div_children = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,[empty_figure],add=False) 
+        cyto_div_children = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,[empty_figure]) 
         cyto_div_style = {'display': 'none'}
     else :
         cyto_utility = _generate_cyto_util_components(dashboard)
         plotly_options_style = {'display': 'none'}
-        plotly_div_children = dashboard.create_graph(plotly_update_outputs["graph_id"].component_id,empty_figure,add=False) 
+        plotly_div_children = dashboard.create_graph(plotly_update_outputs["graph_id"].component_id,empty_figure) 
         plotly_div_style = {'display': 'none'}
         cyto_options_style = {}
-        cyto_div_children = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,cyto_utility+[figure],add=False)
+        cyto_div_children = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,cyto_utility+[figure])
         cyto_div_style = {}
 
     return plotly_options_style,plotly_div_children,plotly_div_style,cyto_options_style,cyto_div_children,cyto_div_style
@@ -321,21 +326,43 @@ def remove_selected_nodes(_, elements, data):
 def display_enhancer_modal(dashboard,n):
     if n is not None and n > 0:
         # Get Potential Enhancement here....
-        children = (dashboard.create_heading_2("Enhancer Heading","Design Enhancement",add=False) +
-                   dashboard.create_line_break(add=False) + 
-                   dashboard.create_heading_6("enh_desc","Tick boxes for Enhancement you would like to enable.",add=False))
+        children = (dashboard.create_heading_1("enhancer_heading","Design Enhancement") +
+                   dashboard.create_line_break() + 
+                   dashboard.create_heading_3("enh_description","Tick boxes for Enhancement you would like to enable.") + 
+                   dashboard.create_line_break(number=3))
 
         dashboard.enhancer.get_enhancements()
         for e in dashboard.enhancer.enhancers.values():
-            print(e.name)
-            print(e.description)
-            print(e.enhancements)
-            print("\n\n")
+            if len(e.enhancements) == 0:
+                continue
+            children = children + (dashboard.create_heading_4(e.name,e.name) + 
+                                  dashboard.create_heading_6(e.description,e.description))
+
+            columns = [
+                {"name" : "Subject", "id" : "subject"},
+                {"name" : "Description", "id" : "description"},
+                {"name" : "Enable", "id" : "enable"},
+            ]
+            data = []
+            for name,enhancement in e.enhancements.items():
+                tickbox = dashboard.create_checklist("T","Enable",[{"label" : "Enable","Value" : "True"}])
+                data.append({"subject" : enhancement.subject ,"description" : enhancement.enhancement_description, "enable" : tickbox})
+                print(type(enhancement))
+
+
+
+            children = children + dashboard.create_table("God knows",columns,data) + dashboard.create_line_break(number=2)
+            
         return [{"display": "block"},children]
     return [{"display": "none"},[]]
 
 def close_modal(n):
     return [0]
+
+def submit_enhancer(dashboard,n):
+    if n is not None and n > 0:
+        return [dashboard.enhancer.save()]
+    raise dash.exceptions.PreventUpdate()
 
 def reverse_graph(dashboard,old_settings,error_str = ""):
     for setting in old_settings:
@@ -350,21 +377,21 @@ def generate_graph_div(dashboard):
     figure_layout_elements = {"autosize": True}
     figure = dashboard.visualiser.build(layout_elements = figure_layout_elements, show = False)
     if isinstance(dashboard.visualiser,PlotlyVisualiser):
-        plotly_graph = [dashboard.create_graph(plotly_update_outputs["graph_id"].component_id,figure,add=False)]
-        cyto_graph = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,[],add=False)
+        plotly_graph = [dashboard.create_graph(plotly_update_outputs["graph_id"].component_id,figure)]
+        cyto_graph = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,[])
         plotly_style = background_color
         cyto_style = hidden_style
     elif isinstance(dashboard.visualiser,CytoscapeVisualiser):
         cyto_utility = _generate_cyto_util_components(dashboard)
         plotly_graph = []
-        cyto_div_children = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,cyto_utility+[figure],add=False)
+        cyto_div_children = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,cyto_utility+[figure])
         cyto_style = background_color
         plotly_style = hidden_style
     else:
         raise ValueError("Visualiser is not valid with dash.")
-    plotly_div = dashboard.create_div(graph_type_outputs["plotly_div"].component_id, plotly_graph, add=False)
-    cyto_div = dashboard.create_div(graph_type_outputs["cyto_div"].component_id, cyto_div_children, add=False,style=cyto_style)
-    graph_container = dashboard.create_div(load_outputs["graph_container_id"].component_id, plotly_div + cyto_div, add=False)
+    plotly_div = dashboard.create_div(graph_type_outputs["plotly_div"].component_id, plotly_graph)
+    cyto_div = dashboard.create_div(graph_type_outputs["cyto_div"].component_id, cyto_div_children,style=cyto_style)
+    graph_container = dashboard.create_div(load_outputs["graph_container_id"].component_id, plotly_div + cyto_div)
     return graph_container,plotly_style,cyto_style
 
 def _create_form_elements(visualiser,dashboard,default_vals = [],style = {},id_prefix = ""):
@@ -390,25 +417,25 @@ def _create_form_elements(visualiser,dashboard,default_vals = [],style = {},id_p
         # The misc section is a special option set as they are all independant options.
         if "Misc" in display_name:
             # Create a heading (DisplayName)
-            miscs = dashboard.create_heading_4(id_prefix + "_misc_settings","Misc Settings",add=False)
+            miscs = dashboard.create_heading_4(id_prefix + "_misc_settings","Misc Settings")
             for k1,v1 in v.items():
                 misc_identifer = id_prefix + "_" + k1
                 removal_words = removal_words + [word for word in display_name.split(" ")]
                 name = _beautify_name(k1)
                 name = "".join("" if i in removal_words else i + " " for i in name.split())
-                miscs = miscs + dashboard.create_toggle_switch(misc_identifer,name,add=False)
-                miscs = miscs + dashboard.create_line_break(add=False)
+                miscs = miscs + dashboard.create_toggle_switch(misc_identifer,name)
+                miscs = miscs + dashboard.create_line_break()
                 identifiers[k1] = Input(misc_identifer,"value")
                 variable_input_list_map[k1] = [True,False]
             
-            misc_div = dashboard.create_div(id_prefix + "_misc_container",miscs,add=False,style=style)
+            misc_div = dashboard.create_div(id_prefix + "_misc_container",miscs,style=style)
             continue
         elif isinstance(v,(int,float)):
             min_v = v/4
             max_v = v*4
             default_val = (min_v + max_v) / 2
             step = 1
-            element = dashboard.create_slider(identifier ,display_name,min_v,max_v,default_val=default_val,step=step,add=False)
+            element = dashboard.create_slider(identifier ,display_name,min_v,max_v,default_val=default_val,step=step)
             identifiers[k] =  Input(identifier,"value")
             variable_input_list_map[identifier] = [min_v,max_v]
 
@@ -424,13 +451,12 @@ def _create_form_elements(visualiser,dashboard,default_vals = [],style = {},id_p
                     default_button = k1
 
             variable_input_list_map[identifier] = [l["value"] for l in inputs]
-            element = dashboard.create_radio_item(identifier,display_name,inputs,value=default_button,add=False)
+            element = dashboard.create_radio_item(identifier,display_name,inputs,value=default_button)
             identifiers[k] = Input(identifier,"value")
 
         breaker = dashboard.create_horizontal_row(False)
-        elements = elements + dashboard.create_div(identifier + "_container",element,add=False,style=style)
-        elements = elements + breaker 
-    
+        elements = elements + dashboard.create_div(identifier + "_container",element,style=style) 
+        elements = elements + breaker     
     return elements + misc_div, identifiers,variable_input_list_map
 
 
@@ -525,13 +551,13 @@ def _generate_options(visualiser):
 
 def _generate_cyto_util_components(dashboard):
     # Slider for zoom
-    zoom_slider = dashboard.create_slider(zoom_inputs["cyto_zoom_slider_id"].component_id,"Zoom Slider",0.1,3,1.5,step=0.1,add=False)
-    zoom_slider_div = dashboard.create_div("zoom_div",zoom_slider,add=False)
+    zoom_slider = dashboard.create_slider(zoom_inputs["cyto_zoom_slider_id"].component_id,"Zoom Slider",0.1,3,1.5,step=0.1)
+    zoom_slider_div = dashboard.create_div("zoom_div",zoom_slider)
 
-    remove_node_button = dashboard.create_button(remove_node_inputs["remove_node_id"].component_id,"Remove Selected Node",add=False)
-    remove_node_div = dashboard.create_div("remove_node_div",remove_node_button,add=False)
+    remove_node_button = dashboard.create_button(remove_node_inputs["remove_node_id"].component_id,"Remove Selected Node")
+    remove_node_div = dashboard.create_div("remove_node_div",remove_node_button)
     utilities = zoom_slider_div + remove_node_div
-    util_div = dashboard.create_div(not_modifier_identifiers["cyto_utility_id"],utilities,add=False)
+    util_div = dashboard.create_div(not_modifier_identifiers["cyto_utility_id"],utilities)
 
     return util_div
 
@@ -543,13 +569,16 @@ def _generate_inputs_outputs(identifiers):
     states = {k:State(v.component_id,v.component_property) for k,v in identifiers.items()}
     return preset_identifiers,identifiers,outputs,states
 
+
 def _create_modal(dashboard):
-    content = (dashboard.create_div(open_modal_output["enhance_modal_options"].component_id,[],add=False) + 
-                dashboard.create_line_break(add=False) + 
-                dashboard.create_button(close_modal_input["enhance_close_button_id"].component_id,"Cancel",add=False))
-    content_div = dashboard.create_div("modal_contenttttt", content, style={'textAlign': 'center'}, className='modal-content',add=False)
+    content = (dashboard.create_div(open_modal_output["enhance_modal_options"].component_id,[]) + 
+               dashboard.create_line_break() + 
+               dashboard.create_button(submit_modal_input["enhance_submit_button_id"].component_id,"Submit")+
+               dashboard.create_button(close_modal_input["enhance_close_button_id"].component_id,"Cancel"))
+
+    content_div = dashboard.create_div("modal_content", content, style={'textAlign': 'center'}, className='modal-content')
     modal_div = dashboard.create_div(open_modal_output["enhance_modal_id"].component_id, content_div, 
-                                     className='modal', style={"display": "none"},add=False)
+                                     className='modal', style={"display": "none"})
 
     return modal_div
 
