@@ -6,12 +6,14 @@ import base64
 import os
 import sys,os
 from collections import OrderedDict 
-
+from rdflib import URIRef
+from urllib.parse import quote as urlquote
 sys.path.insert(0,os.path.expanduser(os.path.join(os.getcwd(),"graph_visualisation")))
 
 from graph_visualisation.plotly.visual import PlotlyVisualiser
 from graph_visualisation.cytoscape.visual import CytoscapeVisualiser
 from sbol_enhancer.specified_enhancer.enhancer import SBOLEnhancer
+from sbol_enhancer.specified_enhancer.enhancment_modules.enhancement import Enhancement,ChoiceEnhancement
 
 
 options_color = "#f8f9fa"
@@ -67,14 +69,24 @@ remove_node_state = {"cyto_elements_id" : State(cyto_graph_id, 'elements'),
 open_modal_input = {"enhance_button_id" : Input("enhance_graph_button","n_clicks")}
 open_modal_output = {"enhance_modal_id" : Output("enhance_graph_modal","style"),
                      "enhance_modal_options" : Output("enhance_modal_options","children")}
+
 close_modal_input = {"enhance_close_button_id" : Input("enhance_graph_close_button","n_clicks")}
 close_modal_output = {"enhance_button_id" : Output("enhance_graph_button","n_clicks")}
 
 submit_modal_input = {"enhance_submit_button_id" : Input("enhance_submit_button_id","n_clicks")}
-submit_modal_output = {"file_upload_id" : Output("file_upload","contents")}
+submit_modal_output = {"file_upload_id" : Output("file_upload","contents"),
+                       "enhance_close_button_id" : Output("enhance_graph_close_button","n_clicks")}
+submit_modal_state = {"enhance_modal_options" : State("enhance_modal_options","children")}
+
+export_modal_open_inputs = {"export_open_button_id" : Input("export_open_button","n_clicks")}
+export_modal_open_output = {"export_modal_id" : Output("export_modal","style"),
+                            "export_modal_options_id" : Output("export_modal_options","children")}
+export_modal_close_input = {"export_close_button_id" : Input("export_close_button","n_clicks")}
+export_modal_close_output = {"export_open_button_id" : Output("export_open_button","n_clicks")}
 
 default_options = []
 def dash_runner(visualiser,enhancer,name = ""):
+    raise NotImplementedError("Start Working on enhancers...")
     dashboard = DashBoard(visualiser,enhancer)
 
     # Add Options
@@ -116,7 +128,9 @@ def dash_runner(visualiser,enhancer,name = ""):
     # Add Toolbox utility.
     toolbox_elements = dashboard.create_file_upload(load_inputs["file_upload_id"].component_id,"Upload Graph","graph_container")
     toolbox_elements = toolbox_elements + dashboard.create_button(open_modal_input["enhance_button_id"].component_id,"Enhance Graph")
-    toolbox_elements = toolbox_elements + _create_modal(dashboard)
+    toolbox_elements = toolbox_elements + _create_enhancer_modal(dashboard)
+    toolbox_elements = toolbox_elements + dashboard.create_button(export_modal_open_inputs["export_open_button_id"].component_id,"Export")
+    toolbox_elements = toolbox_elements + _create_export_modal(dashboard)
     graph_picker_options = [{"label" : k,"value":k} for k in graph_types.keys()]
     toolbox_elements = toolbox_elements + dashboard.create_dropdown(graph_type_inputs["graph_type_dropdown_id"].component_id,"Graph Type",options=graph_picker_options)
     toolbox_div = dashboard.create_div(not_modifier_identifiers["toolbox_id"],toolbox_elements)
@@ -145,9 +159,12 @@ def dash_runner(visualiser,enhancer,name = ""):
         return display_enhancer_modal(dashboard,n_clicks)
     def close_enhancer_modal_inner(n_clicks):
         return close_modal(n_clicks)
-    def submit_enhancer_inner(n_clicks):
-        return submit_enhancer(dashboard,n_clicks)
-
+    def submit_enhancer_inner(n_clicks,enhancer_tables):
+        return submit_enhancer(dashboard,n_clicks,enhancer_tables)
+    def display_export_modal_inner(n_clicks):
+        return display_export_modal(dashboard,n_clicks)
+    def close_export_modal_inner(n_clicks):
+        return close_modal(n_clicks)
 
     dashboard.add_callback(update_plotly_preset_inner,list(plotly_preset_inputs.values()),list(plotly_preset_outputs.values()),list(plotly_preset_state.values()))
     dashboard.add_callback(update_cyto_preset_inner,list(cyto_preset_inputs.values()),list(cyto_preset_outputs.values()),list(cyto_preset_state.values()))
@@ -160,7 +177,11 @@ def dash_runner(visualiser,enhancer,name = ""):
 
     dashboard.add_callback(display_enhancer_modal_inner,list(open_modal_input.values()),list(open_modal_output.values()))
     dashboard.add_callback(close_enhancer_modal_inner,list(close_modal_input.values()),list(close_modal_output.values()))
-    dashboard.add_callback(submit_enhancer_inner,list(submit_modal_input.values()),list(submit_modal_output.values()))
+    dashboard.add_callback(submit_enhancer_inner,list(submit_modal_input.values()),list(submit_modal_output.values()),list(submit_modal_state.values()))
+
+    dashboard.add_callback(display_export_modal_inner,list(export_modal_open_inputs.values()),list(export_modal_open_output.values()))
+    dashboard.add_callback(close_export_modal_inner,list(export_modal_close_input.values()),list(export_modal_close_output.values()))
+
     dashboard.run()
 
 
@@ -252,39 +273,44 @@ def update_cyto_graph(dashboard,*args):
 
     try:
         figure = dashboard.visualiser.build(show=False)
-        print(figure)
         cyto_utility = _generate_cyto_util_components(dashboard)
         return cyto_utility + [figure],False,["No Error"]
     except Exception as ex:
         return reverse_graph(dashboard, old_settings,ex)
 
 def load_graph(dashboard,contents,filename):
-    if filename is None or contents is None:
+    if filename is None and contents is None:
         raise dash.exceptions.PreventUpdate()
+
+    # When load comes from enhancer inputs are incorrect.
+    if contents is not None and filename is None:
+        filename = contents
+        content_string = dashboard.file_manager.read(filename)
     else:
         contents = contents[0]
         filename = filename[0]
         content_type, content_string = contents.split(',')
+
+    try:
         decoded = base64.b64decode(content_string)
         decoded = decoded.decode('utf-8')
-        if os.path.isfile(filename):
-            os.remove(filename)
-        f = open(filename,"a+")
-        for l in str(decoded).splitlines():
-            f.write(l + "\n")
-        f.close()
-
-        if isinstance(dashboard.visualiser,PlotlyVisualiser):
-            dashboard.visualiser = PlotlyVisualiser(filename)
-        elif isinstance(dashboard.visualiser,CytoscapeVisualiser):
-            dashboard.visualiser = CytoscapeVisualiser(filename)
-        dashboard.visualiser._graph.prune_graph()
-        dashboard.enhancer = SBOLEnhancer(filename)
-
-        graph_container,plotly_style,cyto_style = generate_graph_div(dashboard)
-        title = _beautify_filename(filename)
+    except UnicodeDecodeError:
+        decoded = content_string
+    if os.path.isfile(filename):
         os.remove(filename)
-        return title,graph_container
+    
+    dashboard.file_manager.write(filename,str(decoded).splitlines())
+
+    if isinstance(dashboard.visualiser,PlotlyVisualiser):
+        dashboard.visualiser = PlotlyVisualiser(filename)
+    elif isinstance(dashboard.visualiser,CytoscapeVisualiser):
+        dashboard.visualiser = CytoscapeVisualiser(filename)
+    dashboard.visualiser._graph.prune_graph()
+    dashboard.enhancer = SBOLEnhancer(filename)
+
+    graph_container,plotly_style,cyto_style = generate_graph_div(dashboard)
+    title = _beautify_filename(filename)
+    return title,graph_container
 
 def change_graph_type(dashboard,graph_type):
     if graph_type is None or isinstance(dashboard.visualiser,graph_types[graph_type]):
@@ -325,44 +351,106 @@ def remove_selected_nodes(_, elements, data):
 
 def display_enhancer_modal(dashboard,n):
     if n is not None and n > 0:
-        # Get Potential Enhancement here....
-        children = (dashboard.create_heading_1("enhancer_heading","Design Enhancement") +
-                   dashboard.create_line_break() + 
-                   dashboard.create_heading_3("enh_description","Tick boxes for Enhancement you would like to enable.") + 
-                   dashboard.create_line_break(number=3))
-
         dashboard.enhancer.get_enhancements()
+        table_header_static = dashboard.add_th("subject","Subject") + dashboard.add_th("description","Description")
+        
+        table_div_children = []
         for e in dashboard.enhancer.enhancers.values():
             if len(e.enhancements) == 0:
                 continue
-            children = children + (dashboard.create_heading_4(e.name,e.name) + 
-                                  dashboard.create_heading_6(e.description,e.description))
+            enable_all_id = e.name + "_enable_all"
+            enable_all_check = dashboard.create_checklist(e.name,None,[{"label" : "Enable All","value" : "True"}])
+            table_header_vals = table_header_static + dashboard.add_th(enable_all_id,["Enable"] + enable_all_check)
+            table_header = dashboard.add_tr(e.name,table_header_vals,add=False)
+            table_div_children = table_div_children + (dashboard.create_heading_4(e.name,e.name) + 
+                                                       dashboard.create_heading_6(e.description,e.description))
 
-            columns = [
-                {"name" : "Subject", "id" : "subject"},
-                {"name" : "Description", "id" : "description"},
-                {"name" : "Enable", "id" : "enable"},
-            ]
-            data = []
+            table_contents = table_header
             for name,enhancement in e.enhancements.items():
-                tickbox = dashboard.create_checklist("T","Enable",[{"label" : "Enable","Value" : "True"}])
-                data.append({"subject" : enhancement.subject ,"description" : enhancement.enhancement_description, "enable" : tickbox})
-                print(type(enhancement))
+                if isinstance(enhancement,ChoiceEnhancement):
+                    user_input = dashboard.create_dropdown("input","None",[{"label" : dashboard.enhancer.name_generator.get_name(v),"value" : v} for v in enhancement.choices])
+                elif isinstance(enhancement,Enhancement):
+                    user_input = dashboard.create_checklist("input",None,[{"label" : "","value" : "True"}])
+                else:
+                    raise ValueError(f'{enhancement} is of unknown enhancment type.')
 
-
-
-            children = children + dashboard.create_table("God knows",columns,data) + dashboard.create_line_break(number=2)
-            
-        return [{"display": "block"},children]
+                table_row_vals = (dashboard.add_td(name,enhancement.subject) + 
+                                 dashboard.add_td("description",enhancement.enhancement_description) + 
+                                 dashboard.add_td("is_enabled",user_input))
+                identifier = enhancement.subject + "_row"
+                table_row = dashboard.add_tr(identifier,table_row_vals)
+                table_contents = table_contents + table_row
+            table_div_children = table_div_children + dashboard.add_table("enhancer_table",table_contents) + dashboard.create_line_break(number=2)
+        table_div = dashboard.create_div(submit_modal_state["enhance_modal_options"].component_id,table_div_children)            
+        return [{"display": "block"},table_div]
     return [{"display": "none"},[]]
 
 def close_modal(n):
     return [0]
 
-def submit_enhancer(dashboard,n):
+def submit_enhancer(dashboard,n,tables):
+    '''
+    Unusual code - Simply searching through the tables in 
+                   json format to find what we are interested in.
+    '''
     if n is not None and n > 0:
-        return [dashboard.enhancer.save()]
+        for element in tables:
+            element_type = element["type"]
+            if element_type != "Table":
+                continue
+            element = element["props"]["children"]
+            enhancer_name = element[0]["props"]["id"]
+            enhancer = dashboard.enhancer.find_enhancer(enhancer_name)
+
+            enable_all = element[0]["props"]["children"][2]["props"]["children"][1]["props"]
+            if "value" in enable_all and len(enable_all["value"]) > 0 and enable_all["value"][0] == "True":
+                for enhancment in enhancer.enhancements.values():
+                    enhancment.enable(True)
+
+            for e in element:
+                e = e["props"]["children"]
+                if e[0]["type"] != "Td":
+                    continue
+                subject = URIRef(e[0]["props"]["id"])
+                value = e[2]["props"]
+                row_type = value["children"][0]["type"]
+                if "n_clicks" not in value.keys():
+                    continue
+                if "value" not in value["children"][0]["props"].keys():
+                    continue
+                value = value["children"][0]["props"]["value"]
+                if row_type == "Checklist":
+                    if len(value) == 0:
+                        continue
+                    value = value[0]
+                    if value != "True":
+                        continue
+                    enhancer.enable(subject)
+                if row_type == "Dropdown":
+                    if value is None or value == "None":
+                        continue
+                    value = URIRef(value)
+                    enhancer.enable(subject,value)
+
+        dashboard.enhancer.apply_enhancements()
+        enhanced_filename = dashboard.file_manager.generate_filename(dashboard.enhancer.filename)
+        output_fn = dashboard.enhancer.save(enhanced_filename)
+        return [output_fn,0]
     raise dash.exceptions.PreventUpdate()
+
+def display_export_modal(dashboard,n):
+    if n is not None and n > 0:
+        table_div = []      
+        directory = dashboard.file_manager.dir
+        if os.path.isdir(directory):
+            for filename in os.listdir(directory):
+                if filename.endswith(".xml") or filename.endswith(".sbol"): 
+                    location = "/" + "download" + "/{}".format(urlquote(filename))
+                    table_div = table_div + dashboard.create_hyperlink(filename, location) + dashboard.create_line_break()
+                else:
+                    continue
+        return [{"display": "block"},table_div]
+    return [{"display": "none"},[]]
 
 def reverse_graph(dashboard,old_settings,error_str = ""):
     for setting in old_settings:
@@ -570,19 +658,41 @@ def _generate_inputs_outputs(identifiers):
     return preset_identifiers,identifiers,outputs,states
 
 
-def _create_modal(dashboard):
-    content = (dashboard.create_div(open_modal_output["enhance_modal_options"].component_id,[]) + 
+def _create_enhancer_modal(dashboard):
+    headings = (dashboard.create_heading_1("enhancer_heading","Design Enhancement") +
+                dashboard.create_line_break() + 
+                dashboard.create_heading_3("enh_description","Tick boxes for Enhancement you would like to enable.") + 
+                dashboard.create_line_break(number=3))
+
+    content = (dashboard.create_div("enhance_heading_div",headings) + 
+               dashboard.create_div(open_modal_output["enhance_modal_options"].component_id,[]) + 
                dashboard.create_line_break() + 
-               dashboard.create_button(submit_modal_input["enhance_submit_button_id"].component_id,"Submit")+
+               dashboard.create_button(submit_modal_input["enhance_submit_button_id"].component_id,"Submit") +
                dashboard.create_button(close_modal_input["enhance_close_button_id"].component_id,"Cancel"))
 
-    content_div = dashboard.create_div("modal_content", content, style={'textAlign': 'center'}, className='modal-content')
+    content_div = dashboard.create_div("ehance_modal_content", content, style={'textAlign': 'center'}, className='modal-content')
     modal_div = dashboard.create_div(open_modal_output["enhance_modal_id"].component_id, content_div, 
                                      className='modal', style={"display": "none"})
 
     return modal_div
 
 
+def _create_export_modal(dashboard):
+    headings = (dashboard.create_heading_1("export_heading","Export") +
+                dashboard.create_line_break() + 
+                dashboard.create_heading_3("export_desc","Click to download file.") + 
+                dashboard.create_line_break(number=3))
+
+    content = (dashboard.create_div("export_heading_div",headings) + 
+               dashboard.create_div(export_modal_open_output["export_modal_options_id"].component_id,[]) + 
+               dashboard.create_line_break() + 
+               dashboard.create_button(export_modal_close_input["export_close_button_id"].component_id,"Close"))
+
+    content_div = dashboard.create_div("export_modal_content", content, style={'textAlign': 'center'}, className='modal-content')
+    modal_div = dashboard.create_div(export_modal_open_output["export_modal_id"].component_id, content_div, 
+                                     className='modal', style={"display": "none"})
+
+    return modal_div
     
     
     

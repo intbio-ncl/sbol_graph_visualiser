@@ -6,10 +6,18 @@ import dash_daq as daq
 from dash.dependencies import Input, Output
 import dash_bio as dashbio
 import dash_table
+from flask import Flask,send_from_directory
+import os
+
+from util.file_manager import FileManager
+
+file_store_dir = os.path.join(os.getcwd(),"graph_store")
+
+server = Flask(__name__)
+app = dash.Dash(server=server,suppress_callback_exceptions=True)
 
 class DashBoard:
     def __init__(self,graph_visualiser,enhancer):
-        app = dash.Dash(__name__,suppress_callback_exceptions=True)
         self.app = app
         self.visualiser = graph_visualiser
         self.enhancer = enhancer
@@ -17,6 +25,7 @@ class DashBoard:
         self.children = []
         self.parameters_calls = []
         self.callbacks = {}
+        self.file_manager = FileManager(file_store_dir)
 
     def run(self):
         self.app.layout = html.Div(style=self.style,children=self.children)
@@ -25,8 +34,6 @@ class DashBoard:
                 self.app.callback(v["outputs"],v["inputs"])(k)
             else:
                 self.app.callback(v["outputs"],v["inputs"],v["states"])(k)
-                
-
         self.app.run_server(debug=True)
 
     def add_callback(self,function,inputs,outputs,states=None):
@@ -130,12 +137,19 @@ class DashBoard:
             return [label,radio]
 
     def create_checklist(self,identifier,name,options,add=False,**kwargs):
-        label = html.Label(name)
         checklist = dcc.Checklist(id=identifier,options=options,**kwargs)
-        if add:
-            return self._create_element(label,checklist)
+        if name is not None:
+            label = html.Label(name)
+            if add:
+                return self._create_element(label,checklist)
+            else:
+                return [label,checklist]
         else:
-            return [label,checklist]
+            if add:
+                return self._create_element(checklist)
+            else:
+                return [checklist]
+
 
     def create_slider(self,identifier,name,min_val, max_val, default_val = None, step=None, marks = None, add=False,**kwargs):
         label = html.Label(name)
@@ -165,6 +179,34 @@ class DashBoard:
             return self._create_element(html.Hr())
         else:
             return [html.Hr()]
+
+    def add_table(self,identifier,children,add=False,**kwargs):
+        table = html.Table(id=identifier,children=children,**kwargs)
+        if add:
+            return self._create_element(table)
+        else:
+            return [table]
+
+    def add_tr(self,identifier,children,add=False,**kwargs):
+        tr = html.Tr(id=identifier,children=children,**kwargs)
+        if add:
+            return self._create_element(tr)
+        else:
+            return [tr]
+
+    def add_th(self,identifier,children,add=False,**kwargs):
+        th = html.Th(id=identifier,children=children,**kwargs)
+        if add:
+            return self._create_element(th)
+        else:
+            return [th]
+
+    def add_td(self,identifier,children,add=False,**kwargs):
+        th = html.Td(id=identifier,children=children,**kwargs)
+        if add:
+            return self._create_element(th)
+        else:
+            return [th]
 
     def create_line_break(self,number=1,add=False):
         if add:
@@ -229,19 +271,18 @@ class DashBoard:
         else:
             return [sequence_box]
 
-
-    def create_table(self,identifier,columns,data,add=False,**kwargs):
+    def create_complex_table(self,identifier,columns,data,add=False,**kwargs):
         table = dash_table.DataTable(
                 id=identifier,
                 columns=columns,
                 data=data,
-                #editable=True,
-                #filter_action="native",
-                #sort_action="native",
-                #sort_mode="multi",
-                #column_selectable="single",
-                #row_selectable="multi",
-                #row_deletable=True,
+                editable=True,
+                filter_action="native",
+                sort_action="native",
+                sort_mode="multi",
+                column_selectable="single",
+                row_selectable="multi",
+                row_deletable=True,
                 selected_columns=[],
                 selected_rows=[],
                 page_action="native",
@@ -253,3 +294,17 @@ class DashBoard:
             return self._create_element(table)
         else:
             return [table]
+
+    def create_hyperlink(self,identifier,href,add=False):
+        a_tag = html.A(identifier, href=href)
+        if add:
+            return self._create_element(a_tag)
+        else:
+            return [a_tag]
+
+
+
+@server.route("/download/<path:path>")
+def download(path):
+    """Serve a file from the upload directory."""
+    return send_from_directory(file_store_dir, path, as_attachment=True)
