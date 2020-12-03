@@ -86,7 +86,6 @@ export_modal_close_output = {"export_open_button_id" : Output("export_open_butto
 
 default_options = []
 def dash_runner(visualiser,enhancer,name = ""):
-    raise NotImplementedError("Start Working on enhancers...")
     dashboard = DashBoard(visualiser,enhancer)
 
     # Add Options
