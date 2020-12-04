@@ -354,32 +354,33 @@ def display_enhancer_modal(dashboard,n):
         table_header_static = dashboard.add_th("subject","Subject") + dashboard.add_th("description","Description")
         
         table_div_children = []
-        for e in dashboard.enhancer.enhancers.values():
-            if len(e.enhancements) == 0:
-                continue
-            enable_all_id = e.name + "_enable_all"
-            enable_all_check = dashboard.create_checklist(e.name,None,[{"label" : "Enable All","value" : "True"}])
-            table_header_vals = table_header_static + dashboard.add_th(enable_all_id,["Enable"] + enable_all_check)
-            table_header = dashboard.add_tr(e.name,table_header_vals,add=False)
-            table_div_children = table_div_children + (dashboard.create_heading_4(e.name,e.name) + 
-                                                       dashboard.create_heading_6(e.description,e.description))
+        for enhancers in dashboard.enhancer._all_enhancers:
+            for e in enhancers.values():
+                if len(e.enhancements) == 0:
+                    continue
+                enable_all_id = e.name + "_enable_all"
+                enable_all_check = dashboard.create_checklist(e.name,None,[{"label" : "Enable All","value" : "True"}])
+                table_header_vals = table_header_static + dashboard.add_th(enable_all_id,["Enable"] + enable_all_check)
+                table_header = dashboard.add_tr(e.name,table_header_vals,add=False)
+                table_div_children = table_div_children + (dashboard.create_heading_4(e.name,e.name) + 
+                                                        dashboard.create_heading_6(e.description,e.description))
 
-            table_contents = table_header
-            for name,enhancement in e.enhancements.items():
-                if isinstance(enhancement,ChoiceEnhancement):
-                    user_input = dashboard.create_dropdown("input","None",[{"label" : dashboard.enhancer.name_generator.get_name(v),"value" : v} for v in enhancement.choices])
-                elif isinstance(enhancement,Enhancement):
-                    user_input = dashboard.create_checklist("input",None,[{"label" : "","value" : "True"}])
-                else:
-                    raise ValueError(f'{enhancement} is of unknown enhancment type.')
+                table_contents = table_header
+                for name,enhancement in e.enhancements.items():
+                    if isinstance(enhancement,ChoiceEnhancement):
+                        user_input = dashboard.create_dropdown("input","None",[{"label" : dashboard.enhancer.name_generator.get_name(v),"value" : v} for v in enhancement.choices])
+                    elif isinstance(enhancement,Enhancement):
+                        user_input = dashboard.create_checklist("input",None,[{"label" : "","value" : "True"}])
+                    else:
+                        raise ValueError(f'{enhancement} is of unknown enhancment type.')
 
-                table_row_vals = (dashboard.add_td(name,enhancement.subject) + 
-                                 dashboard.add_td("description",enhancement.enhancement_description) + 
-                                 dashboard.add_td("is_enabled",user_input))
-                identifier = enhancement.subject + "_row"
-                table_row = dashboard.add_tr(identifier,table_row_vals)
-                table_contents = table_contents + table_row
-            table_div_children = table_div_children + dashboard.add_table("enhancer_table",table_contents) + dashboard.create_line_break(number=2)
+                    table_row_vals = (dashboard.add_td(name,enhancement.subject) + 
+                                    dashboard.add_td("description",enhancement.enhancement_description) + 
+                                    dashboard.add_td("is_enabled",user_input))
+                    identifier = enhancement.subject + "_row"
+                    table_row = dashboard.add_tr(identifier,table_row_vals)
+                    table_contents = table_contents + table_row
+                table_div_children = table_div_children + dashboard.add_table("enhancer_table",table_contents) + dashboard.create_line_break(number=2)
         table_div = dashboard.create_div(submit_modal_state["enhance_modal_options"].component_id,table_div_children)            
         return [{"display": "block"},table_div]
     return [{"display": "none"},[]]
