@@ -12,9 +12,10 @@ sys.path.insert(0,os.path.expanduser(os.path.join(os.getcwd(),"graph_visualisati
 
 from graph_visualisation.plotly.visual import PlotlyVisualiser
 from graph_visualisation.cytoscape.visual import CytoscapeVisualiser
-from sbol_enhancer.specified_enhancer.enhancer import SBOLEnhancer
-from sbol_enhancer.specified_enhancer.enhancment_modules.enhancement import Enhancement,ChoiceEnhancement
 
+from sbol_enhancer.enhancer import SBOLEnhancer
+from sbol_enhancer.modules.enhancement.choice_enhancement import ChoiceEnhancement
+from sbol_enhancer.modules.enhancement.enhancement import Enhancement
 
 options_color = "#f8f9fa"
 plotly_id_prefix = "plotly"
@@ -70,12 +71,12 @@ open_modal_input = {"enhance_button_id" : Input("enhance_graph_button","n_clicks
 open_modal_output = {"enhance_modal_id" : Output("enhance_graph_modal","style"),
                      "enhance_modal_options" : Output("enhance_modal_options","children")}
 
-close_modal_input = {"enhance_close_button_id" : Input("enhance_graph_close_button","n_clicks")}
-close_modal_output = {"enhance_button_id" : Output("enhance_graph_button","n_clicks")}
+submit_modal_input = {"enhance_submit_button_id" : Input("enhance_submit_button_id","n_clicks"),
+                      "enhance_close_button_id" : Input("enhance_graph_close_button","n_clicks")}
 
-submit_modal_input = {"enhance_submit_button_id" : Input("enhance_submit_button_id","n_clicks")}
 submit_modal_output = {"file_upload_id" : Output("file_upload","contents"),
-                       "enhance_close_button_id" : Output("enhance_graph_close_button","n_clicks")}
+                       "enhance_button_id" : Output("enhance_graph_button","n_clicks")}
+
 submit_modal_state = {"enhance_modal_options" : State("enhance_modal_options","children")}
 
 export_modal_open_inputs = {"export_open_button_id" : Input("export_open_button","n_clicks")}
@@ -156,10 +157,8 @@ def dash_runner(visualiser,enhancer,name = ""):
         return remove_selected_nodes(_,node_id,data)
     def display_enhancer_modal_inner(n_clicks):
         return display_enhancer_modal(dashboard,n_clicks)
-    def close_enhancer_modal_inner(n_clicks):
-        return close_modal(n_clicks)
-    def submit_enhancer_inner(n_clicks,enhancer_tables):
-        return submit_enhancer(dashboard,n_clicks,enhancer_tables)
+    def submit_enhancer_inner(n_submit,n_close,enhancer_tables):
+        return submit_enhancer(dashboard,n_submit,n_close,enhancer_tables)
     def display_export_modal_inner(n_clicks):
         return display_export_modal(dashboard,n_clicks)
     def close_export_modal_inner(n_clicks):
@@ -175,7 +174,6 @@ def dash_runner(visualiser,enhancer,name = ""):
     dashboard.add_callback(remove_node_inner,list(remove_node_inputs.values()),list(remove_node_outputs.values()),list(remove_node_state.values()))
 
     dashboard.add_callback(display_enhancer_modal_inner,list(open_modal_input.values()),list(open_modal_output.values()))
-    dashboard.add_callback(close_enhancer_modal_inner,list(close_modal_input.values()),list(close_modal_output.values()))
     dashboard.add_callback(submit_enhancer_inner,list(submit_modal_input.values()),list(submit_modal_output.values()),list(submit_modal_state.values()))
 
     dashboard.add_callback(display_export_modal_inner,list(export_modal_open_inputs.values()),list(export_modal_open_output.values()))
@@ -350,37 +348,42 @@ def remove_selected_nodes(_, elements, data):
 
 def display_enhancer_modal(dashboard,n):
     if n is not None and n > 0:
-        dashboard.enhancer.get_enhancements()
-        table_header_static = dashboard.add_th("subject","Subject") + dashboard.add_th("description","Description")
+        stage_num_str = f'Stage Number: {dashboard.enhancer.get_stage_num()}'
+        table_div_children = dashboard.create_heading_3("stage_num",stage_num_str)
+        stage_enhancers = dashboard.enhancer.get_current_stage()
         
-        table_div_children = []
-        for enhancers in dashboard.enhancer._all_enhancers:
-            for e in enhancers.values():
-                if len(e.enhancements) == 0:
-                    continue
-                enable_all_id = e.name + "_enable_all"
-                enable_all_check = dashboard.create_checklist(e.name,None,[{"label" : "Enable All","value" : "True"}])
-                table_header_vals = table_header_static + dashboard.add_th(enable_all_id,["Enable"] + enable_all_check)
-                table_header = dashboard.add_tr(e.name,table_header_vals,add=False)
-                table_div_children = table_div_children + (dashboard.create_heading_4(e.name,e.name) + 
-                                                        dashboard.create_heading_6(e.description,e.description))
+        table_header_static = dashboard.add_th("subject","Subject") + dashboard.add_th("description","Description")
+        for name,enhancer in stage_enhancers.items():
+            enhancer.get()
+            if len(enhancer.enhancements) == 0:
+                continue
+            enable_all_id = enhancer.name + "_enable_all"
+            enable_all_check = dashboard.create_checklist(enhancer.name,None,[{"label" : "Enable All","value" : "True"}])
+            table_header_vals = table_header_static + dashboard.add_th(enable_all_id,["Enable"] + enable_all_check)
+            table_header = dashboard.add_tr(enhancer.name,table_header_vals,add=False)
+            table_div_children = table_div_children + (dashboard.create_heading_4(enhancer.name,enhancer.name) + 
+                                                    dashboard.create_heading_6(enhancer.description,enhancer.description))
 
-                table_contents = table_header
-                for name,enhancement in e.enhancements.items():
-                    if isinstance(enhancement,ChoiceEnhancement):
-                        user_input = dashboard.create_dropdown("input","None",[{"label" : dashboard.enhancer.name_generator.get_name(v),"value" : v} for v in enhancement.choices])
-                    elif isinstance(enhancement,Enhancement):
-                        user_input = dashboard.create_checklist("input",None,[{"label" : "","value" : "True"}])
-                    else:
-                        raise ValueError(f'{enhancement} is of unknown enhancment type.')
+            table_contents = table_header
+            for name,enhancement in enhancer.enhancements.items():
+                if isinstance(enhancement,ChoiceEnhancement):
+                    user_input = dashboard.create_dropdown("input","None",[{"label" : dashboard.enhancer.name_generator.get_name(v),"value" : v} for v in enhancement.choices])
+                elif isinstance(enhancement,Enhancement):
+                    user_input = dashboard.create_checklist("input",None,[{"label" : "","value" : "True"}])
+                else:
+                    raise ValueError(f'{enhancement} is of unknown enhancment type.')
 
-                    table_row_vals = (dashboard.add_td(name,enhancement.subject) + 
-                                    dashboard.add_td("description",enhancement.enhancement_description) + 
-                                    dashboard.add_td("is_enabled",user_input))
-                    identifier = enhancement.subject + "_row"
-                    table_row = dashboard.add_tr(identifier,table_row_vals)
-                    table_contents = table_contents + table_row
-                table_div_children = table_div_children + dashboard.add_table("enhancer_table",table_contents) + dashboard.create_line_break(number=2)
+                table_row_vals = (dashboard.add_td(name,enhancement.subject) + 
+                                dashboard.add_td("description",enhancement.enhancement_description) + 
+                                dashboard.add_td("is_enabled",user_input))
+                identifier = enhancement.subject + "_row"
+                table_row = dashboard.add_tr(identifier,table_row_vals)
+                table_contents = table_contents + table_row
+            table_div_children = table_div_children + dashboard.add_table("enhancer_table",table_contents) + dashboard.create_line_break(number=2)
+        
+        if len(table_div_children) <= 1:
+            table_div_children = table_div_children + dashboard.create_heading_5("stage_num","No Enhancements found in this stage.")
+
         table_div = dashboard.create_div(submit_modal_state["enhance_modal_options"].component_id,table_div_children)            
         return [{"display": "block"},table_div]
     return [{"display": "none"},[]]
@@ -388,12 +391,21 @@ def display_enhancer_modal(dashboard,n):
 def close_modal(n):
     return [0]
 
-def submit_enhancer(dashboard,n,tables):
+def submit_enhancer(dashboard,submit_n,close_n,tables):
     '''
     Unusual code - Simply searching through the tables in 
                    json format to find what we are interested in.
     '''
-    if n is not None and n > 0:
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise dash.exceptions.PreventUpdate()
+
+    button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    if button_id == submit_modal_input["enhance_close_button_id"].component_id:
+        dashboard.enhancer.reset()
+        return [None,0]
+
+    if button_id == submit_modal_input["enhance_submit_button_id"].component_id:
         for element in tables:
             element_type = element["type"]
             if element_type != "Table":
@@ -431,11 +443,14 @@ def submit_enhancer(dashboard,n,tables):
                         continue
                     value = URIRef(value)
                     enhancer.enable(subject,value)
+            enhancer.apply()
 
-        dashboard.enhancer.apply_enhancements()
-        enhanced_filename = dashboard.file_manager.generate_filename(dashboard.enhancer.filename)
-        output_fn = dashboard.enhancer.save(enhanced_filename)
-        return [output_fn,0]
+        if dashboard.enhancer.has_next_stage():
+            return [None,1]
+        else:
+            enhanced_filename = dashboard.file_manager.generate_filename(dashboard.enhancer.filename)
+            output_fn = dashboard.enhancer.save(enhanced_filename)
+            return [output_fn,0]
     raise dash.exceptions.PreventUpdate()
 
 def display_export_modal(dashboard,n):
@@ -658,6 +673,9 @@ def _generate_inputs_outputs(identifiers):
     return preset_identifiers,identifiers,outputs,states
 
 
+def _create_enhancer_next_modal(dashbaord):
+    pass
+
 def _create_enhancer_modal(dashboard):
     headings = (dashboard.create_heading_1("enhancer_heading","Design Enhancement") +
                 dashboard.create_line_break() + 
@@ -668,12 +686,11 @@ def _create_enhancer_modal(dashboard):
                dashboard.create_div(open_modal_output["enhance_modal_options"].component_id,[]) + 
                dashboard.create_line_break() + 
                dashboard.create_button(submit_modal_input["enhance_submit_button_id"].component_id,"Submit") +
-               dashboard.create_button(close_modal_input["enhance_close_button_id"].component_id,"Cancel"))
+               dashboard.create_button(submit_modal_input["enhance_close_button_id"].component_id,"Cancel"))
 
     content_div = dashboard.create_div("ehance_modal_content", content, style={'textAlign': 'center'}, className='modal-content')
     modal_div = dashboard.create_div(open_modal_output["enhance_modal_id"].component_id, content_div, 
                                      className='modal', style={"display": "none"})
-
     return modal_div
 
 

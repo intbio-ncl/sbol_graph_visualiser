@@ -1,5 +1,8 @@
 import argparse
 import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join("sbol_enhancer")))
 from graph_builder.networkx_wrapper import NetworkXGraphWrapper
 
 from graph_visualisation.networkx.visual import NetworkXGraphBuilder
@@ -12,7 +15,7 @@ from graph_visualisation.networkx.run import nwx_runner
 from graph_visualisation.plotly.run import plotly_runner
 from graph_dashboards.dash.run import dash_runner
 
-from sbol_enhancer.specified_enhancer.enhancer import SBOLEnhancer
+from sbol_enhancer.enhancer import SBOLEnhancer
 
 visual_mapper = {
                 "networkx" : {"builder" : NetworkXGraphWrapper,"visual" : {"networkx" : NetworkXGraphBuilder}, "run" : nwx_runner},
