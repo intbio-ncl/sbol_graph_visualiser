@@ -26,7 +26,7 @@ visual_mapper = {
 
 def process_input(filename,visualiser,graph_type):
     graph_builder = visual_mapper[visualiser]["builder"](filename,prune=True)
-    enhancer = SBOLEnhancer(filename)
+    enhancer = SBOLEnhancer(filename,staged=True)
     graph_visualiser = visual_mapper[visualiser]["visual"][graph_type](graph_builder)
     graph_title = filename.split(os.path.sep)[-1].split(".")[0]
     visual_mapper[visualiser]["run"](graph_visualiser,enhancer,graph_title)

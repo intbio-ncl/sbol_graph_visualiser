@@ -13,9 +13,9 @@ sys.path.insert(0,os.path.expanduser(os.path.join(os.getcwd(),"graph_visualisati
 from graph_visualisation.plotly.visual import PlotlyVisualiser
 from graph_visualisation.cytoscape.visual import CytoscapeVisualiser
 
-from sbol_enhancer.enhancer import SBOLEnhancer
-from sbol_enhancer.modules.enhancement.choice_enhancement import ChoiceEnhancement
-from sbol_enhancer.modules.enhancement.enhancement import Enhancement
+from enhancer import SBOLEnhancer
+from modules.enhancement.choice_enhancement import ChoiceEnhancement
+from modules.enhancement.enhancement import Enhancement
 
 options_color = "#f8f9fa"
 plotly_id_prefix = "plotly"
@@ -287,7 +287,6 @@ def load_graph(dashboard,contents,filename):
         contents = contents[0]
         filename = filename[0]
         content_type, content_string = contents.split(',')
-
     try:
         decoded = base64.b64decode(content_string)
         decoded = decoded.decode('utf-8')
@@ -303,7 +302,7 @@ def load_graph(dashboard,contents,filename):
     elif isinstance(dashboard.visualiser,CytoscapeVisualiser):
         dashboard.visualiser = CytoscapeVisualiser(filename)
     dashboard.visualiser._graph.prune_graph()
-    dashboard.enhancer = SBOLEnhancer(filename)
+    dashboard.enhancer = SBOLEnhancer(filename,staged=True)
 
     graph_container,plotly_style,cyto_style = generate_graph_div(dashboard)
     title = _beautify_filename(filename)
@@ -348,12 +347,12 @@ def remove_selected_nodes(_, elements, data):
 
 def display_enhancer_modal(dashboard,n):
     if n is not None and n > 0:
-        stage_num_str = f'Stage Number: {dashboard.enhancer.get_stage_num()}'
+        enhancer_stage = next(dashboard.enhancer)
+        stage_num_str = f'Stage Number: {enhancer_stage.number}'
         table_div_children = dashboard.create_heading_3("stage_num",stage_num_str)
-        stage_enhancers = dashboard.enhancer.get_current_stage()
         
         table_header_static = dashboard.add_th("subject","Subject") + dashboard.add_th("description","Description")
-        for name,enhancer in stage_enhancers.items():
+        for enhancer in enhancer_stage:
             enhancer.get()
             if len(enhancer.enhancements) == 0:
                 continue
@@ -361,11 +360,12 @@ def display_enhancer_modal(dashboard,n):
             enable_all_check = dashboard.create_checklist(enhancer.name,None,[{"label" : "Enable All","value" : "True"}])
             table_header_vals = table_header_static + dashboard.add_th(enable_all_id,["Enable"] + enable_all_check)
             table_header = dashboard.add_tr(enhancer.name,table_header_vals,add=False)
-            table_div_children = table_div_children + (dashboard.create_heading_4(enhancer.name,enhancer.name) + 
-                                                    dashboard.create_heading_6(enhancer.description,enhancer.description))
+            table_div_children = (table_div_children + 
+                                 dashboard.create_heading_4(enhancer.name,enhancer.name) + 
+                                 dashboard.create_heading_6(enhancer.description,enhancer.description))
 
             table_contents = table_header
-            for name,enhancement in enhancer.enhancements.items():
+            for name,enhancement in enhancer.items():
                 if isinstance(enhancement,ChoiceEnhancement):
                     user_input = dashboard.create_dropdown("input","None",[{"label" : dashboard.enhancer.name_generator.get_name(v),"value" : v} for v in enhancement.choices])
                 elif isinstance(enhancement,Enhancement):
@@ -373,7 +373,7 @@ def display_enhancer_modal(dashboard,n):
                 else:
                     raise ValueError(f'{enhancement} is of unknown enhancment type.')
 
-                table_row_vals = (dashboard.add_td(name,enhancement.subject) + 
+                table_row_vals = (dashboard.add_td(enhancer.name,enhancement.subject) + 
                                 dashboard.add_td("description",enhancement.enhancement_description) + 
                                 dashboard.add_td("is_enabled",user_input))
                 identifier = enhancement.subject + "_row"
@@ -412,7 +412,7 @@ def submit_enhancer(dashboard,submit_n,close_n,tables):
                 continue
             element = element["props"]["children"]
             enhancer_name = element[0]["props"]["id"]
-            enhancer = dashboard.enhancer.find_enhancer(enhancer_name)
+            enhancer = dashboard.enhancer.get_enhancer(enhancer_name)
 
             enable_all = element[0]["props"]["children"][2]["props"]["children"][1]["props"]
             if "value" in enable_all and len(enable_all["value"]) > 0 and enable_all["value"][0] == "True":
@@ -445,12 +445,14 @@ def submit_enhancer(dashboard,submit_n,close_n,tables):
                     enhancer.enable(subject,value)
             enhancer.apply()
 
-        if dashboard.enhancer.has_next_stage():
+        if dashboard.enhancer.has_next():
             return [None,1]
         else:
             enhanced_filename = dashboard.file_manager.generate_filename(dashboard.enhancer.filename)
             output_fn = dashboard.enhancer.save(enhanced_filename)
             return [output_fn,0]
+
+            
     raise dash.exceptions.PreventUpdate()
 
 def display_export_modal(dashboard,n):
