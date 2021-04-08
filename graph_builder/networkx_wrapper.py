@@ -496,18 +496,25 @@ class NetworkXGraphWrapper:
                     participant1_type = self.retrieve_node(participant1[1],identifiers.predicates.role)
                     interaction_type = self.retrieve_node(interaction[1],identifiers.predicates.type)
                     for participant2 in participants:
-                        if participant1 == participant2 or participant1[2] in done_list or participant2[2] in done_list:
+                        if participant1 == participant2:
                             continue
-                        
-                        cd2 = self._get_cd_from_part(participant2[1])
-                        
                         participant2_type = self.retrieve_node(participant2[1],identifiers.predicates.role)
+                        if not self._valid_participant_types(participant1_type,participant2_type):
+                            continue
+                        cd2 = self._get_cd_from_part(participant2[1])
+
                         interaction_edges = interaction_edges + self._get_in_out_participants(cd1,cd2,participant1_type,participant2_type,interaction_type)
                         done_list.append(participant1[2])
 
         interaction_graph = self._sub_graph(interaction_edges)
         return interaction_graph
     
+    def _valid_participant_types(self,p1,p2):
+        input_participants = [identifiers.external.participant_reactant]
+        if p1 in input_participants and p2 in input_participants:
+            return False
+        return True
+        
     def produce_protein_protein_interaction_graph(self):
         ppi_edges = []
         node_attrs = {}
