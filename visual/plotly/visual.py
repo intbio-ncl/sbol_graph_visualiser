@@ -1,13 +1,11 @@
 import sys,os
 import plotly.graph_objects as go
 import networkx as nx
-from graph_builder.networkx_wrapper import NetworkXGraphWrapper
 
-sys.path.insert(0,os.path.expanduser(os.path.join(os.getcwd(),"util")))
 from rdflib import URIRef,Literal
-from sbol_rdflib_identifiers import identifiers
-from color_util import SBOLTypeColors,SBOLPredicateColors,calculate_next_color,calculate_role_color
-from graph_visualisation.abstract_visualiser import AbstractVisualiser
+from util.sbol_identifiers import identifiers
+from util.color_util import calculate_next_color,calculate_role_color
+from visual.abstract_visualiser import AbstractVisualiser
 
 
 class PlotlyVisualiser(AbstractVisualiser):

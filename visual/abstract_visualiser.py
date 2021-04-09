@@ -1,23 +1,25 @@
 import sys,os
 import plotly.graph_objects as go
 import networkx as nx
-from graph_builder.networkx_wrapper import NetworkXGraphWrapper
+from builder.builder import GraphBuilder
 
-sys.path.insert(0,os.path.expanduser(os.path.join(os.getcwd(),"util")))
 from rdflib import URIRef,Literal
-from sbol_rdflib_identifiers import identifiers
-from color_util import SBOLTypeColors,SBOLPredicateColors,calculate_next_color,calculate_role_color
+from util.sbol_identifiers import identifiers
 
 
 class AbstractVisualiser:
     def __init__(self, graph = None):
-        if isinstance(graph,NetworkXGraphWrapper):
+        if graph is None:
+            self._graph = None
+        elif isinstance(graph,GraphBuilder):
             self._graph = graph
+            self.graph_view = self._graph.graph
         else:
-            self._graph = NetworkXGraphWrapper(graph)
+            self._graph = GraphBuilder(graph)
+            self.graph_view = self._graph.graph
 
         self.mode = self.set_network_mode
-        self.graph_view = self._graph
+        
         self.layout = self.set_spring_layout
         self.pos = []
         
@@ -35,9 +37,6 @@ class AbstractVisualiser:
         return functions
 
     def set_interaction_preset(self):
-        '''
-        Master Function to provide insight into Interactions between components.
-        '''
         sub_functions = [
             self.set_network_mode,
             self.set_interaction_view,
@@ -54,33 +53,7 @@ class AbstractVisualiser:
         ]
         return self._set_preset(sub_functions)
 
-    def set_parts_preset(self):
-        '''
-        Master Function to provide insight into heiraachy of components.
-        '''
-        sub_functions = [
-            self.set_network_mode,
-            self.set_parts_view,
-            self.add_standard_edge_color,
-            self.add_node_name_labels
-        ]
-        return self._set_preset(sub_functions)
-
-    def set_parent_preset(self):
-        '''
-        Master Function to provide insight into parent-child relationship between sbol elements.
-        '''
-        sub_functions = [
-            self.set_tree_mode,
-            self.set_parent_view,
-            self.add_node_name_labels
-        ]
-        return self._set_preset(sub_functions)
-
     def set_adjacency_preset(self):
-        '''
-        Master Function to best show how nodes are interconnected.
-        '''
         sub_functions = [
             self.set_network_mode,
             self.set_full_graph_view,
@@ -89,22 +62,7 @@ class AbstractVisualiser:
         ]
         return self._set_preset(sub_functions)
 
-    def set_functional_preset(self):
-        '''
-        Master Function to provide insight into the Functional aspect of a graph.
-        '''
-        sub_functions = [
-            self.set_network_mode,
-            self.set_functional_view,
-            self.add_node_name_labels,
-            self.add_standard_edge_color,
-        ]
-        return self._set_preset(sub_functions)
-
     def set_component_preset(self):
-        '''
-        Master Function to display interconected components of the graph.
-        '''
         sub_functions = [
             self.set_tree_mode,
             self.set_components_view,
@@ -112,62 +70,11 @@ class AbstractVisualiser:
             self.add_standard_edge_color,
         ]
         return self._set_preset(sub_functions)
-
-    def set_combinatorial_derivation_preset(self):
-        '''
-        Master Function to attempt to make a preset that makes cbd more easy to understabd
-        '''
-        sub_functions = [
-            self.set_tree_mode,
-            self.set_combinatorial_derivation_view,
-            self.add_node_name_labels
-        ]
-        return self._set_preset(sub_functions)
-
-
-    def set_common_part_preset(self):
-        '''
-        Master Function to attempt to make common parts between constructs more visible.
-        '''
-        sub_functions = [
-            self.set_network_mode,
-            self.set_parts_view,
-            self.add_node_role_labels,
-            self.add_standard_edge_color,
-        ]
-        return self._set_preset(sub_functions)
     
-    def set_sequence_preset(self):
-        '''
-        Master Function to attempt to make common parts between constructs more visible.
-        '''
-        sub_functions = [
-            self.set_network_mode,
-            self.set_sequence_view,
-            self.add_node_name_labels,
-            self.add_standard_edge_color,
-        ]
-        return self._set_preset(sub_functions)
-
-    def set_glyph_preset(self):
-        '''
-        Master function to attempt to display the graph in a glyph like form.
-        '''
-        sub_functions = [
-        ]
-        return self._set_preset(sub_functions)
-
-    def set_DBTL_preset(self):
-        '''
-        Master Function to provide insight into parent-child relationship between sbol elements.
-        '''
-        sub_functions = []
-        return self._set_preset(sub_functions)
-
     # ---------------------- Set Mode (Type of graph) ------------------------------------
     def set_network_mode(self):
         if self.mode == self.set_network_mode:
-            self.graph_view = self.graph_view.get_graph()
+            self.graph_view = self.graph_view.graph
         else:
             self.mode = self.set_network_mode
 
@@ -219,33 +126,6 @@ class AbstractVisualiser:
         components_preset = self._graph.produce_components_graph()
         self.graph_view = components_preset
 
-    def set_parts_view(self):
-        parts_graph = self._graph.produce_parts_graph()
-        self.graph_view = parts_graph
-
-    def set_functional_view(self):
-        ''' 
-        :type: preset
-        Sets the rendered graph as a graph displaying 
-        CD's as subparts of other CD's.
-        Nodes - ComponentDefinitions
-        Edges - Components (Instances of CD's)
-        :rtype: None
-        '''
-        functional_graph = self._graph.produce_functional_graph()
-        self.graph_view = functional_graph
-
-    def set_parent_view(self):
-        parent_graph = self._graph.produce_parent_graph()
-        self.graph_view = parent_graph
-
-    def set_combinatorial_derivation_view(self):
-        cd_graph = self._graph.produce_set_combinatorial_derivation_graph()
-        self.graph_view = cd_graph
-
-    def set_sequence_view(self):
-        sequence_graph = self._graph.produce_sequence_preset()
-        self.graph_view = sequence_graph
 
     # ---------------------- Pick a layout ----------------------
     def set_spring_layout(self):
@@ -292,50 +172,7 @@ class AbstractVisualiser:
         else:
             self.layout = self.set_planar_layout
 
-    def set_shell_layout(self):
-        ''' 	
-        Draw graph with shell layout.
-        :rtype: None
-        '''
-        if self.layout == self.set_shell_layout:
-            self.pos = nx.shell_layout(self.graph_view.graph)
-    
-        else:
-            self.layout = self.set_shell_layout
 
-    def set_spiral_layout(self):
-        ''' 	
-        Position nodes in a spiral layout.
-        :rtype: None
-        '''
-        if self.layout == self.set_spiral_layout:
-            self.pos = nx.spiral_layout(self.graph_view.graph)
-    
-        else:
-            self.layout = self.set_spiral_layout
-            
-    def set_spectral_layout(self):
-        ''' 	
-        Position nodes using the eigenvectors of the graph Laplacian.
-        :rtype: None
-        '''
-        if self.layout == self.set_spectral_layout:
-            self.pos = nx.spectral_layout(self.graph_view.graph)
-    
-        else:
-            self.layout = self.set_spectral_layout
-            
-    def set_random_layout(self):
-        ''' 	
-        Position nodes uniformly at random in the unit square.
-        :rtype: None
-        '''
-        if self.layout == self.set_random_layout:
-            self.pos = nx.random_layout(self.graph_view.graph)
-    
-        else:
-            self.layout = self.set_random_layout
-    
     # ---------------------- Pick the node content ----------------------
 
     def add_node_no_labels(self):

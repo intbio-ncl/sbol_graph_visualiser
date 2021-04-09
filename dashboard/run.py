@@ -8,10 +8,9 @@ import sys,os
 from collections import OrderedDict 
 from rdflib import URIRef
 from urllib.parse import quote as urlquote
-sys.path.insert(0,os.path.expanduser(os.path.join(os.getcwd(),"graph_visualisation")))
 
-from graph_visualisation.plotly.visual import PlotlyVisualiser
-from graph_visualisation.cytoscape.visual import CytoscapeVisualiser
+from visual.plotly.visual import PlotlyVisualiser
+from visual.cytoscape.visual import CytoscapeVisualiser
 
 from enhancer import SBOLEnhancer
 from modules.enhancement.choice_enhancement import ChoiceEnhancement
@@ -90,10 +89,10 @@ def dash_runner(visualiser,enhancer,name = ""):
     dashboard = DashBoard(visualiser,enhancer)
 
     # Add Options
-    plotly_form_elements,plotly_identifiers,plotly_maps = _create_form_elements(PlotlyVisualiser(),dashboard,
+    plotly_form_elements,plotly_identifiers,plotly_maps = _create_form_elements(PlotlyVisualiser,dashboard,
                                                             default_vals = default_options,
                                                             style=background_color,id_prefix=plotly_id_prefix)
-    cyto_form_elements,cyto_identifiers,cyto_maps = _create_form_elements(CytoscapeVisualiser(),dashboard,
+    cyto_form_elements,cyto_identifiers,cyto_maps = _create_form_elements(CytoscapeVisualiser,dashboard,
                                                             default_vals = default_options,
                                                             style=background_color,id_prefix=cyto_id_prefix)
 
@@ -578,6 +577,7 @@ def _beautify_filename(filename):
     return name
 
 def _generate_options(visualiser):
+    visualiser = visualiser()
     blacklist_functions = ["build",
                            "mode",
                            "misc_node_settings",
@@ -591,7 +591,6 @@ def _generate_options(visualiser):
                            "copy_settings"]
 
     options = {"preset" : {},
-               "clustering" : {},
                "mode" : {},
                "view" : {},
                "layout" : {}}

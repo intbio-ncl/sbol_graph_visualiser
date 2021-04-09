@@ -4,11 +4,12 @@ import dash_cytoscape as cyto
 cyto.load_extra_layouts()
 import dash_html_components as html
 import math
-sys.path.insert(0,os.path.expanduser(os.path.join(os.getcwd(),"util")))
-from color_util import SBOLTypeColors,SBOLPredicateColors,calculate_next_color,calculate_role_color
-from sbol_rdflib_identifiers import identifiers
-from graph_builder.networkx_wrapper import NetworkXGraphWrapper
-from graph_visualisation.abstract_visualiser import AbstractVisualiser
+
+from util.color_util import calculate_next_color,calculate_role_color
+from util.sbol_identifiers import identifiers
+from builder.utility import get_name
+from builder.utility import get_sbol_object_role
+from visual.abstract_visualiser import AbstractVisualiser
 import networkx as nx
 
 
@@ -49,63 +50,6 @@ class CytoscapeVisualiser(AbstractVisualiser):
 
         return current_settings
 
-    # ---------------------- Set Clustering ----------------------------------------------------------------------------------------------
-
-    def set_non_clustering(self):
-        self._reset_parent_labels()
-        
-    def set_type_clustering(self):
-        '''
-        Definition:
-            Cluster as to wether a node has a rdf_type egde.
-            Only two levels of clustering.
-        '''
-        self._reset_parent_labels()
-        objects = self.graph_view.search((None,identifiers.predicates.rdf_type,None),)
-        for n,v,e in objects:
-            node_edges = self.graph_view.edges(n)
-            self.graph_view.nodes[n]["is_parent"] = True
-            for node_edge in node_edges:
-                self.graph_view.nodes[node_edge[1]]["parent"] = n
-
-    def set_parent_clustering(self):
-        '''
-        Cluster Based on SBOL parent-child relationships.
-        TopLevels are roots, Non-TopLevels with rdf-types are branches and leafs, 
-        Non-rdf-type elements aren't clustered.
-        '''
-        def handle_object(element):
-            node_edges = self.graph_view.edges(element,data=True)
-            for n,v,e in node_edges:
-                predicate = e["triples"][0][1]
-                if predicate in identifiers.predicates.ownership_predicates:
-                    self.graph_view.nodes[n]["is_parent"] = True
-                    self.graph_view.nodes[v]["parent"] = element
-                elif (predicate == identifiers.predicates.component and 
-                self._graph.retrieve_node(n,identifiers.predicates.rdf_type) == identifiers.objects.component_definition):
-                    self.graph_view.nodes[n]["is_parent"] = True
-                    self.graph_view.nodes[v]["parent"] = element
-                node_type = self._graph.retrieve_node(v,identifiers.predicates.rdf_type)
-                if node_type is not None:
-                    handle_object(v)
-        self._reset_parent_labels()
-        components = self.graph_view.search((None,identifiers.predicates.rdf_type,None))
-        top_levels = [c for c in components if c[1] in identifiers.objects.top_levels]
-            
-        for obj in top_levels:
-            handle_object(obj[0])
-
-    def _reset_parent_labels(self):
-        for node in self.graph_view.nodes(data=True):
-            try:
-                del node[1]["parent"]
-            except KeyError:
-                pass
-
-            try:
-                del node[1]["is_parent"]
-            except KeyError:
-                pass
     # ---------------------- Set Preset (Sets one or more other settings to focus on a specific thing in the graph) ----------------------
     def set_protein_protein_interaction_preset(self):
         '''
@@ -130,46 +74,12 @@ class CytoscapeVisualiser(AbstractVisualiser):
             self.add_edge_name_labels]
         return parent_sub_functions + self._set_preset(sub_class_sub_functions)
 
-    def set_parts_preset(self):
-        '''
-        Master Function to provide insight into heiraachy of components.
-        '''
-        parent_sub_functions = super().set_parts_preset()
-        sub_class_sub_functions = [
-            self.set_dagre_layout,
-            self.add_adaptive_node_color]
-        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
-
-    def set_parent_preset(self):
-        '''
-        Master Function to provide insight into parent-child relationship between sbol elements.
-        '''
-        parent_sub_functions = super().set_parent_preset()
-        sub_class_sub_functions = [
-            self.set_breadthfirst_layout,
-            self.add_edge_name_labels,
-            self.add_adaptive_node_color,
-            self.add_adaptive_edge_color]
-        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
-
     def set_adjacency_preset(self):
         parent_sub_functions = super().set_adjacency_preset()
         sub_class_sub_functions = [
             self.set_circular_layout,
             self.add_edge_no_labels,
             self.add_node_total_adjacency_color
-        ]
-        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
-
-    def set_functional_preset(self):
-        '''
-        Master Function to provide insight into the Functional aspect of a graph.
-        '''
-        parent_sub_functions = super().set_functional_preset()
-
-        sub_class_sub_functions = [
-            self.set_concentric_layout,
-            self.add_adaptive_node_color
         ]
         return parent_sub_functions + self._set_preset(sub_class_sub_functions)
 
@@ -184,31 +94,6 @@ class CytoscapeVisualiser(AbstractVisualiser):
             self.add_edge_no_labels
         ]
         return parent_sub_functions + self._set_preset(sub_class_sub_functions)
-
-    def set_combinatorial_derivation_preset(self):
-        '''
-        Master Function to attempt to make a preset that makes cbd more easy to understabd
-        '''
-        parent_sub_functions = super().set_combinatorial_derivation_preset()
-        sub_class_sub_functions = [
-            self.set_breadthfirst_layout,
-            self.add_edge_name_labels,
-            self.add_adaptive_node_color,
-            self.add_adaptive_edge_color
-        ]
-        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
-        
-    def set_common_part_preset(self):
-        '''
-        Master Function to attempt to make common parts between constructs more visible.
-        '''
-        parent_sub_functions = super().set_common_part_preset()
-        sub_class_sub_functions = [
-            self.set_breadthfirst_layout,
-            self.add_edge_no_labels,
-            self.add_node_in_adjacency_color
-        ]
-        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
     
     def set_sequence_preset(self):
         '''
@@ -221,22 +106,6 @@ class CytoscapeVisualiser(AbstractVisualiser):
         ]
         return parent_sub_functions + self._set_preset(sub_class_sub_functions)   
     
-    def set_glyph_preset(self):
-        '''
-        Master function to attempt to display the graph in a glyph like form.
-        '''
-        parent_sub_functions = super().set_glyph_preset()
-        sub_class_sub_functions = []
-        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
-
-    def set_DBTL_preset(self):
-        '''
-        Master Function to provide insight into parent-child relationship between sbol elements.
-        '''
-        parent_sub_functions = super().set_DBTL_preset()
-        sub_class_sub_functions = []
-        return parent_sub_functions + self._set_preset(sub_class_sub_functions)
-
     # ---------------------- Pick a layout ----------------------
     def set_no_layout(self):
         if self.layout == self.set_no_layout:
@@ -244,34 +113,6 @@ class CytoscapeVisualiser(AbstractVisualiser):
             return {"name" : "preset"}
         else:
             self.layout = self.set_no_layout
-
-    def set_random_layout(self):
-        if self.layout == self.set_random_layout:
-            self.pos = None
-            return {"name" : "random"}
-        else:
-            self.layout = self.set_random_layout
-
-    def set_grid_layout(self):
-        if self.layout == self.set_grid_layout:
-            self.pos = None
-            row_num = cols_num = (math.ceil(math.sqrt(len(self.graph_view.nodes)))) 
-
-            return {"name" : "grid",
-                    "rows" : row_num,
-                    "cols" : cols_num}
-        else:
-            self.layout = self.set_grid_layout
-
-    def set_semi_circular_layout(self):
-        if self.layout == self.set_semi_circular_layout:
-            self.pos = None
-            return {"name" : "circle",
-                    'radius': 250,
-                    'startAngle': math.pi * 1/6,
-                    'sweep': math.pi * 2/3}
-        else:
-            self.layout = self.set_semi_circular_layout
 
     def set_concentric_layout(self):
         if self.layout == self.set_concentric_layout:
@@ -367,7 +208,6 @@ class CytoscapeVisualiser(AbstractVisualiser):
         else:
             self.layout = self.set_klay_layout
             
-    # ---------------------- Pick the node content ----------------------
 
     # ---------------------- Pick the edge content ----------------------
     def add_edge_no_labels(self):
@@ -462,12 +302,12 @@ class CytoscapeVisualiser(AbstractVisualiser):
             type_color_map = {"no_type" : (0,0,0)}
             role_color_map = {"no_role" : (0,0,0)}
             for node in nodes:
-                obj_type = self._graph.retrieve_node(node,identifiers.predicates.rdf_type)
+                obj_type = self._graph.graph.get_rdf_type(node)
                 if obj_type is None:
                     type_color = type_color_map["no_type"]
                     obj_type = "No Type"
                 else:
-                    obj_name = self._graph._get_name(str(obj_type))
+                    obj_name = get_name(str(obj_type))
                     if obj_name in type_color_map.keys():
                         type_color = type_color_map[obj_name]
                     else:
@@ -475,7 +315,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
                         type_color_map[obj_name] = type_curr_color
                         type_curr_color = calculate_next_color(type_curr_color)
                         
-                role = self._graph.get_sbol_object_role(node,obj_type)
+                role = get_sbol_object_role(self._graph.graph,node,obj_type)
                 if role is None:
                     role = "no_role"
                     role_color = role_color_map[role]
@@ -486,8 +326,8 @@ class CytoscapeVisualiser(AbstractVisualiser):
                     role_color_map[role] = role_color
 
                 role = role.replace(" ","").lower()
-                node_colors.append({self._graph._get_name(obj_type) : "rgb" +  str(type_color)})
-                node_edge_colors.append({self._graph._get_name(role) : "rgb" +  str(role_color)})
+                node_colors.append({get_name(obj_type) : "rgb" +  str(type_color)})
+                node_edge_colors.append({get_name(role) : "rgb" +  str(role_color)})
             
             self._node_edge_colors = node_edge_colors
             return node_colors
@@ -510,7 +350,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
             for u,v in edges:
                 edge = edges[u,v]
                 predicate = edge["triples"][0][1]
-                predicate_type = self._graph._get_name(predicate)
+                predicate_type = get_name(predicate)
                 if predicate_type in color_map.keys():
                     color = color_map[predicate_type]
                 else:
@@ -518,7 +358,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
                     color_map[predicate_type] = curr_color
                     curr_color = calculate_next_color(curr_color)
                 
-                edge_colors.append({self._graph._get_name(predicate_type) : "rgb" +  str(color)})
+                edge_colors.append({get_name(predicate_type) : "rgb" +  str(color)})
 
             return edge_colors
         else:
@@ -539,7 +379,7 @@ class CytoscapeVisualiser(AbstractVisualiser):
                     shape = shape_map["no_type"]
                     obj_type = "No Type"
                 else:
-                    obj_type = self._graph._get_name(obj_type)
+                    obj_type = get_name(obj_type)
                     if obj_type in shape_map.keys():
                         shape = shape_map[obj_type]
                     else:
