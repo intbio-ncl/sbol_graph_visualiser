@@ -1,20 +1,32 @@
 import rdflib
 
-
 class SBOLIdentifiers:
     def __init__(self):
         self.namespaces = Namespace()
         self.objects = Objects(self.namespaces)
         self.predicates = Predicates(self.namespaces)
         self.external = ExternalIdentifiers(self.namespaces)
-    
 
+    def translate_role(self,role):
+        translators = [
+            self.external.cd_role_name,
+            self.external.cd_type_names,
+            self.external.interaction_type_names,
+            self.external.inhibition_participants]
+
+        for translator in translators:
+            try:
+                return translator[role]
+            except KeyError:
+                continue
+        return None
+    
 class Namespace:
     def __init__(self):
         self.sbol = rdflib.URIRef('http://sbols.org/v2#')
         identifiers = rdflib.URIRef('http://identifiers.org/')
         self.sequence_ontology = rdflib.URIRef(identifiers + 'so/SO:')
-        self.sbo_biomodels = rdflib.URIRef(identifiers + 'biomodels.sbo/SBO:')
+        self.sbo_biomodels = rdflib.URIRef(identifiers + 'biomodels.sbo/SBO:') 
         self.identifier_edam = rdflib.URIRef(identifiers + 'edam/')
 
         self.biopax = rdflib.URIRef('http://www.biopax.org/release/biopax-level3.owl#')
@@ -22,6 +34,7 @@ class Namespace:
         self.edam = rdflib.URIRef('http://edamontology.org/format')
         self.owl = rdflib.URIRef('http://www.w3.org/2002/07/owl#')
         self.prov = rdflib.URIRef('https://www.w3.org/ns/prov#')
+        self.synbiohub = rdflib.URIRef('http://wiki.synbiohub.org/wiki/Terms/synbiohub#')
 
 class Objects:
     def __init__(self, namespaces):
@@ -45,8 +58,8 @@ class Objects:
         self.attachment = rdflib.term.URIRef(self.namespaces.sbol + "Attachment")
         self.collection = rdflib.term.URIRef(self.namespaces.sbol + "Collection")
         self.sequence_annotation = rdflib.term.URIRef(self.namespaces.sbol + "SequenceAnnotation")
-        self.participation = rdflib.term.URIRef(self.namespaces.sbol + "Participation")
         self.sequence_constraint = rdflib.term.URIRef(self.namespaces.sbol + "SequenceConstraint")
+        self.participation = rdflib.term.URIRef(self.namespaces.sbol + "Participation")
 
         self.top_levels = {rdflib.URIRef(self.namespaces.sbol + name) for name in
                             ['Sequence',
@@ -63,6 +76,8 @@ class Objects:
                             'CombinatorialDerivation',
                             'Experiment',
                             'ExperimentalData']}
+
+        self.default_prune_nodes = [self.sequence]
 
 class Predicates:
     def __init__(self, namespaces):
@@ -109,27 +124,36 @@ class Predicates:
 
         self.local = rdflib.term.URIRef(self.namespaces.sbol + 'local')
         self.remote = rdflib.term.URIRef(self.namespaces.sbol + 'remote')
-
-        self.strategy = rdflib.term.URIRef(self.namespaces.sbol + 'strategy')
+        self.module = rdflib.term.URIRef(self.namespaces.sbol + 'module')
+        self.maps_to = rdflib.term.URIRef(self.namespaces.sbol + 'mapsTo')
         self.variable_component = rdflib.term.URIRef(self.namespaces.sbol + 'variableComponent')
-        self.variable = rdflib.term.URIRef(self.namespaces.sbol + 'variable')
-        self.variant = rdflib.term.URIRef(self.namespaces.sbol + 'variant')
-        self.operator = rdflib.term.URIRef(self.namespaces.sbol + 'operator')
-        self.variant_collection = rdflib.term.URIRef(self.namespaces.sbol + 'variantCollection')
-        self.variant_derivation = rdflib.term.URIRef(self.namespaces.sbol + 'variantDerivation')
 
-        self.module = rdflib.term.URIRef(self.namespaces.sbol + "module")
-        self.member = rdflib.term.URIRef(self.namespaces.sbol + "member")
-        self.ownership_predicates = {rdflib.URIRef(self.namespaces.sbol + predicate) for predicate in
-                                ['module',
-                                'mapsTo',
-                                'interaction',
-                                'participation',
-                                'functionalComponent',
-                                'sequenceConstraint',
-                                'location',
-                                'sequenceAnnotation',
-                                'variableComponent']}  
+
+        self.mutable_notes = rdflib.term.URIRef(self.namespaces.synbiohub + 'mutableNotes')
+        self.mutable_description = rdflib.term.URIRef(self.namespaces.synbiohub + 'mutableDescription')
+        self.mutable_provenance = rdflib.term.URIRef(self.namespaces.synbiohub + 'mutableProvenance')
+
+        self.ownership_predicates = [
+            self.module,
+            self.maps_to,
+            self.interaction,
+            self.participation,
+            self.functional_component,
+            self.sequence_constraint,
+            self.location,
+            self.sequence_annotation,
+            self.variable_component
+        ] 
+
+        self.default_prune_edges = [
+            self.version,
+            self.display_id,
+            self.persistent_identity,
+            self.access,
+            self.direction,
+            self.sequence,
+            self.encoding,
+            self.elements]
 
 class ExternalIdentifiers:
     def __init__(self, namespaces):
@@ -142,6 +166,7 @@ class ExternalIdentifiers:
         self.component_definition_protein = rdflib.URIRef(self.namespaces.biopax + "Protein")
         self.component_definition_smallMolecule = rdflib.URIRef(self.namespaces.biopax + "SmallMolecule")
         self.component_definition_complex = rdflib.URIRef(self.namespaces.biopax + "Complex")
+        self.component_definition_all = rdflib.URIRef("www.placeholder.com/all_type")
 
         self.component_definition_promoter       = rdflib.URIRef(self.namespaces.sequence_ontology + "0000167")
         self.component_definition_rbs            = rdflib.URIRef(self.namespaces.sequence_ontology + "0000139")
@@ -158,7 +183,7 @@ class ExternalIdentifiers:
         self.component_definition_tag            = rdflib.URIRef(self.namespaces.sequence_ontology + "0000324")
         self.component_definition_engineeredTag  = rdflib.URIRef(self.namespaces.sequence_ontology + "0000807")
         self.component_definition_sgRNA          = rdflib.URIRef(self.namespaces.sequence_ontology + "0001998")
-        self.component_definition_transcriptionFactor = rdflib.URIRef("ttp://identifiers.org/go/GO:0003700")
+        self.component_definition_transcriptionFactor = rdflib.URIRef("http://identifiers.org/go/GO:0003700")
 
         self.interaction_inhibition = rdflib.URIRef(self.namespaces.sbo_biomodels + "0000169")
         self.interaction_stimulation = rdflib.URIRef(self.namespaces.sbo_biomodels + "0000170")
@@ -217,144 +242,68 @@ class ExternalIdentifiers:
         self.variable_component_cardinality_zeroOrMore = rdflib.URIRef(self.namespaces.sbol + "zeroOrMore")
         self.variable_component_cardinality_oneOrMore = rdflib.URIRef(self.namespaces.sbol + "oneOrMore")
 
-        self.dna_roles = {self.component_definition_promoter : "Promoter",
+
+        self.cd_type_names = {
+            self.component_definition_DNA : "DNA",
+            self.component_definition_DNARegion : "DNA",
+            self.component_definition_RNA : "RNA",
+            self.component_definition_RNARegion : "RNA",
+            self.component_definition_protein : "Protein",
+            self.component_definition_smallMolecule : "Small Molecule",
+            self.component_definition_complex: "Complex"}
+
+
+
+        self.cd_role_name = {self.component_definition_promoter : "Promoter",
                         self.component_definition_rbs : "RBS",
                         self.component_definition_cds : "CDS",
                         self.component_definition_terminator : "Terminator",
                         self.component_definition_engineeredRegion : "Engineered Region",
+                        self.component_definition_engineeredGene : "Engineered Gene",
                         self.component_definition_operator : "Operator",
-                        self.component_definition_gene : "Gene"}
-        self.rna_roles = {self.component_definition_mRNA : "mRNA",
-                         self.component_definition_sgRNA : "sgRNA",
-                         self.component_definition_cds : "CDS RNA"}
-        self.protein_roles = {self.component_definition_transcriptionFactor : "Transcriptional Factor"}
-        self.small_molecule_roles = {self.component_definition_effector : "Effector"}
-        self.complex_roles = {}
+                        self.component_definition_gene : "Gene",
+                        self.component_definition_mRNA : "mRNA",
+                        self.component_definition_sgRNA : "sgRNA",
+                        self.component_definition_cds : "CDS-RNA",
+                        self.component_definition_transcriptionFactor : "Transcriptional Factor",
+                        self.component_definition_effector : "Effector",
+                        self.component_definition_sgRNA : "sgRNA",
+                        self.component_definition_engineeredTag : "Engineered Tag",
+                        self.component_definition_tag : "Tag",
+                        self.component_definition_startCodon: "Start Codon",
+                        self.component_definition_nonCovBindingSite: "Non-Covalent Binding Site"}
+        
 
-    def get_component_definition_identifier_name(self, type=None,role = None):
-        '''
-        Reverse method that when you know the URI's return a descriptive name for said ComponentDefinition
-        '''
-        if type is None:
-            potential_maps = [self.dna_roles,
-                              self.rna_roles,
-                              self.protein_roles,
-                              self.small_molecule_roles,
-                              self.complex_roles]
+        self.interaction_type_names = {
+            self.interaction_inhibition: "Inhibition",
+            self.interaction_stimulation:"Stimulation",
+            self.interaction_biochemical_reaction:"Biochemical reaction",
+            self.interaction_noncovalent_bonding:"Noncovalent bonding",
+            self.interaction_degradation:"Degradation",
+            self.interaction_genetic_production:"Genetic production",
+            self.interaction_control:"Control"
+        }
 
-            for roles in potential_maps:
-                try:
-                    return roles[role]
-                except KeyError:
-                    continue
-            return "Unknown"
-                
-        if type == self.component_definition_DNA or type == self.component_definition_DNARegion:
-            try:
-                return self.dna_roles[role]
-            except KeyError:
-                return "DNA"
+        self.inhibition_participants = {self.participant_inhibitor : "Inhibitor",
+                                        self.participant_inhibited : "Inhibited", 
+                                        self.participant_participation_promoter : "Promoter",
+                                        self.participant_stimulator : "Stimulator",
+                                        self.participant_stimulated : "Stimulated", 
+                                        self.participant_reactant : "Reactant",
+                                        self.participant_product : "Product",
+                                        self.participant_modifier : "Modifier",
+                                        self.participant_modified : "Modified",
+                                        self.participant_template : "Template"}
 
-        elif type == self.component_definition_RNA or type == self.component_definition_RNARegion:
-            try:
-                return self.rna_roles[role]
-            except KeyError:
-                return "RNA"
-
-        elif type == self.component_definition_protein:
-            try:
-                return self.protein_roles[role]
-            except KeyError:
-                return "Protein"
-
-        elif type == self.component_definition_smallMolecule:
-            try:
-                return self.small_molecule_roles[role]
-            except KeyError:
-                return "Small Molecule"
-
-        elif type == self.component_definition_complex:
-            try:
-                return self.complex_roles[role]
-            except KeyError:
-                return "Complex"
-
-        else:
-            return "Unknown"
-        return "Unknown"
-    
-    def get_type_from_role(self,role):
-        if role in self.dna_roles:
-            return self.component_definition_DNA
-        if role in self.rna_roles:
-            return self.component_definition_RNA
-        if role in self.protein_roles:
-            return self.component_definition_protein
-        if role in self.small_molecule_roles:
-            return self.component_definition_smallMolecule
-        if role in self.complex_roles:
-            return self.component_definition_complex
-
-    def get_participant_role_name(self,role):
-        if role == self.participant_inhibitor:
-            return "Inhibitor"
-        if role == self.participant_inhibited:
-            return "Inhibited"
-        if role == self.participant_stimulator:
-            return "Stimulator"
-        if role == self.participant_stimulated:
-            return "Stimulated"
-        if role == self.participant_modifier:
-            return "Modifier"
-        if role == self.participant_modified:
-            return "Modified"
-        if role == self.participant_product:
-            return "Product"
-        if role == self.participant_reactant:
-            return "Reactant"
-        if role == self.participant_participation_promoter:
-            return "Promoter"
-        if role == self.participant_template:
-            return "Template"
-        return "Unknown"
-
-    def get_interaction_type_name(self,int_type):
-        if int_type == self.interaction_inhibition:
-            return "Inhibition"
-        if int_type == self.interaction_stimulation:
-            return "Stimulation"
-        if int_type == self.interaction_biochemical_reaction:
-            return "Biochemical reaction"
-        if int_type == self.interaction_noncovalent_bonding:
-            return "Noncovalent bonding"
-        if int_type == self.interaction_degradation:
-            return "Degradation"
-        if int_type == self.interaction_genetic_production:
-            return "Genetic production"
-        if int_type == self.interaction_control:
-            return "Control"
-        return "Unknown"
-    
-    def get_location_orientation_name(self,orientation):
-        if orientation == self.location_orientation_inline:
-            return "Inline"
-        if orientation == self.location_orientation_reverseComplement:
-            return "Reverse Complement"
-
-    def get_model_framework_name(self,framework):
-        if framework == self.model_framework_continuous:
-            return "Continuous"
-        if framework == self.model_framework_discrete:
-            return "Discrete"
-        return "Unknown Framework"
-
-    def get_model_language_name(self,language):
-        if language == self.model_language_SBML:
-            return "SBML"
-        if language == self.model_language_CellML:
-            return "CellML"
-        if language == self.model_language_BioPAX:
-            return "BioPAX"
-        return "Unknown Language"
+        self.interaction_direction =   {self.participant_inhibitor : "in",
+                                        self.participant_stimulator : "in",
+                                        self.participant_modifier : "in",
+                                        self.participant_reactant : "in",
+                                        self.participant_participation_promoter : "in",
+                                        self.participant_template : "in",
+                                        self.participant_inhibited : "out",
+                                        self.participant_stimulated : "out",
+                                        self.participant_modified : "out",
+                                        self.participant_product : "out"}
 
 identifiers = SBOLIdentifiers()

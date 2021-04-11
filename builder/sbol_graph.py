@@ -24,7 +24,6 @@ class SBOLGraph:
     def sub_graph(self,edges,node_attrs={}):
         return self._graph.sub_graph(edges,node_attrs)
 
-
     def get_rdf_type(self,subject):
         return self._graph.retrieve_node(subject,identifiers.predicates.rdf_type)
 

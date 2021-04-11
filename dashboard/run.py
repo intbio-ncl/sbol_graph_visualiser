@@ -1,23 +1,21 @@
-from .visual import DashBoard
 from inspect import signature
 from dash.dependencies import Input, Output,State
 import dash
 import base64
 import os
-import sys,os
 from collections import OrderedDict 
 from rdflib import URIRef
 from urllib.parse import quote as urlquote
 
-from visual.plotly.visual import PlotlyVisualiser
-from visual.cytoscape.visual import CytoscapeVisualiser
+
+from dashboard.visual import DashBoard
+from visual.visual import CytoscapeVisualiser
 
 from enhancer import SBOLEnhancer
 from modules.enhancement.choice_enhancement import ChoiceEnhancement
 from modules.enhancement.enhancement import Enhancement
 
 options_color = "#f8f9fa"
-plotly_id_prefix = "plotly"
 cyto_id_prefix = "cyto"
 background_color = {"backgroundColor" : options_color}
 hidden_style = background_color.copy()
@@ -28,13 +26,6 @@ cyto_graph_id = "cytoscape_graph"
 not_modifier_identifiers = {"sidebar_id" : "sidebar",
                             "toolbox_id" : "toolbox",
                             "cyto_utility_id" : "cyto_utility"}
-
-plotly_preset_inputs = OrderedDict()
-plotly_preset_outputs = OrderedDict()
-plotly_update_inputs = OrderedDict()
-plotly_update_outputs = {"graph_id" : Output("plotly_graph","figure"),
-                        "error_id" : Output("plotly_error_alert", "is_open"),
-                        "error_content" : Output("plotly_error_alert","children")}
 
 cyto_preset_inputs = OrderedDict()
 cyto_preset_outputs = OrderedDict()
@@ -49,15 +40,9 @@ load_outputs = {"title_id" : Output("title","children"),
                 "graph_container_id" : Output("graph_container","children")}
 
 graph_type_inputs = {"graph_type_dropdown_id" : Input("graph_type" , "value")}
-graph_type_outputs = {"plotly_options_id" : Output("plotly_options","style"),
-                      "plotly_div" : Output("plotly_div","children"),
-                      "plotly_div_style" : Output("plotly_div","style"),
-                      "cyto_options_id" : Output("cyto_options","style"),
+graph_type_outputs = {"cyto_options_id" : Output("cyto_options","style"),
                       "cyto_div" : Output("cyto_div","children"),
                       "cyto_div_style" : Output("cyto_div","style")}
-
-graph_types = {"plotly" : PlotlyVisualiser,
-               "cytoscape" : CytoscapeVisualiser}
                
 zoom_inputs = {"cyto_zoom_slider_id" : Input("cyto_zoom_slider","value")}
 
@@ -89,39 +74,27 @@ def dash_runner(visualiser,enhancer,name = ""):
     dashboard = DashBoard(visualiser,enhancer)
 
     # Add Options
-    plotly_form_elements,plotly_identifiers,plotly_maps = _create_form_elements(PlotlyVisualiser,dashboard,
-                                                            default_vals = default_options,
-                                                            style=background_color,id_prefix=plotly_id_prefix)
     cyto_form_elements,cyto_identifiers,cyto_maps = _create_form_elements(CytoscapeVisualiser,dashboard,
                                                             default_vals = default_options,
                                                             style=background_color,id_prefix=cyto_id_prefix)
 
-    del plotly_maps["plotly_preset"]
     del cyto_maps["cyto_preset"]
-    plotly_preset_identifiers,plotly_identifiers,plotly_preset_output,plotly_preset_state = _generate_inputs_outputs(plotly_identifiers)
     cyto_preset_identifiers,cyto_identifiers,cyto_preset_output,cyto_preset_state = _generate_inputs_outputs(cyto_identifiers)
     
-    plotly_update_inputs.update(plotly_identifiers)
-    plotly_preset_inputs.update(plotly_preset_identifiers)
-    plotly_preset_outputs.update(plotly_preset_output)
-
     cyto_update_inputs.update(cyto_identifiers)
     cyto_preset_inputs.update(cyto_preset_identifiers)
     cyto_preset_outputs.update(cyto_preset_output)
     
-
     # Add a title.
     title = "Graph for " + _beautify_name(name)
     title = dashboard.create_heading_1(load_outputs["title_id"].component_id,title)
 
     # Add Graph
-    graph_container,plotly_style,cyto_style = generate_graph_div(dashboard)
-    plotly_form_div = dashboard.create_div(graph_type_outputs["plotly_options_id"].component_id,plotly_form_elements,style=plotly_style)
+    graph_container,cyto_style = generate_graph_div(dashboard)
     cytoscape_form_div = dashboard.create_div(graph_type_outputs["cyto_options_id"].component_id,cyto_form_elements,style=cyto_style)
-    dashboard.create_sidebar(not_modifier_identifiers["sidebar_id"],"Options",plotly_form_div + cytoscape_form_div,style={},add=True)
+    dashboard.create_sidebar(not_modifier_identifiers["sidebar_id"],"Options",cytoscape_form_div,style={},add=True)
 
     # Add all non-sidebar stuff to content.
-    plotly_error = dashboard.create_alert(plotly_update_outputs["error_id"].component_id,"Error.",color="danger",dismissable=True,fade=True,is_open=False)
     cyto_error = dashboard.create_alert(cyto_update_outputs["error_id"].component_id,"Error.",color="danger",dismissable=True,fade=True,is_open=False)
 
     # Add Toolbox utility.
@@ -130,26 +103,18 @@ def dash_runner(visualiser,enhancer,name = ""):
     toolbox_elements = toolbox_elements + _create_enhancer_modal(dashboard)
     toolbox_elements = toolbox_elements + dashboard.create_button(export_modal_open_inputs["export_open_button_id"].component_id,"Export")
     toolbox_elements = toolbox_elements + _create_export_modal(dashboard)
-    graph_picker_options = [{"label" : k,"value":k} for k in graph_types.keys()]
-    toolbox_elements = toolbox_elements + dashboard.create_dropdown(graph_type_inputs["graph_type_dropdown_id"].component_id,"Graph Type",options=graph_picker_options)
     toolbox_div = dashboard.create_div(not_modifier_identifiers["toolbox_id"],toolbox_elements)
 
-    final_elements = toolbox_div + title + plotly_error + cyto_error + graph_container
+    final_elements = toolbox_div + title + cyto_error + graph_container
     dashboard.create_div("content",final_elements,add=True)
 
     # Bind the callbacks
-    def update_plotly_preset_inner(preset_name,*states):
-        return update_preset(dashboard,preset_name,plotly_maps,states)
     def update_cyto_preset_inner(preset_name,*states):
         return update_preset(dashboard,preset_name,cyto_maps,states)
-    def update_plotly_graph_inner(*args):
-        return update_plotly_graph(dashboard,args)
     def update_cyto_graph_inner(*args):
         return update_cyto_graph(dashboard,args)
     def load_graph_inner(contents,filename):
         return load_graph(dashboard,contents,filename)
-    def change_graph_type_inner(graph_type):
-        return change_graph_type(dashboard,graph_type)
     def update_zoom_inner(value):
         return update_zoom(value)
     def remove_node_inner(_,node_id,data):
@@ -163,12 +128,9 @@ def dash_runner(visualiser,enhancer,name = ""):
     def close_export_modal_inner(n_clicks):
         return close_modal(n_clicks)
 
-    dashboard.add_callback(update_plotly_preset_inner,list(plotly_preset_inputs.values()),list(plotly_preset_outputs.values()),list(plotly_preset_state.values()))
     dashboard.add_callback(update_cyto_preset_inner,list(cyto_preset_inputs.values()),list(cyto_preset_outputs.values()),list(cyto_preset_state.values()))
-    dashboard.add_callback(update_plotly_graph_inner,list(plotly_update_inputs.values()),list(plotly_update_outputs.values()))
     dashboard.add_callback(update_cyto_graph_inner,list(cyto_update_inputs.values()),list(cyto_update_outputs.values()))
     dashboard.add_callback(load_graph_inner,list(load_inputs.values()),list(load_outputs.values()),list(load_states.values()))
-    dashboard.add_callback(change_graph_type_inner,list(graph_type_inputs.values()),list(graph_type_outputs.values()))
     dashboard.add_callback(update_zoom_inner,list(zoom_inputs.values()),Output(cyto_graph_id,"zoom"))
     dashboard.add_callback(remove_node_inner,list(remove_node_inputs.values()),list(remove_node_outputs.values()),list(remove_node_state.values()))
 
@@ -209,38 +171,6 @@ def update_preset(dashboard,preset_name,mappings,*states):
             final_outputs.append(state)
     return final_outputs
 
-def update_plotly_graph(dashboard,*args):
-    if not isinstance(dashboard.visualiser,PlotlyVisualiser):
-        raise dash.exceptions.PreventUpdate()
-    args = args[0]
-    old_settings = dashboard.visualiser.copy_settings()
-    for index,setter_str in enumerate(args):
-        if setter_str is not None:
-            try:
-                setter = getattr(dashboard.visualiser,setter_str,None)
-                parameter = None
-            except TypeError:
-                # Must be a input element rather than a checkbox.
-                # With annonymous implementation this is tough.
-                to_call = list(plotly_update_inputs.keys())[index]
-                parameter = setter_str
-                setter = getattr(dashboard.visualiser,to_call,None)                    
-            if setter is not None:
-                try:
-                    if parameter is not None:
-                        setter(parameter)
-                    else:
-                        setter()
-                except Exception as ex:
-                    return reverse_graph(dashboard, old_settings,ex)
-
-    try:
-        figure = dashboard.visualiser.build(show=False)
-        figure.update_layout(transition_duration=500)
-        return figure,False,"No Error"
-    except Exception as ex:
-        return reverse_graph(dashboard, old_settings,ex)
-    
 
 def update_cyto_graph(dashboard,*args):
     if not isinstance(dashboard.visualiser,CytoscapeVisualiser):
@@ -295,44 +225,13 @@ def load_graph(dashboard,contents,filename):
         os.remove(filename)
     
     dashboard.file_manager.write(filename,str(decoded).splitlines())
-
-    if isinstance(dashboard.visualiser,PlotlyVisualiser):
-        dashboard.visualiser = PlotlyVisualiser(filename)
-    elif isinstance(dashboard.visualiser,CytoscapeVisualiser):
-        dashboard.visualiser = CytoscapeVisualiser(filename)
+    dashboard.visualiser = CytoscapeVisualiser(filename)
     dashboard.visualiser._graph.prune_graph()
     dashboard.enhancer = SBOLEnhancer(filename,staged=True)
 
-    graph_container,plotly_style,cyto_style = generate_graph_div(dashboard)
+    graph_container,cyto_style = generate_graph_div(dashboard)
     title = _beautify_filename(filename)
     return title,graph_container
-
-def change_graph_type(dashboard,graph_type):
-    if graph_type is None or isinstance(dashboard.visualiser,graph_types[graph_type]):
-        raise dash.exceptions.PreventUpdate()
-    
-    empty_figure = dashboard.visualiser._create_empty_figure()
-    dashboard.visualiser = graph_types[graph_type](dashboard.visualiser._graph)
-    dashboard.visualiser._graph.prune_graph()
-    figure = dashboard.visualiser.build(show=False)
-
-    if graph_type == "plotly":
-        plotly_options_style = {}
-        plotly_div_children = dashboard.create_graph(plotly_update_outputs["graph_id"].component_id,figure) 
-        plotly_div_style = {}
-        cyto_options_style = {'display': 'none'}
-        cyto_div_children = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,[empty_figure]) 
-        cyto_div_style = {'display': 'none'}
-    else :
-        cyto_utility = _generate_cyto_util_components(dashboard)
-        plotly_options_style = {'display': 'none'}
-        plotly_div_children = dashboard.create_graph(plotly_update_outputs["graph_id"].component_id,empty_figure) 
-        plotly_div_style = {'display': 'none'}
-        cyto_options_style = {}
-        cyto_div_children = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,cyto_utility+[figure])
-        cyto_div_style = {}
-
-    return plotly_options_style,plotly_div_children,plotly_div_style,cyto_options_style,cyto_div_children,cyto_div_style
 
 def update_zoom(value):
     return value
@@ -450,8 +349,6 @@ def submit_enhancer(dashboard,submit_n,close_n,tables):
             enhanced_filename = dashboard.file_manager.generate_filename(dashboard.enhancer.filename)
             output_fn = dashboard.enhancer.save(enhanced_filename)
             return [output_fn,0]
-
-            
     raise dash.exceptions.PreventUpdate()
 
 def display_export_modal(dashboard,n):
@@ -477,26 +374,16 @@ def reverse_graph(dashboard,old_settings,error_str = ""):
     return figure,True,error_string
 
 def generate_graph_div(dashboard):
-    # Cyto is different to plotly, you dont add it to a graph it standalone in the component list.
     figure_layout_elements = {"autosize": True}
     figure = dashboard.visualiser.build(layout_elements = figure_layout_elements, show = False)
-    if isinstance(dashboard.visualiser,PlotlyVisualiser):
-        plotly_graph = [dashboard.create_graph(plotly_update_outputs["graph_id"].component_id,figure)]
-        cyto_graph = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,[])
-        plotly_style = background_color
-        cyto_style = hidden_style
-    elif isinstance(dashboard.visualiser,CytoscapeVisualiser):
-        cyto_utility = _generate_cyto_util_components(dashboard)
-        plotly_graph = []
-        cyto_div_children = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,cyto_utility+[figure])
-        cyto_style = background_color
-        plotly_style = hidden_style
-    else:
-        raise ValueError("Visualiser is not valid with dash.")
-    plotly_div = dashboard.create_div(graph_type_outputs["plotly_div"].component_id, plotly_graph)
+
+    cyto_utility = _generate_cyto_util_components(dashboard)
+    cyto_div_children = dashboard.create_div(cyto_update_outputs["graph_id"].component_id,cyto_utility+[figure])
+    cyto_style = background_color
+
     cyto_div = dashboard.create_div(graph_type_outputs["cyto_div"].component_id, cyto_div_children,style=cyto_style)
-    graph_container = dashboard.create_div(load_outputs["graph_container_id"].component_id, plotly_div + cyto_div)
-    return graph_container,plotly_style,cyto_style
+    graph_container = dashboard.create_div(load_outputs["graph_container_id"].component_id, cyto_div)
+    return graph_container,cyto_style
 
 def _create_form_elements(visualiser,dashboard,default_vals = [],style = {},id_prefix = ""):
     default_options = [visualiser.set_network_mode,
@@ -623,9 +510,6 @@ def _generate_options(visualiser):
             if func_str.split("_")[-1] == "preset":
                 option_name = "preset"
 
-            elif func_str.split("_")[-1] == "clustering":
-                option_name = "clustering"
-
             elif func_str.split("_")[-1] == "view":
                 option_name = "view"
 
@@ -668,14 +552,10 @@ def _generate_cyto_util_components(dashboard):
 def _generate_inputs_outputs(identifiers):
     preset_identifiers = {"preset" : identifiers["preset"]}
     del identifiers["preset"]
-
     outputs = {k:Output(v.component_id,v.component_property) for k,v in identifiers.items()}
     states = {k:State(v.component_id,v.component_property) for k,v in identifiers.items()}
     return preset_identifiers,identifiers,outputs,states
 
-
-def _create_enhancer_next_modal(dashbaord):
-    pass
 
 def _create_enhancer_modal(dashboard):
     headings = (dashboard.create_heading_1("enhancer_heading","Design Enhancement") +

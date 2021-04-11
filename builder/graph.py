@@ -1,13 +1,9 @@
-
+import re
 import networkx as nx
-
 from rdflib import URIRef,Graph
 from rdflib.extras.external_graph_libs import rdflib_to_networkx_digraph
 
-from builder.utility import get_name
-from builder.utility import default_prune_nodes
-from builder.utility import default_prune_edges
-from builder.utility import translate_role
+from util.sbol_identifiers import identifiers
 
 class GraphWrapper:
     def __init__(self,graph,prune=False):
@@ -17,9 +13,10 @@ class GraphWrapper:
             _graph = Graph()
             _graph.load(graph)
             self._graph = rdflib_to_networkx_digraph(_graph)
+            self._generate_labels()
         if prune:
             self._prune_graph()        
-        self._generate_labels()
+       
 
     @property
     def nodes(self):
@@ -40,15 +37,10 @@ class GraphWrapper:
     def adjacency(self):
         return self._graph.adjacency()
 
-
     def in_edges(self,node = None):
-        if not isinstance(self.graph,nx.classes.digraph.DiGraph):
-            raise ValueError(f'Graph is not direted.')   
         return self.graph.in_edges(node)
     
     def out_edges(self,node = None):
-        if not isinstance(self.graph,nx.classes.digraph.DiGraph):
-            raise ValueError(f'Graph is not direted.')   
         return self.graph.out_edges(node)
 
     def search(self,pattern,graph=None):
@@ -96,7 +88,7 @@ class GraphWrapper:
             node_attrs[n] = self.nodes[n]
             v_copy = v
             if v in seen:
-                v = URIRef(n[0:-2] + "/" + get_name(str(v)) + "/1")
+                v = URIRef(n[0:-2] + "/" + self._get_name(str(v)) + "/1")
                 node_attrs[v] = self.nodes[v_copy]
             seen.append(v)
             e = {'triples': [(n,e["triples"][0][1],v)], 
@@ -106,9 +98,13 @@ class GraphWrapper:
         tree_graph = self.sub_graph(tree_edges,node_attrs)
         return tree_graph
 
+    def get_network(self):
+        return self
+        
     def sub_graph(self,nodes,node_attrs = {}):
         new_graph = nx.DiGraph()
         new_graph.add_edges_from(nodes)
+
         for subject,node in new_graph.edges:
             try:
                 new_graph.nodes[subject].update(node_attrs[subject])
@@ -116,7 +112,7 @@ class GraphWrapper:
                 pass
             if "display_name" not in new_graph.nodes[subject].keys():
                 if isinstance(subject,URIRef):
-                    name = get_name(subject)
+                    name = self._get_name(subject)
                 else:
                     name = node
                 new_graph.nodes[subject]["display_name"] = name
@@ -127,7 +123,7 @@ class GraphWrapper:
                 pass
             if "display_name" not in new_graph.nodes[node].keys():
                 if isinstance(node,URIRef):
-                    name = get_name(node)
+                    name = self._get_name(node)
                 else:
                     name = node
                 new_graph.nodes[node]["display_name"] = name
@@ -146,7 +142,7 @@ class GraphWrapper:
         for subject,node in self._graph.edges:
             if "display_name" not in self.nodes[subject].keys():
                 if isinstance(subject,URIRef):
-                    name = get_name(subject)
+                    name = self._get_name(subject)
                 else:
                     name = subject
                 self._graph.nodes[subject]["display_name"] = name
@@ -155,20 +151,20 @@ class GraphWrapper:
                 if isinstance(node,URIRef):
                     # This is a little hacky, basically leveraging the 
                     # knowledge of the SBOL data model to reduce execution time.
-                    name = translate_role(subject,node)
+                    name = identifiers.translate_role(node)
                     if name is None:
-                        name = get_name(node)
+                        name = self._get_name(node)
                 else:
                     name = node
                 self._graph.nodes[node]["display_name"] = name
 
             edge = self._graph.edges[subject,node]
             if "triples" in edge.keys():
-                nx.set_edge_attributes(self._graph,{(subject,node) : {"display_name" : get_name(edge["triples"][0][1])}})
+                nx.set_edge_attributes(self._graph,{(subject,node) : {"display_name" : self._get_name(edge["triples"][0][1])}})
 
     def _prune_graph(self):
-        prune_edges = default_prune_edges
-        prune_nodes = default_prune_nodes
+        prune_edges = identifiers.predicates.default_prune_edges
+        prune_nodes = identifiers.objects.default_prune_nodes
 
         to_prune_edges = []
         to_prune_nodes = []
@@ -179,7 +175,7 @@ class GraphWrapper:
                 to_prune_nodes.append(n2)
             # edge = self._graph.edges[n1,n2]
             if "display_name" in edge.keys():
-                if edge["display_name"] in [get_name(p) for p in prune_edges]:
+                if edge["display_name"] in [self._get_name(p) for p in prune_edges]:
                     to_prune_edges.append((n1,n2))
             elif "triples" in edge.keys():
                 for index,triple in enumerate(edge["triples"]):
@@ -195,5 +191,15 @@ class GraphWrapper:
     def _create_edge_dict(self,s,p,o,weight=1):
         edge = {'triples': [(s,p,o)], 
                 'weight': weight, 
-                'display_name': get_name(str(p))}
+                'display_name': self._get_name(str(p))}
         return edge
+
+    def _get_name(self,subject):
+        split_subject = self._split(subject)
+        if len(split_subject[-1]) == 1 and split_subject[-1].isdigit():
+            return split_subject[-2]
+        else:
+            return split_subject[-1]
+
+    def _split(self,uri):
+        return re.split('#|\/|:', uri)

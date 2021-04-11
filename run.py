@@ -4,7 +4,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join("sbol_enhancer")))
 from builder.builder import GraphBuilder
-from visual.cytoscape.visual import CytoscapeVisualiser
+from visual.visual import CytoscapeVisualiser
 from dashboard.run import dash_runner
 from sbol_enhancer.enhancer import SBOLEnhancer
 
