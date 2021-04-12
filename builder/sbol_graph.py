@@ -71,8 +71,8 @@ class SBOLGraph:
     def get_component_instances(self):
         return self._graph.search((None,[identifiers.predicates.component,identifiers.predicates.functional_component],None))
     
-    def get_definition(self):
-        self.retrieve_node(p,identifiers.predicates.definition)
+    def get_definition(self,component):
+        return self._graph.retrieve_node(component,identifiers.predicates.definition)
 
     def get_module_definitions(self):
         return self._graph.search((None,identifiers.predicates.rdf_type,identifiers.objects.module_definition))

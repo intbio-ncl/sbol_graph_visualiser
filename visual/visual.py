@@ -99,6 +99,17 @@ class CytoscapeVisualiser:
             self.add_edge_name_labels]
         return self._set_preset(preset_functions)
 
+    def set_interaction_genetic_preset(self):
+        preset_functions = [
+            self.set_network_mode,
+            self.set_genetic_interaction_view,
+            self.add_node_name_labels,
+            self.set_klay_layout,
+            self.add_adaptive_node_color,
+            self.add_adaptive_edge_color,
+            self.add_edge_name_labels]
+        return self._set_preset(preset_functions)
+
     def set_adjacency_preset(self):
         preset_functions = [
             self.set_network_mode,
@@ -142,6 +153,10 @@ class CytoscapeVisualiser:
 
     def set_interaction_view(self):
         interaction_graph = self._graph.produce_interaction_graph()
+        self.graph_view = interaction_graph
+
+    def set_genetic_interaction_view(self):
+        interaction_graph = self._graph.produce_genetic_interaction_graph()
         self.graph_view = interaction_graph
 
     def set_protein_protein_interaction_view(self):

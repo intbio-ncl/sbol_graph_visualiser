@@ -27,6 +27,7 @@ class GraphBuilder:
         cd_edges = []
         for cd,node,edge in self._graph.get_component_definitions():
             components = self._graph.get_components(cd)
+            components = [self._graph.get_definition(c) for c in components]
             cd_edges += [(cd,c,edge) for c in components]
         parts_graph = self._graph.sub_graph(cd_edges)
         return parts_graph
@@ -35,12 +36,12 @@ class GraphBuilder:
     def produce_interaction_graph(self):
         interaction_edges = []
         for md,interaction,edge  in self._graph.get_interactions():
+            i_type = self._graph.get_type(interaction)
             participations = [p[1] for p in self._graph.get_participations(interaction)]
             if len(participations) == 1:
                 participation = participations[0][1]
                 cd1 = self._graph.get_component_definition(participation=participation)
                 p_type = self._graph.get_role(participation)
-                i_type = self._graph.get_type(interaction)
                 i_edge = self._create_interaction_edge(cd1,cd1,p_type,p_type,i_type)
                 interaction_edges.append(i_edge)
                 continue
@@ -48,6 +49,35 @@ class GraphBuilder:
                 cd1 = self._graph.get_component_definition(participation=p1)
                 p1_type = self._graph.get_role(p1)
                 i_type = self._graph.get_type(interaction)
+                for p2 in participations:
+                    if p1 == p2:
+                        continue
+                    p2_type = self._graph.get_role(p2)
+                    cd2 = self._graph.get_component_definition(participation=p2)
+                    i_edge = self._create_interaction_edge(cd1,cd2,p1_type,p2_type,i_type)
+                    if i_edge is None:
+                        continue
+                    interaction_edges.append(i_edge)
+        interaction_graph = self._graph.sub_graph(interaction_edges)
+        return interaction_graph
+
+
+    def produce_genetic_interaction_graph(self):
+        '''
+        No Non-Genetic Nodes.
+        If an interaction comes from a non-genetic entity, Then 
+        Only use inhibition and stimulation.
+        '''
+        interaction_edges = []
+        for md,interaction,edge  in self._graph.get_interactions():
+            i_type = self._graph.get_type(interaction)
+            participations = [p[1] for p in self._graph.get_participations(interaction)]
+            for p1 in participations:
+                cd1 = self._graph.get_component_definition(participation=p1)
+                p1_type = self._graph.get_role(p1)
+                i_type = self._graph.get_type(interaction)
+                if i_type != identifiers.external.interaction_stimulation and i_type != identifiers.external.interaction_inhibition:
+                    continue
                 for p2 in participations:
                     if p1 == p2:
                         continue
@@ -99,12 +129,6 @@ class GraphBuilder:
                 handle_edge(vertex)
         ppi_graph = self._graph.sub_graph(ppi_edges,node_attrs=node_attrs)
         return ppi_graph
-
-
-    def produce_heirachy_graph(self):
-        pass
-    def produce_interaction_abstract(self):
-        pass
 
 
     def _create_interaction_edge(self,cd1,cd2,p1_type,p2_type,i_type):
