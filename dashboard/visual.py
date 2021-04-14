@@ -17,10 +17,9 @@ server = Flask(__name__)
 app = dash.Dash(server=server,suppress_callback_exceptions=True)
 
 class DashBoard:
-    def __init__(self,graph_visualiser,enhancer):
+    def __init__(self,graph_visualiser):
         self.app = app
         self.visualiser = graph_visualiser
-        self.enhancer = enhancer
         self.style = {}
         self.children = []
         self.parameters_calls = []
