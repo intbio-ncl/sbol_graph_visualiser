@@ -43,6 +43,13 @@ class GraphWrapper:
     def out_edges(self,node = None):
         return self.graph.out_edges(node)
 
+    def merge_nodes(self,node1,node2):
+        self._graph = GraphWrapper(nx.contracted_nodes(self._graph,node1,node2))
+        return self._graph
+    
+    def remove_edge(self,n1,n2):
+        self._graph.remove_edge(n1,n2)
+
     def search(self,pattern,graph=None):
         matches = []
         (s, p, o) = pattern

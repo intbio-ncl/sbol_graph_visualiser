@@ -1,3 +1,5 @@
+import networkx as nx
+
 from builder.sbol_graph import SBOLGraph
 from util.sbol_identifiers import identifiers
 
@@ -63,31 +65,27 @@ class GraphBuilder:
 
 
     def produce_genetic_interaction_graph(self):
-        '''
-        No Non-Genetic Nodes.
-        If an interaction comes from a non-genetic entity, Then 
-        Only use inhibition and stimulation.
-        '''
-        interaction_edges = []
-        for md,interaction,edge  in self._graph.get_interactions():
-            i_type = self._graph.get_type(interaction)
-            participations = [p[1] for p in self._graph.get_participations(interaction)]
-            for p1 in participations:
-                cd1 = self._graph.get_component_definition(participation=p1)
-                p1_type = self._graph.get_role(p1)
-                i_type = self._graph.get_type(interaction)
-                if i_type != identifiers.external.interaction_stimulation and i_type != identifiers.external.interaction_inhibition:
-                    continue
-                for p2 in participations:
-                    if p1 == p2:
-                        continue
-                    p2_type = self._graph.get_role(p2)
-                    cd2 = self._graph.get_component_definition(participation=p2)
-                    i_edge = self._create_interaction_edge(cd1,cd2,p1_type,p2_type,i_type)
-                    if i_edge is None:
-                        continue
-                    interaction_edges.append(i_edge)
-        interaction_graph = self._graph.sub_graph(interaction_edges)
+        interaction_graph = self.produce_interaction_graph()
+        merge_operations = []
+        for n1,n2,e1 in interaction_graph.edges(data=True):
+            i_type = e1["triples"][0][1]
+            if i_type == identifiers.external.interaction_genetic_production:
+                merge_operations.append((n1,n2))
+            elif (i_type == identifiers.external.interaction_noncovalent_bonding and 
+            self._graph.get_type(n1) == identifiers.external.component_definition_smallMolecule):
+                    merge_operations.append((n1,n2))
+        for n1,n2 in merge_operations:
+            interaction_graph = interaction_graph.merge_nodes(n1,n2)
+
+        remove_operations = []
+        for n1,n2,e1 in interaction_graph.edges(data=True):
+            i_type = e1["triples"][0][1]
+            if n1 == n2:
+                remove_operations.append((n1,n2))
+            elif i_type == identifiers.external.interaction_noncovalent_bonding:
+                remove_operations.append((n1,n2))
+        for n1,n2 in remove_operations:
+            interaction_graph.remove_edge(n1,n2)
         return interaction_graph
 
 

@@ -21,6 +21,9 @@ class SBOLGraph:
     def graph(self,graph):
         self._graph = graph
 
+    def merge_nodes(self,node1,node2):
+        return self._graph.merge_nodes(node1,node2)
+
     def sub_graph(self,edges,node_attrs={}):
         return self._graph.sub_graph(edges,node_attrs)
 
