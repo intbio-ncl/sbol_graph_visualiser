@@ -25,7 +25,7 @@ class GraphBuilder:
     def produce_full_graph(self):
         return self._graph.graph
 
-    def produce_components_graph(self):
+    def produce_heirarchy_graph(self):
         cd_edges = []
         for cd,node,edge in self._graph.get_component_definitions():
             components = self._graph.get_components(cd)
@@ -33,6 +33,29 @@ class GraphBuilder:
             cd_edges += [(cd,c,edge) for c in components]
         parts_graph = self._graph.sub_graph(cd_edges)
         return parts_graph
+
+    def produce_components_graph(self):
+        component_edges = []
+        for cd,node,edge in self._graph.get_component_definitions():
+            cd_types = self._graph.get_types(cd)
+            type_pred = identifiers.predicates.type
+            component_edges += [(cd,cd_type,self._create_descriptor_edge(cd,cd_type,type_pred)) 
+                                for cd_type in cd_types]
+            cd_roles = self._graph.get_roles(cd)
+            role_pred = identifiers.predicates.role
+            component_edges += [(cd,cd_role,self._create_descriptor_edge(cd,cd_role,role_pred)) 
+                                for cd_role in cd_roles]
+            components = self._graph.get_components(cd)
+            component_edges += [(cd,c,self._create_component_edge(cd,c)) for c in components]
+
+        for md,node,edge in self._graph.get_module_definitions():
+            interactions = self._graph.get_interactions(md)
+            component_edges += [(md,i,self._create_descriptor_edge(md,i,identifiers.predicates.interaction)) for i in interactions]
+
+            fcs = self._graph.get_functional_components(md)
+            component_edges += [(md,fc,self._create_component_edge(md,fc)) for fc in fcs]
+        component_graph = self._graph.sub_graph(component_edges)
+        return component_graph
 
 
     def produce_interaction_graph(self):
@@ -160,3 +183,13 @@ class GraphBuilder:
 
 
 
+    def _create_descriptor_edge(self,entity,descriptor,predicate):
+        edge = {"triples" : [(entity,predicate,descriptor)],
+                "weight"  : 1,
+                "display_name" : self._graph.graph._get_name(predicate)}
+        return edge
+    def _create_component_edge(self,cd,component):
+        edge = {"triples" : [(cd,identifiers.predicates.component,component)],
+                "weight"  : 1,
+                "display_name" : "sub-component"}
+        return edge

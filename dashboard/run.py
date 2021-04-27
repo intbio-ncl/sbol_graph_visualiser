@@ -474,6 +474,7 @@ def _generate_options(visualiser):
                            "edge_text_preset",
                            "node_color_preset",
                            "edge_color_preset",
+                           "node_size_preset",
                            "layout",
                            "copy_settings"]
 

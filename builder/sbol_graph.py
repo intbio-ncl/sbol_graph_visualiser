@@ -40,7 +40,9 @@ class SBOLGraph:
             cd = self._graph.retrieve_node(fc,identifiers.predicates.definition)
             return cd
                             
-    def get_interactions(self):
+    def get_interactions(self,md=None):
+        if md is not None:
+            return self._graph.retrieve_nodes(md,identifiers.predicates.interaction)
         return self._graph.search((None,identifiers.predicates.interaction,None))
 
     def get_components(self,cd=None,sa=None):
@@ -56,8 +58,14 @@ class SBOLGraph:
     def get_type(self,subject):
         return self._graph.retrieve_node(subject,identifiers.predicates.type)
 
+    def get_types(self,subject):
+        return self._graph.retrieve_nodes(subject,identifiers.predicates.type)
+
     def get_role(self,subject):
         return self._graph.retrieve_node(subject,identifiers.predicates.role)
+
+    def get_roles(self,subject):
+        return self._graph.retrieve_nodes(subject,identifiers.predicates.role)
 
     def get_sequence_annotations(self,cd):
         return self._graph.retrieve_nodes(cd,identifiers.predicates.sequence_annotation)
@@ -68,8 +76,10 @@ class SBOLGraph:
     def get_locations(self,sa):
         return self._graph.retrieve_nodes(sa,identifiers.predicates.location)
 
-    def get_functional_components(self):
-        return self._graph.search((module_definition[0],identifiers.predicates.functional_component,None))
+    def get_functional_components(self,md=None):
+        if md is not None:
+            return self._graph.retrieve_nodes(md,identifiers.predicates.functional_component)
+        return self._graph.search((None,identifiers.predicates.functional_component,None))
 
     def get_component_instances(self):
         return self._graph.search((None,[identifiers.predicates.component,identifiers.predicates.functional_component],None))

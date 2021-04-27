@@ -37,11 +37,10 @@ class CytoscapeVisualiser:
         self.edge_text_preset = None
         self.node_color_preset = self.add_standard_node_color
         self.edge_color_preset = self.add_standard_edge_color
+        self.node_size_preset = self.add_standard_node_size
 
         self.elements = []
-        self._node_size = 15
         self._edge_width = 1
-        self._node_edge_size = 3
         self._node_text_size = 5
         self._edge_text_size = 5
         self._node_shape_preset = self.set_circle_node_shape
@@ -121,13 +120,24 @@ class CytoscapeVisualiser:
             self.add_node_total_adjacency_color]
         return self._set_preset(preset_functions)
 
+    def set_heirarchy_preset(self):
+        preset_functions = [
+            self.set_tree_mode,
+            self.set_heirarchy_view,
+            self.add_node_name_labels,
+            self.add_standard_edge_color,
+            self.set_dagre_layout,
+            self.add_adaptive_node_color,
+            self.add_edge_no_labels]
+        return self._set_preset(preset_functions)
+
     def set_component_preset(self):
         preset_functions = [
             self.set_tree_mode,
             self.set_components_view,
             self.add_node_name_labels,
             self.add_standard_edge_color,
-            self.set_dagre_layout,
+            self.set_cose_layout,
             self.add_adaptive_node_color,
             self.add_edge_no_labels]
         return self._set_preset(preset_functions)
@@ -162,6 +172,10 @@ class CytoscapeVisualiser:
     def set_protein_protein_interaction_view(self):
         ppi_graph = self._graph.produce_protein_protein_interaction_graph()
         self.graph_view = ppi_graph
+
+    def set_heirarchy_view(self):
+        heirarchy_preset = self._graph.produce_heirarchy_graph
+        self.graph_view = heirarchy_preset
 
     def set_components_view(self):
         components_preset = self._graph.produce_components_graph()
@@ -381,6 +395,27 @@ class CytoscapeVisualiser:
         else:
             self.node_text_preset = self.add_node_role_labels
 
+
+    def add_standard_node_size(self):
+        if self.node_size_preset == self.add_standard_node_size:
+            standard_size = 20
+            return [standard_size for node in self.graph_view.nodes()]
+        else:
+            self.node_size_preset = self.add_standard_node_size
+
+    def add_type_node_size(self):
+        from random import randint
+        if self.node_size_preset == self.add_type_node_size:
+            node_sizes = []
+            for node in self.graph_view.nodes():
+                if self._graph.graph.get_rdf_type(node) is None:
+                    node_sizes.append(10)
+                else:
+                    node_sizes.append(20)
+            return node_sizes
+        else:
+            self.node_size_preset = self.add_type_node_size
+
     # ---------------------- Pick the node color ----------------------
 
     def add_standard_node_color(self):
@@ -535,6 +570,7 @@ class CytoscapeVisualiser:
             return edge_colors
         else:
             self.edge_color_preset = self.add_adaptive_edge_color
+
     # ---------------------- Pick the edge content ----------------------
     def add_edge_no_labels(self):
         if self.edge_text_preset == self.add_edge_no_labels:
@@ -654,16 +690,6 @@ class CytoscapeVisualiser:
         self.edge_shape = "segments"
    
   # ---------------------- Misc Settings ---------------------
-    def node_size(self,size = None):
-        if size is None:
-            return self._node_size
-        self._node_size = float(size)
-
-    def node_edge_size(self,width = None):
-        if width is None:
-            return self._node_edge_size
-        self._node_edge_size = float(width)
-
     def edge_width(self,width = None): 
         if width is None:
             return self._edge_width
@@ -695,17 +721,19 @@ class CytoscapeVisualiser:
         if self.node_text_preset is not None:
             node_text = self.node_text_preset()
             stylesheet.append({'selector': 'node','style': {'content': 'data(label)',
-                                                            "height" : self._node_size,
-                                                            "width" : self._node_size,
+                                                            "height" : "data(size)",
+                                                            "width" : "data(size)",
                                                             "font-size" : self._node_text_size}})
         node_color = self.node_color_preset()
         node_shapes = self._node_shape_preset()
+        node_sizes = self.node_size_preset()
         cyto_nodes = []
         for index,node in enumerate(self.graph_view.nodes(data=True)):
             label = node[1]
             node = node[0]
             color_key =  list(node_color[index].keys())[0]
             node_shape = node_shapes[index]
+            node_size = node_sizes[index]
             node_shape_value = str(list(node_shape.values())[0])
 
             try:
@@ -727,13 +755,13 @@ class CytoscapeVisualiser:
                 
             if is_parent:
                 cyto_node = {
-                    'data': {'id': node, 'label': node_text[index], 'parent' : parent},
+                    'data': {'id': node, 'label': node_text[index], 'parent' : parent,"size" : node_size},
                     "classes" : "top-center " + "parent"
                 }
 
             else:
                 cyto_node = {
-                    'data': {'id': node, 'label': node_text[index], 'parent' : parent},
+                    'data': {'id': node, 'label': node_text[index], 'parent' : parent,"size" : node_size},
                     "classes" : "top-center " + color_key + " " + node_edge_color_key + " " + node_shape_value,
                 }
 
@@ -742,7 +770,7 @@ class CytoscapeVisualiser:
                     temp_node_selectors.append(color_key)                             
                 if node_edge_color_key not in temp_edge_selectors:
                     stylesheet.append({"selector" : "." + node_edge_color_key,"style" : {"border-color": node_edge_color_color,
-                                                                                        "border-width": self._node_edge_size}})                                    
+                                                                                        "border-width": "3"}})                                    
                     temp_edge_selectors.append(node_edge_color_key)
 
             if self.pos != [] and self.pos is not None:
