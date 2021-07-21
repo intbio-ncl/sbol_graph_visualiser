@@ -33,8 +33,11 @@ class Namespace:
         self.dc = rdflib.URIRef('http://purl.org/dc/terms/')
         self.edam = rdflib.URIRef('http://edamontology.org/format')
         self.owl = rdflib.URIRef('http://www.w3.org/2002/07/owl#')
-        self.prov = rdflib.URIRef('https://www.w3.org/ns/prov#')
+        self.prov = rdflib.URIRef('http://www.w3.org/ns/prov#')
         self.synbiohub = rdflib.URIRef('http://wiki.synbiohub.org/wiki/Terms/synbiohub#')
+
+        self.prune = ["http://purl.org/dc/elements/1.1/",
+                      "http://purl.obolibrary.org/obo/"]
 
 class Objects:
     def __init__(self, namespaces):
@@ -60,6 +63,11 @@ class Objects:
         self.sequence_annotation = rdflib.term.URIRef(self.namespaces.sbol + "SequenceAnnotation")
         self.sequence_constraint = rdflib.term.URIRef(self.namespaces.sbol + "SequenceConstraint")
         self.participation = rdflib.term.URIRef(self.namespaces.sbol + "Participation")
+        self.activity = rdflib.term.URIRef(self.namespaces.prov + "Activity")
+        self.usage = rdflib.term.URIRef(self.namespaces.prov + "Usage")
+        self.association = rdflib.term.URIRef(self.namespaces.prov + "Association")
+        self.plan = rdflib.term.URIRef(self.namespaces.prov + "Plan")
+        self.agent = rdflib.term.URIRef(self.namespaces.prov + "Agent")
 
         self.top_levels = {rdflib.URIRef(self.namespaces.sbol + name) for name in
                             ['Sequence',
@@ -77,7 +85,17 @@ class Objects:
                             'Experiment',
                             'ExperimentalData']}
 
-        self.default_prune_nodes = [self.sequence]
+        self.prune = [
+            self.agent,
+            self.plan,
+            self.association,
+            self.usage,
+            self.activity,
+            self.attachment,
+            self.implementation,
+            self.experimental_data,
+            self.experiment,
+            self.sequence]
 
 class Predicates:
     def __init__(self, namespaces):
@@ -127,11 +145,29 @@ class Predicates:
         self.module = rdflib.term.URIRef(self.namespaces.sbol + 'module')
         self.maps_to = rdflib.term.URIRef(self.namespaces.sbol + 'mapsTo')
         self.variable_component = rdflib.term.URIRef(self.namespaces.sbol + 'variableComponent')
-
+        self.size = rdflib.term.URIRef(self.namespaces.sbol + 'size')
+        self.hash = rdflib.term.URIRef(self.namespaces.sbol + 'hash')
+        self.format = rdflib.term.URIRef(self.namespaces.sbol + 'format')
+        self.attachment = rdflib.term.URIRef(self.namespaces.sbol + 'attachment')
+        self.member = rdflib.term.URIRef(self.namespaces.sbol + 'member')
+        self.refinement = rdflib.term.URIRef(self.namespaces.sbol + "refinement")
+        self.model = rdflib.term.URIRef(self.namespaces.sbol + "model")
 
         self.mutable_notes = rdflib.term.URIRef(self.namespaces.synbiohub + 'mutableNotes')
         self.mutable_description = rdflib.term.URIRef(self.namespaces.synbiohub + 'mutableDescription')
         self.mutable_provenance = rdflib.term.URIRef(self.namespaces.synbiohub + 'mutableProvenance')
+        self.toplevel = rdflib.term.URIRef(self.namespaces.synbiohub + 'topLevel')
+        self.ownedby = rdflib.term.URIRef(self.namespaces.synbiohub + 'ownedBy')
+
+        self.created = rdflib.term.URIRef(self.namespaces.dc + 'created')
+
+        self.was_generated_by = rdflib.term.URIRef(self.namespaces.prov + 'wasGeneratedBy') 
+        self.ended_at_time = rdflib.term.URIRef(self.namespaces.prov + 'endedAtTime')
+        self.had_plan = rdflib.term.URIRef(self.namespaces.prov + 'hadPlan')
+        self.entity = rdflib.term.URIRef(self.namespaces.prov + 'entity')
+        self.qualified_association = rdflib.term.URIRef(self.namespaces.prov + 'qualifiedAssociation')
+        self.qualified_usage = rdflib.term.URIRef(self.namespaces.prov + 'qualifiedUsage')
+        self.agent = rdflib.term.URIRef(self.namespaces.prov + 'agent')
 
         self.ownership_predicates = [
             self.module,
@@ -145,15 +181,48 @@ class Predicates:
             self.variable_component
         ] 
 
-        self.default_prune_edges = [
-            self.version,
-            self.display_id,
-            self.persistent_identity,
+        self.prune = [
+            #self.definition,
+            self.description,
+            self.title,
+            self.rdf_type,
+            self.start,
+            self.end,
+            self.at,
+            self.type,
+            self.role,
+            self.member,
+            self.sequence_constraint_restriction,
+            self.variable_component,
             self.access,
-            self.direction,
-            self.sequence,
+            self.elements,
+            self.size,
+            self.language,
+            self.persistent_identity,
+            self.display_id,
+            self.version,
             self.encoding,
-            self.elements]
+            self.direction,
+            self.orientation,
+            self.framework,
+            self.source,
+            self.toplevel,
+            self.ownedby,
+            self.was_generated_by,
+            self.created,
+            self.ended_at_time,
+            self.had_plan,
+            self.entity,
+            self.qualified_association,
+            self.qualified_usage,
+            self.hash,
+            self.format,
+            self.attachment,
+            self.agent,
+            self.sequence,
+            self.location,
+            self.model,
+            self.refinement]
 
 class ExternalIdentifiers:
     def __init__(self, namespaces):

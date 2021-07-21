@@ -1,51 +1,30 @@
 import sys,os
 import math
 import re
-
-import dash
 import dash_cytoscape as cyto
-import dash_html_components as html
 import networkx as nx
-from rdflib import Literal,URIRef
+from util.color_manager import StandardPalette
+from rdflib.namespace import RDF
 
 
-from util.color_util import calculate_next_color
-from util.color_util import calculate_role_color
-from util.sbol_identifiers import identifiers
-
-from builder.builder import GraphBuilder
-
-
-
-class CytoscapeVisualiser:
-
-    def __init__(self, graph = None):
-        if graph is None:
-            self._graph = None
-        elif isinstance(graph,GraphBuilder):
-            self._graph = graph
-            self.graph_view = self._graph.graph._graph
-        else:
-            self._graph = GraphBuilder(graph)
-            self.graph_view = self._graph.graph._graph
-
+class AbstractVisualiser:
+    def __init__(self):
         cyto.load_extra_layouts()
         self.pos = []
         self.mode = self.set_network_mode
         self.layout = self.set_spring_layout
         self.node_text_preset = self.add_node_no_labels
-        self.edge_text_preset = None
+        self.edge_text_preset = self.add_edge_no_labels
         self.node_color_preset = self.add_standard_node_color
         self.edge_color_preset = self.add_standard_edge_color
         self.node_size_preset = self.add_standard_node_size
 
         self.elements = []
-        self._edge_width = 1
-        self._node_text_size = 5
+        self._standard_node_size = 30
+        self._node_text_size = 3
         self._edge_text_size = 5
         self._node_shape_preset = self.set_circle_node_shape
         self.edge_shape = "straight"
-        self._node_edge_colors = []
         self.cyto_shapes = ["circle",
                             "square",
                             "triangle",
@@ -76,142 +55,78 @@ class CytoscapeVisualiser:
             func()
         return functions
 
-    def set_protein_protein_interaction_preset(self):
-        preset_functions = [
-            self.set_network_mode,
-            self.set_protein_protein_interaction_view,
-            self.add_node_name_labels,
-            self.add_standard_node_color,
-            self.set_cola_layout,
-            self.add_adaptive_edge_color,
-            self.add_edge_name_labels]
-        return self._set_preset(preset_functions)
-
-    def set_interaction_preset(self):
-        preset_functions = [
-            self.set_network_mode,
-            self.set_interaction_view,
-            self.add_node_name_labels,
-            self.set_klay_layout,
-            self.add_adaptive_node_color,
-            self.add_adaptive_edge_color,
-            self.add_edge_name_labels]
-        return self._set_preset(preset_functions)
-
-    def set_interaction_genetic_preset(self):
-        preset_functions = [
-            self.set_network_mode,
-            self.set_genetic_interaction_view,
-            self.add_node_name_labels,
-            self.set_klay_layout,
-            self.add_adaptive_node_color,
-            self.add_adaptive_edge_color,
-            self.add_edge_name_labels]
-        return self._set_preset(preset_functions)
-
-    def set_adjacency_preset(self):
-        preset_functions = [
-            self.set_network_mode,
-            self.set_full_graph_view,
-            self.add_node_adjacency_labels,
-            self.add_standard_edge_color,
-            self.set_circular_layout,
-            self.add_edge_no_labels,
-            self.add_node_total_adjacency_color]
-        return self._set_preset(preset_functions)
-
-    def set_heirarchy_preset(self):
-        preset_functions = [
-            self.set_tree_mode,
-            self.set_heirarchy_view,
-            self.add_node_name_labels,
-            self.add_standard_edge_color,
-            self.set_dagre_layout,
-            self.add_adaptive_node_color,
-            self.add_edge_no_labels]
-        return self._set_preset(preset_functions)
-
-    def set_component_preset(self):
-        preset_functions = [
-            self.set_tree_mode,
-            self.set_components_view,
-            self.add_node_name_labels,
-            self.add_standard_edge_color,
-            self.set_cose_layout,
-            self.add_adaptive_node_color,
-            self.add_edge_no_labels]
-        return self._set_preset(preset_functions)
-
-
     
     # ---------------------- Set Mode (Type of graph) ------------------------------------
     def set_network_mode(self):
+        '''
+        Set the graph to the standard Node-Edge-Node Network graph.
+        Duplicates are merged into the same node leading to connectedness.
+        '''
         if self.mode == self.set_network_mode:
             self.graph_view = self.graph_view.get_network()
         else:
             self.mode = self.set_network_mode
 
     def set_tree_mode(self):
+        '''
+        Produce a Tree-Like graph where duplicates within 
+        the graph are NOT treated as the same node.
+        This will result in a tree/heirarchy structure within a graph.
+        '''
         if self.mode == self.set_tree_mode:
             self.graph_view = self.graph_view.get_tree()
         else:
             self.mode = self.set_tree_mode
 
-    # ---------------------- Set Graph (Set a different graph view) ----------------------
+    
     def set_full_graph_view(self):
+        '''
+        Renders the Full graph. 
+        Default option.
+        '''
         self.graph_view = self._graph.produce_full_graph()
-
-    def set_interaction_view(self):
-        interaction_graph = self._graph.produce_interaction_graph()
-        self.graph_view = interaction_graph
-
-    def set_genetic_interaction_view(self):
-        interaction_graph = self._graph.produce_genetic_interaction_graph()
-        self.graph_view = interaction_graph
-
-    def set_protein_protein_interaction_view(self):
-        ppi_graph = self._graph.produce_protein_protein_interaction_graph()
-        self.graph_view = ppi_graph
-
-    def set_heirarchy_view(self):
-        heirarchy_preset = self._graph.produce_heirarchy_graph
-        self.graph_view = heirarchy_preset
-
-    def set_components_view(self):
-        components_preset = self._graph.produce_components_graph()
-        self.graph_view = components_preset
-
 
     # ---------------------- Pick a layout ----------------------
     def set_spring_layout(self):
+        '''
+        Position nodes using Fruchterman-Reingold force-directed algorithm.
+        '''
         if self.layout == self.set_spring_layout:
             self.pos = nx.spring_layout(self.graph_view.graph, iterations=200)
-    
         else:
             self.layout = self.set_spring_layout
 
     def set_circular_layout(self):
+        '''
+        Position nodes on a circle.
+        '''
         if self.layout == self.set_circular_layout:
             self.pos = nx.circular_layout(self.graph_view.graph)
-    
         else:
             self.layout = self.set_circular_layout
 
     def set_kamada_kawai_layout(self):
+        '''
+        Position nodes using Kamada-Kawai path-length cost-function.
+        '''
         if self.layout == self.set_kamada_kawai_layout:
             self.pos = nx.kamada_kawai_layout(self.graph_view.graph)
-    
         else:
             self.layout = self.set_kamada_kawai_layout
 
     def set_planar_layout(self):
+        '''
+        Position nodes without edge intersections.
+        '''
         if self.layout == self.set_planar_layout:
             self.pos = nx.planar_layout(self.graph_view.graph)
-    
         else:
             self.layout = self.set_planar_layout
 
     def set_no_layout(self):
+        '''
+        No new positional data produced for graph.
+        '''
         if self.layout == self.set_no_layout:
             self.pos = None
             return {"name" : "preset"}
@@ -219,6 +134,10 @@ class CytoscapeVisualiser:
             self.layout = self.set_no_layout
 
     def set_concentric_layout(self):
+        '''
+        Position nodes into concentric circles, 
+        based on the specified metric. 
+        '''
         if self.layout == self.set_concentric_layout:
             self.pos = None
             return {"name" : "concentric"}
@@ -226,6 +145,10 @@ class CytoscapeVisualiser:
             self.layout = self.set_concentric_layout
 
     def set_breadthfirst_layout(self):
+        '''
+        Positions nodes in levels, according to the levels 
+        generated by running a breadth-first search on the graph.
+        '''
         if self.layout == self.set_breadthfirst_layout:
             self.pos = None
             return {"name" : "breadthfirst",
@@ -234,6 +157,10 @@ class CytoscapeVisualiser:
             self.layout = self.set_breadthfirst_layout
 
     def set_cose_layout(self):
+        '''
+        Positions nodes based on the CoSE: Compound Spring Embedder - 
+        A force directed layout scheme.
+        '''
         if self.layout == self.set_cose_layout:
             self.pos = None
             return {"name" : "cose",
@@ -256,6 +183,11 @@ class CytoscapeVisualiser:
             self.layout = self.set_cose_layout
 
     def set_cose_bilkent_layout(self):
+        '''
+        Positions nodes based on the CoSE: Compound Spring Embedder - 
+        A force directed layout scheme.
+        Similar to COSE but more expensive + can provide better results.
+        '''
         if self.layout == self.set_cose_bilkent_layout:
             self.pos = None
             return {"name" : "cose-bilkent"}
@@ -263,6 +195,9 @@ class CytoscapeVisualiser:
             self.layout = self.set_cose_bilkent_layout
 
     def set_cola_layout(self):
+        '''
+        Positions nodes based on a force directed algorithm.
+        '''
         if self.layout == self.set_cola_layout:
             self.pos = None
             return {"name" : "cola"}
@@ -270,6 +205,10 @@ class CytoscapeVisualiser:
             self.layout = self.set_cola_layout
 
     def set_euler_layout(self):
+        '''
+        Positions nodes based on a force directed algorithm.
+        It is fairly fast. However, cola tends to give better results.
+        '''
         if self.layout == self.set_euler_layout:
             self.pos = None
             return {"name" : "euler"}
@@ -277,6 +216,11 @@ class CytoscapeVisualiser:
             self.layout = self.set_euler_layout
 
     def set_spread_layout(self):
+        '''
+        Positions nodes based on a force directed algorithm.
+        First, it runs cose and then it spreads out the graph 
+        to fill out the viewport as much as possible.
+        '''
         if self.layout == self.set_spread_layout:
             self.pos = None
             return {"name" : "spread"}
@@ -284,6 +228,9 @@ class CytoscapeVisualiser:
             self.layout = self.set_spread_layout
 
     def set_dagre_layout(self):
+        '''
+        Positions nodes based on a traditional binary tree heirarchical layout.
+        '''
         if self.layout == self.set_dagre_layout:
             self.pos = None
             return {"name" : "dagre"}
@@ -291,53 +238,55 @@ class CytoscapeVisualiser:
             self.layout = self.set_dagre_layout
 
     def set_klay_layout(self):
+        '''
+        Positions nodes based on a heirarchical layout.
+        '''
         if self.layout == self.set_klay_layout:
             self.pos = None
-            return {"name" : "klay",
-                    'idealEdgeLength': 100,
-                    'nodeOverlap': 20,
-                    'refresh': 20,
-                    'fit': True,
-                    'padding': 30,
-                    'randomize': False,
-                    'componentSpacing': 100,
-                    'nodeRepulsion': 400000,
-                    'edgeElasticity': 100,
-                    'nestingFactor': 5,
-                    'gravity': 80,
-                    'numIter': 1000,
-                    'initialTemp': 200,
-                    'coolingFactor': 0.95,
-                    'minTemp': 1.0}
+            return {"name" : "klay"}
         else:
             self.layout = self.set_klay_layout
    
+    def set_grid_layout(self):
+        '''
+        Positions nodes based on a heirarchical layout.
+        '''
+        if self.layout == self.set_grid_layout:
+            self.pos = None
+            return {"name" : "grid"}
+        else:
+            self.layout = self.set_grid_layout
    
     # ---------------------- Pick the node content ----------------------
-
     def add_node_no_labels(self):
+        '''
+        Textual data pertaining to a node is not rendered.
+        '''
         if self.node_text_preset == self.add_node_no_labels:
             return [None] * len(self.graph_view.nodes())
         else:
             self.node_text_preset = self.add_node_no_labels
 
     def add_node_adjacency_labels(self):
+        '''
+        Textual data pertaining to a node relates 
+        to number of incoming and outgoing edges.
+        '''
         if self.node_text_preset == self.add_node_adjacency_labels:
             node_text = []
-            if isinstance(self._graph.graph,nx.classes.digraph.DiGraph):
-                for node in self.graph_view.nodes:
-                    num_in = len(self.graph_view.in_edges(node))
-                    num_out = len(self.graph_view.out_edges(node)) 
-                    node_text.append(f"# IN: {str(num_in)}, # OUT: {str(num_out)}")
-
-            else:
-                for node, adjacencies in enumerate(self.graph_view.adjacency):
-                    node_text.append('# of connections: '+ str(len(adjacencies[1])))
+            for node in self.graph_view.nodes:
+                num_in = len(self.graph_view.in_edges(node))
+                num_out = len(self.graph_view.out_edges(node)) 
+                node_text.append(f"# IN: {str(num_in)}, # OUT: {str(num_out)}")
             return node_text
         else:
             self.node_text_preset = self.add_node_adjacency_labels
 
     def add_node_name_labels(self):
+        '''
+        Textual data pertaining to a node relates to the 
+        name the node was provided during building of the graph.
+        '''
         if self.node_text_preset == self.add_node_name_labels:
             node_text = []
             names = nx.get_node_attributes(self.graph_view,"display_name")
@@ -346,242 +295,175 @@ class CytoscapeVisualiser:
             return node_text
         else:
             self.node_text_preset = self.add_node_name_labels
-    
+
+        
     def add_node_type_labels(self):
+        '''
+        Textual data pertaining to a node is of the RDF type.
+        '''
         if self.node_text_preset == self.add_node_type_labels:
             node_text = []
             for node in self.graph_view.nodes:
-                edges = [[e for e in edge[2]["triples"]] for edge in self._graph.edges(node,data=True)]
-                found = False
-                for edge in edges:
-                    edge = edge[0]
-                    if edge[1] == identifiers.predicates.rdf_type:
-                        node_text.append(self._get_name(str(edge[2])))
-                        found = True
+                for n,v,e in self._graph.edges(node,keys=True):
+                    if e[1] == RDF.type:
+                        node_text.append(self._get_name(str(e[2])))
                         break
-                if not found:
+                else:
                     # I think this should only be literals and external identifiers.
-                    if isinstance(edge[2],Literal):
+                    if isinstance(e[2],Literal):
                         node_text.append("Literal")
-                    elif isinstance(edge[2],URIRef):
+                    elif isinstance(e[2],URIRef):
                         node_text.append("Identifier")
                     else:
                         node_text.append("?")
             return node_text
         else:
             self.node_text_preset = self.add_node_type_labels
-        
-    def add_node_role_labels(self):
-        if self.node_text_preset == self.add_node_role_labels:
-            node_texts = []
-            nodes = self.graph_view.nodes()
-            for node in nodes:
-                obj_type = self._graph.graph.get_rdf_type(node)
-                if obj_type is None:
-                    node_texts.append("No Type")
-                    continue
-                role = self._graph.graph.get_role(node)
-                if role is not None:
-                    node_texts.append(self._get_name(str(obj_type)) + " - " + identifiers.translate_role(role))
-                    continue
-                role = self._graph.graph.get_type(node)
-                if role is not None:
-                    node_texts.append(self._get_name(str(obj_type)) + " - " + identifiers.translate_role(role))
-                    continue
-                else:
-                    node_texts.append(self._get_name(str(obj_type)))
+
             
-            return node_texts
+
+    # ---------------------- Pick the node color ----------------------
+    def add_standard_node_color(self):
+        '''
+        All node colors are the same standard color.
+        '''
+        if self.node_color_preset == self.add_standard_node_color:
+            return [{"standard" : StandardPalette.primary.value} for node in self.graph_view.nodes()]
         else:
-            self.node_text_preset = self.add_node_role_labels
+            self.node_color_preset = self.add_standard_node_color
 
+    def add_rdf_type_node_color(self):
+        '''
+        Dual color, Objects and Properties have a unique color.
+        '''
+        if self.node_color_preset == self.add_rdf_type_node_color:
+            colors = []
+            for node,data in self.graph_view.nodes(data=True):
+                if self._graph.graph.get_rdf_type(node) is not None:
+                    color = {"rdf_type" : StandardPalette.primary.value}
+                else:
+                    color = {"no_type" : StandardPalette.secondary.value}
+                colors.append(color)
+            return colors
+        else:
+            self.node_color_preset = self.add_rdf_type_node_color
 
+    # ---------------------- Set Node Size ----------------------
     def add_standard_node_size(self):
+        '''
+        The Node size for each node is equal.
+        '''
         if self.node_size_preset == self.add_standard_node_size:
-            standard_size = 20
-            return [standard_size for node in self.graph_view.nodes()]
+            return [self._standard_node_size for node in self.graph_view.nodes()]
         else:
             self.node_size_preset = self.add_standard_node_size
 
     def add_type_node_size(self):
-        from random import randint
+        '''
+        The Node size for each node is based on whether it is 
+        a Object or a property i.e. does the node has an RDF type.
+        '''
         if self.node_size_preset == self.add_type_node_size:
             node_sizes = []
             for node in self.graph_view.nodes():
                 if self._graph.graph.get_rdf_type(node) is None:
-                    node_sizes.append(10)
+                    node_sizes.append(self._standard_node_size/2)
                 else:
-                    node_sizes.append(20)
+                    node_sizes.append(self._standard_node_size)
             return node_sizes
         else:
             self.node_size_preset = self.add_type_node_size
 
-    # ---------------------- Pick the node color ----------------------
-
-    def add_standard_node_color(self):
-        if self.node_color_preset == self.add_standard_node_color:
-            standard_color = "#888"
-            return [{"standard" : standard_color} for node in self.graph_view.nodes()]
+    def add_centrality_node_size(self):
+        '''
+        The Node size is greater the more 
+        incoming + outgoing edges of said node. 
+        '''
+        if self.node_size_preset == self.add_centrality_node_size:
+            node_sizes = []
+            for index,node in enumerate(self.graph_view.nodes()):
+                node_size = 1 + len(self.graph_view.in_edges(node)) + len(self.graph_view.out_edges(node))
+                node_size = int((node_size * self._standard_node_size) / 4)
+                if node_size > 100:
+                    node_size = 100
+                if node_size < self._standard_node_size/2:
+                    node_size = self._standard_node_size
+                node_sizes.append(node_size)
+            return node_sizes
         else:
-            self.node_color_preset = self.add_standard_node_color
+            self.node_size_preset = self.add_centrality_node_size
 
-    def add_node_total_adjacency_color(self):
-        if self.node_color_preset == self.add_node_total_adjacency_color:
-            self._node_edge_colors.clear()
-            adj_colors = []
-            adj_curr_color = (255,0,0)
-            adj_color_map = {}
-            for node in self.graph_view.nodes:
-                node_adj = len(self.graph_view.in_edges(node)) + len(self.graph_view.out_edges(node)) 
-                if node_adj in adj_color_map.keys():
-                    pass
-                else:
-                    adj_color = adj_curr_color
-                    adj_color_map[node_adj] = adj_color
-                    adj_curr_color = calculate_next_color(adj_curr_color)
-                adj_colors.append({str(node_adj) : "rgb" +  str(adj_color)})
-            return adj_colors
+
+    def add_in_centrality_node_size(self):
+        '''
+        The Node size is greater the more 
+        incoming edges of said node. 
+        '''
+        if self.node_size_preset == self.add_in_centrality_node_size:
+            node_sizes = []
+            for index,node in enumerate(self.graph_view.nodes()):
+                node_size = 1 + len(self.graph_view.in_edges(node))
+                node_size = int((node_size * self._standard_node_size) / 2)
+                if node_size > 100:
+                    node_size = 100
+                if node_size < self._standard_node_size/2:
+                    node_size = self._standard_node_size
+                node_sizes.append(node_size)
+            return node_sizes
         else:
-            self.node_color_preset = self.add_node_total_adjacency_color
-    
-    def add_node_in_adjacency_color(self):
-        if self.node_color_preset == self.add_node_in_adjacency_color:
-            if not isinstance(self.graph_view.graph,nx.classes.digraph.DiGraph):
-                raise ValueError("Graph doesnt have input/output edges.")
-            self._node_edge_colors.clear()
-            adj_colors = []
-            adj_curr_color = (255,0,0)
-            adj_color_map = {}
-            for node in self.graph_view.nodes:
-                node_adj = len(self.graph_view.in_edges(node)) 
-                if node_adj in adj_color_map.keys():
-                    pass
-                else:
-                    adj_color = adj_curr_color
-                    adj_color_map[node_adj] = adj_color
-                    adj_curr_color = calculate_next_color(adj_curr_color)
-                adj_colors.append({str(node_adj) : "rgb" +  str(adj_color)})
-            return adj_colors
+            self.node_size_preset = self.add_in_centrality_node_size
+
+
+    def add_out_centrality_node_size(self):
+        '''
+        The Node size is greater the more 
+        outgoing edges of said node. 
+        '''
+        if self.node_size_preset == self.add_out_centrality_node_size:
+            node_sizes = []
+            for index,node in enumerate(self.graph_view.nodes()):
+                node_size = 1 + len(self.graph_view.out_edges(node))
+                node_size = int((node_size * self._standard_node_size) / 2)
+                if node_size > 100:
+                    node_size = 100
+                if node_size < self._standard_node_size/2:
+                    node_size = self._standard_node_size
+                node_sizes.append(node_size)
+            return node_sizes
         else:
-            self.node_color_preset = self.add_node_in_adjacency_color
-
-    def add_node_out_adjacency_color(self):
-        if self.node_color_preset == self.add_node_out_adjacency_color:
-            if not isinstance(self.graph_view.graph,nx.classes.digraph.DiGraph):
-                raise ValueError("Graph doesnt have input/output edges.")
-            self._node_edge_colors.clear()
-            adj_colors = []
-            adj_curr_color = (255,0,0)
-            adj_color_map = {}
-            for node in self.graph_view.nodes:
-                node_adj = len(self.graph_view.out_edges(node)) 
-                if node_adj in adj_color_map.keys():
-                    pass
-                else:
-                    adj_color = adj_curr_color
-                    adj_color_map[node_adj] = adj_color
-                    adj_curr_color = calculate_next_color(adj_curr_color)
-                adj_colors.append({str(node_adj) : "rgb" +  str(adj_color)})
-            return adj_colors
-        else:
-            self.node_color_preset = self.add_node_out_adjacency_color
-
-    def add_adaptive_node_color(self):
-        if self.node_color_preset == self.add_adaptive_node_color:
-            node_colors = []
-            node_edge_colors = []
-            nodes = self.graph_view.nodes()
-            type_curr_color = (255,0,0)
-            type_color_map = {"no_type" : (0,0,0)}
-            role_color_map = {"no_role" : (0,0,0)}
-            for node in nodes:
-                obj_type = self._graph.graph.get_rdf_type(node)
-                if obj_type is None:
-                    type_color = type_color_map["no_type"]
-                    obj_type = "No Type"
-                else:
-                    obj_name = self._get_name(str(obj_type))
-                    if obj_name in type_color_map.keys():
-                        type_color = type_color_map[obj_name]
-                    else:
-                        type_color = type_curr_color
-                        type_color_map[obj_name] = type_curr_color
-                        type_curr_color = calculate_next_color(type_curr_color)
-                        
-                
-                def node_edge_color(role):
-                    if role is None:
-                        role_color = role_color_map[role]
-                    elif role in role_color_map.keys():
-                        role_color = role_color_map[role]
-                    else:
-                        role_color = calculate_role_color(type_color_map[obj_name],role_color_map)
-                        role_color_map[role] = role_color
-
-                    role = role.replace(" ","").lower()
-                    node_colors.append({self._get_name(obj_type) : "rgb" +  str(type_color)})
-                    node_edge_colors.append({self._get_name(role) : "rgb" +  str(role_color)})
-                    
-
-                role = self._graph.graph.get_role(node)
-                if role is not None:
-                    node_edge_color(role)
-                    continue
-                role = self._graph.graph.get_type(node)
-                if role is not None:
-                    node_edge_color(role)
-                    continue
-                else:
-                    node_edge_color("no_role")
-                    continue
-
-            self._node_edge_colors = node_edge_colors
-            return node_colors
-        else:
-            self.node_color_preset = self.add_adaptive_node_color
-    
-    
+            self.node_size_preset = self.add_out_centrality_node_size
+        
     # ---------------------- Pick the edge color ----------------------
     def add_standard_edge_color(self):
+        '''
+        The color pertaining to each edge is uniform. 
+        '''
         if self.edge_color_preset == self.add_standard_edge_color:
             return [{"standard" : "#888"} for e in self.graph_view.edges]
         else:
             self.edge_color_preset = self.add_standard_edge_color
 
-    def add_adaptive_edge_color(self):
-        edge_colors = []
-        if self.edge_color_preset == self.add_adaptive_edge_color:
-            edges = self.graph_view.edges
-            curr_color = (255,0,0)
-            color_map = {}
-            for u,v in edges:
-                edge = edges[u,v]
-                predicate = edge["triples"][0][1]
-                predicate_type = self._get_name(predicate)
-                if predicate_type in color_map.keys():
-                    color = color_map[predicate_type]
-                else:
-                    color = curr_color
-                    color_map[predicate_type] = curr_color
-                    curr_color = calculate_next_color(curr_color)
-                
-                edge_colors.append({self._get_name(predicate_type) : "rgb" +  str(color)})
+    
 
-            return edge_colors
-        else:
-            self.edge_color_preset = self.add_adaptive_edge_color
 
     # ---------------------- Pick the edge content ----------------------
     def add_edge_no_labels(self):
+        '''
+        Textual data pertaining to a egde is not rendered.
+        '''
         if self.edge_text_preset == self.add_edge_no_labels:
             return [None] * len(self.graph_view.edges())
         else:
             self.edge_text_preset = self.add_edge_no_labels
 
     def add_edge_name_labels(self):
+        '''
+        Textual data pertaining relates to the 
+        name provides when building the graph.
+        '''
         if self.edge_text_preset == self.add_edge_name_labels:
             edge_names = []
-            for index,edge in enumerate(self.graph_view.edges(data=True)):
+            for edge in self.graph_view.edges(data=True):
                 edge_names.append(edge[2]["display_name"])
             return edge_names
         else:
@@ -589,7 +471,11 @@ class CytoscapeVisualiser:
 
     
     # ---------------------- Set Node Shape ----------------------
+
     def set_adaptive_node_shape(self):
+        '''
+        Sets the shape of each node based on the RDF type of given node.
+        '''
         if self._node_shape_preset == self.set_adaptive_node_shape:
             default_shape = self.cyto_shapes[0]
             cyto_shapes = self.cyto_shapes[1:]
@@ -603,7 +489,7 @@ class CytoscapeVisualiser:
                     shape = shape_map["no_type"]
                     obj_type = "No Type"
                 else:
-                    obj_type = self._get_name(obj_type)
+                    obj_type = self._get_name(obj_type[1]["key"])
                     if obj_type in shape_map.keys():
                         shape = shape_map[obj_type]
                     else:
@@ -619,48 +505,72 @@ class CytoscapeVisualiser:
             self._node_shape_preset = self.set_adaptive_node_shape
 
     def set_circle_node_shape(self):
+        '''
+        Sets the shape of each node to a circle.
+        '''
         if self._node_shape_preset == self.set_circle_node_shape:
             return [{"standard" : "circle"} for node in self.graph_view.nodes]
         else:
             self._node_shape_preset = self.set_circle_node_shape
 
     def set_square_node_shape(self):
+        '''
+        Sets the shape of each node to a square.
+        '''
         if self._node_shape_preset == self.set_square_node_shape:
             return [{"standard" : "square"} for node in self.graph_view.nodes]
         else:
             self._node_shape_preset = self.set_square_node_shape
 
     def set_triangle_node_shape(self):
+        '''
+        Sets the shape of each node to a triangle.
+        '''
         if self._node_shape_preset == self.set_triangle_node_shape:
             return [{"standard" : "triangle"} for node in self.graph_view.nodes]
         else:
             self._node_shape_preset = self.set_triangle_node_shape
 
     def set_rectangle_node_shape(self):
+        '''
+        Sets the shape of each node to a rectangle.
+        '''
         if self._node_shape_preset == self.set_rectangle_node_shape:
             return [{"standard" : "rectangle"} for node in self.graph_view.nodes]
         else:
             self._node_shape_preset = self.set_rectangle_node_shape
 
     def set_diamond_node_shape(self):
+        '''
+        Sets the shape of each node to a diamond.
+        '''
         if self._node_shape_preset == self.set_diamond_node_shape:
             return [{"standard" : "diamond"} for node in self.graph_view.nodes]
         else:
             self._node_shape_preset = self.set_diamond_node_shape
 
     def set_hexagon_node_shape(self):
+        '''
+        Sets the shape of each node to a hexagon.
+        '''
         if self._node_shape_preset == self.set_hexagon_node_shape:
             return [{"standard" : "hexagon"} for node in self.graph_view.nodes]
         else:
             self._node_shape_preset = self.set_hexagon_node_shape
 
     def set_octagon_node_shape(self):
+        '''
+        Sets the shape of each node to a octagon.
+        '''
         if self._node_shape_preset == self.set_octagon_node_shape:
             return [{"standard" : "octagon"} for node in self.graph_view.nodes]
         else:
             self._node_shape_preset = self.set_octagon_node_shape
             
     def set_vee_node_shape(self):
+        '''
+        Sets the shape of each node to a vee.
+        '''
         if self._node_shape_preset == self.set_vee_node_shape:
             return [{"standard" : "vee"} for node in self.graph_view.nodes]
         else:
@@ -669,32 +579,50 @@ class CytoscapeVisualiser:
     
     # ---------------------- Set edge shape ----------------------
     def set_straight_edge_shape(self):
+        '''
+        Sets the shape of each edge to a straight line.
+        '''
         self.edge_shape = "straight"
 
     def set_bezier_edge_shape(self):
+        '''
+        Sets the shape of each edge to a straight line.
+        Overlapping edges are curved.
+        '''
         self.edge_shape = "bezier"
 
     def set_taxi_edge_shape(self):
+        '''
+        Sets the shape of each edge to a two straight 
+        lines with a right angle.
+        '''
         self.edge_shape = "taxi"
 
     def set_unbundled_bezier_edge_shape(self):
+        '''
+        Sets the shape of each edge based on the unbundled_bezier algorithm.
+        '''
         self.edge_shape = "unbundled-bezier"
         
     def set_loop_edge_shape(self):
+        '''
+        Sets the shape of each edge to a loop .
+        '''
         self.edge_shape = "loop"
 
     def set_haystack_edge_shape(self):
+        '''
+        Sets the shape of each edge based on the haystack algorithm.
+        '''
         self.edge_shape = "haystack"
 
     def set_segments_edge_shape(self):
+        '''
+        Sets the shape of each edge to a set of segments. 
+        '''
         self.edge_shape = "segments"
    
   # ---------------------- Misc Settings ---------------------
-    def edge_width(self,width = None): 
-        if width is None:
-            return self._edge_width
-        self._edge_width = float(width)
-
     def node_text_size(self,size = None):
         if size is None:
             return self._node_text_size
@@ -705,7 +633,7 @@ class CytoscapeVisualiser:
             return self._edge_text_size
         self._edge_text_size = float(size)
 
-    def build(self,layout_elements = {},show=True):
+    def build(self,layout_elements = {}, graph_id="cytoscape_graph", legend=False, width=100,height=100):
         elements = []
         stylesheet = []
         temp_node_selectors = []
@@ -717,7 +645,6 @@ class CytoscapeVisualiser:
             layout = self.layout()
         elif self.pos == [] and self.pos is None:
             raise ValueError("Unable to visualise with no positional data.")
-
         if self.node_text_preset is not None:
             node_text = self.node_text_preset()
             stylesheet.append({'selector': 'node','style': {'content': 'data(label)',
@@ -727,23 +654,20 @@ class CytoscapeVisualiser:
         node_color = self.node_color_preset()
         node_shapes = self._node_shape_preset()
         node_sizes = self.node_size_preset()
+        edge_color = self.edge_color_preset()  
+        edge_text = self.edge_text_preset()
+        if legend:
+            legend_dict = self._build_legend(node_color,edge_color,node_shapes)
+
+        cyto_edges = []
         cyto_nodes = []
         for index,node in enumerate(self.graph_view.nodes(data=True)):
             label = node[1]
             node = node[0]
             color_key =  list(node_color[index].keys())[0]
             node_shape = node_shapes[index]
-            node_size = node_sizes[index]
             node_shape_value = str(list(node_shape.values())[0])
-
-            try:
-                node_edge_color_key = list(self._node_edge_colors[index].keys())[0]
-                node_edge_color_color = self._node_edge_colors[index][node_edge_color_key]
-                node_edge_color_key = node_edge_color_key.lower()
-            except IndexError:
-                node_edge_color_key = "no_edge_color"
-                node_edge_color_color = "#888"
-
+            node_size = node_sizes[index]
             try:
                 parent = label["parent"]
             except KeyError:
@@ -752,55 +676,33 @@ class CytoscapeVisualiser:
                 is_parent = label["is_parent"]
             except KeyError:
                 is_parent = False
-                
             if is_parent:
                 cyto_node = {
-                    'data': {'id': node, 'label': node_text[index], 'parent' : parent,"size" : node_size},
-                    "classes" : "top-center " + "parent"
-                }
-
+                    'data': {'id': node, 'label': node_text[index],"size" : node_size, 'parent' : parent},
+                    "classes" : "top-center " + "parent"}
             else:
                 cyto_node = {
-                    'data': {'id': node, 'label': node_text[index], 'parent' : parent,"size" : node_size},
-                    "classes" : "top-center " + color_key + " " + node_edge_color_key + " " + node_shape_value,
-                }
+                    'data': {'id': node, 'label': node_text[index],"size" : node_size,'parent' : parent},
+                    "classes" : "top-center " + color_key + " " + node_shape_value}
 
                 if color_key not in temp_node_selectors:
-                    stylesheet.append({"selector" : "." + color_key,"style" : {"background-color" : node_color[index][color_key]}})    
+                    stylesheet.append({"selector" : "." + color_key, "style" : {"background-color" : node_color[index][color_key]}})    
                     temp_node_selectors.append(color_key)                             
-                if node_edge_color_key not in temp_edge_selectors:
-                    stylesheet.append({"selector" : "." + node_edge_color_key,"style" : {"border-color": node_edge_color_color,
-                                                                                        "border-width": "3"}})                                    
-                    temp_edge_selectors.append(node_edge_color_key)
 
             if self.pos != [] and self.pos is not None:
                 cyto_node["position"] = {'x': 2000 * self.pos[node][0], 'y': 2000 * self.pos[node][1]}
             cyto_nodes.append(cyto_node)
 
-
-        cyto_edges = []
-        if self.edge_text_preset is not None:
-            edge_text = self.edge_text_preset()
-        else:
-            edge_text = ["" for e in self.graph_view.edges]
-
         stylesheet.append({'selector': 'edge','style': {'content': 'data(label)',
-                                                'height' : self._edge_width,
-                                                "width" : self._edge_width,
                                                 "mid-target-arrow-color": "grey",
                                                 "mid-target-arrow-shape": "triangle",
-                                                "font-size" : self._edge_text_size}})
-        if self.edge_color_preset is not None:
-            edge_color = self.edge_color_preset()  
-        
+                                                "font-size" : self._edge_text_size}})        
         for index,e in enumerate(self.graph_view.edges(data=True)):
             u,v,edge  = e
             color_key =  list(edge_color[index].keys())[0]
             cyto_edge = {
                 'data': {'source': u, 'target': v, 'label': edge_text[index]},
-                "classes" : "center-right " + color_key,
-                "size" : self._edge_width
-            }
+                "classes" : "center-right " + color_key}
 
             if color_key not in temp_edge_selectors:
                 stylesheet.append({"selector" : "." + color_key,"style" : {"line-color" : edge_color[index][color_key],
@@ -817,40 +719,74 @@ class CytoscapeVisualiser:
             "border-width": 2,
             "border-color": "black",
             "label": "data(label)",
-            'z-index': 9999
-        }})
+            'z-index': 9999}})
+
         for shape in self.cyto_shapes:
             stylesheet.append({
                 'selector': '.' + shape,
-                'style': {
-                    'shape': shape
-                }})
+                'style': {'shape': shape}})
 
         self.elements = elements + cyto_nodes + cyto_edges
         figure = cyto.Cytoscape(
-            id='cytoscape_graph',
+            id=graph_id,
             layout=layout,
-            style={'width': '100%', 'height': '1200px'},
+            style={'width': f'{str(width)}vw', 'height': f'{str(height)}vh'},
             elements=self.elements,
-            stylesheet = stylesheet
-        )
+            stylesheet = stylesheet,
+            responsive=True)
+        
+        if legend:
+            return figure,legend_dict
         return figure
     
-    def _create_empty_figure(self):
-        return cyto.Cytoscape(
-            id='cytoscape_graph',
-            layout={'name': 'preset'},
-            style={'width': '100%', 'height': '400px'},
-            elements=[
-            ]
-        )
+
+    def _build_legend(self,node_colors=[],edge_colors=[],node_shapes=[],node_sizes=[]):
+        legend_dict = {}
+        f_node_colors = {}
+        f_edge_colors = {}
+        f_node_shapes = {}
+        f_node_sizes = {}
+        for node_color in node_colors:
+            for k,v in node_color.items():
+                f_node_colors[k] = v
+        if len(f_node_colors) > 0:
+            legend_dict["Node Color"] = f_node_colors
+
+        for edge_color in edge_colors:
+            for k,v in edge_color.items():
+                f_edge_colors[k] = v
+        if len(f_edge_colors) > 0:
+            legend_dict["Edge Color"] = f_edge_colors
+
+        for node_shape in node_shapes:
+            for k,v in node_shape.items():
+                f_node_shapes[k] = v
+        if len(f_node_shapes) > 0:
+            legend_dict["Node Shape"] = f_node_shapes
+
+        for node_size in node_sizes:
+            for k,v in node_size.items():
+                f_node_sizes[k] = v
+        if len(f_node_sizes) > 0:
+            legend_dict["Node Size"] = f_node_sizes
+        return legend_dict
+
 
     def _get_name(self,subject):
         split_subject = self._split(subject)
         if len(split_subject[-1]) == 1 and split_subject[-1].isdigit():
+            return split_subject[-2]
+        elif len(split_subject[-1]) == 3 and _isfloat(split_subject[-1]):
             return split_subject[-2]
         else:
             return split_subject[-1]
 
     def _split(self,uri):
         return re.split('#|\/|:', uri)
+        
+def _isfloat(x):
+    try:
+        float(x)
+        return True
+    except ValueError:
+        return False

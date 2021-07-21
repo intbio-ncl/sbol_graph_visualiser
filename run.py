@@ -1,26 +1,29 @@
 import argparse
-import os
-import sys
-
-sys.path.insert(0, os.path.abspath(os.path.join("sbol_enhancer")))
-from builder.builder import GraphBuilder
-from visual.visual import CytoscapeVisualiser
-from dashboard.run import dash_runner
-from sbol_enhancer.enhancer import SBOLEnhancer
+from flask import Flask
+from dashboards.sbol_dash import SBOLDash
+from dashboards.results_dash import ResultDash
+from dashboards.kg_dash import KnowledgeDash
+assets_dir = "assets"
 
 
-def process_input(filename):
-    graph_builder = GraphBuilder(filename,prune=True)
-    enhancer = SBOLEnhancer(filename,staged=True)
-    graph_visualiser = CytoscapeVisualiser(graph_builder)
-    graph_title = filename.split(os.path.sep)[-1].split(".")[0]
-    dash_runner(graph_visualiser,enhancer,graph_title)
+def process_input(filename,summary,knowledge):
+    server = Flask(__name__)
+    if summary:
+        dashboard = ResultDash(__name__,server)
+    elif knowledge:
+        dashboard = KnowledgeDash(__name__,server)
+    else:
+        dashboard = SBOLDash(__name__,server)
+    dashboard.load_graph(filename)
+    dashboard.run()
 
 def language_processor_args():
     parser = argparse.ArgumentParser(description="Network Visualisation Tool")
     parser.add_argument('filename', default=None, nargs='?',help="File to parse as Input")
+    parser.add_argument('-s', '--summary', help="Renders Summary Dashboard.", default=None, action='store_true')
+    parser.add_argument("-k", "--knowledge",help="For knowledge Graph", default=None, action='store_true')
     return  parser.parse_args()
 
 if __name__ == "__main__":
     args = language_processor_args()
-    process_input(args.filename)
+    process_input(args.filename,args.summary,args.knowledge)
